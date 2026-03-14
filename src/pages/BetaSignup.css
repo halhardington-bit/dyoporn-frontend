@@ -1,0 +1,276 @@
+.betaPage {
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at top left, rgba(255, 255, 255, 0.06), transparent 34%),
+    radial-gradient(circle at bottom right, rgba(255, 255, 255, 0.04), transparent 28%),
+    linear-gradient(180deg, #050505 0%, #0b0b0b 45%, #111111 100%);
+  color: #f5f5f5;
+}
+
+.betaNoise {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.06;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: 30px 30px;
+  mask-image: radial-gradient(circle at center, black 45%, transparent 100%);
+  -webkit-mask-image: radial-gradient(circle at center, black 45%, transparent 100%);
+}
+
+.betaGlow {
+  position: absolute;
+  border-radius: 999px;
+  filter: blur(90px);
+  pointer-events: none;
+  opacity: 0.12;
+}
+
+.betaGlowA {
+  top: -140px;
+  left: -80px;
+  width: 420px;
+  height: 420px;
+  background: #ffffff;
+}
+
+.betaGlowB {
+  right: -120px;
+  bottom: -120px;
+  width: 360px;
+  height: 360px;
+  background: #9a9a9a;
+}
+
+.betaWrap {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 36px;
+}
+
+.betaShell {
+  width: 100%;
+  max-width: 860px;
+  padding: 56px 56px 42px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 32px;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.06) 0%,
+    rgba(255, 255, 255, 0.03) 100%
+  );
+  box-shadow:
+    0 30px 100px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.betaTopline {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 26px;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.78rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.betaKicker {
+  color: #ffffff;
+  font-weight: 800;
+}
+
+.betaDot {
+  width: 5px;
+  height: 5px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.betaSmall {
+  font-weight: 500;
+}
+
+.betaBrandRow {
+  margin-bottom: 18px;
+}
+
+.betaBrandBlock {
+  position: relative;
+  display: inline-block;
+}
+
+.betaBrand {
+  position: relative;
+  z-index: 2;
+  font-size: clamp(2.6rem, 7vw, 5.8rem);
+  line-height: 0.9;
+  font-weight: 900;
+  letter-spacing: -0.06em;
+  color: #ffffff;
+}
+
+.betaBrandShadow {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  transform: translate(6px, 6px);
+  font-size: clamp(2.6rem, 7vw, 5.8rem);
+  line-height: 0.9;
+  font-weight: 900;
+  letter-spacing: -0.06em;
+  color: rgba(255, 255, 255, 0.08);
+  user-select: none;
+  pointer-events: none;
+}
+
+.betaTitle {
+  margin: 0 0 18px;
+  max-width: 760px;
+  font-size: clamp(2.1rem, 4.7vw, 4.2rem);
+  line-height: 0.96;
+  font-weight: 800;
+  letter-spacing: -0.05em;
+  color: #f3f3f3;
+}
+
+.betaSubtitle {
+  margin: 0 0 32px;
+  max-width: 650px;
+  font-size: 1.04rem;
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.betaForm {
+  display: flex;
+  gap: 12px;
+  align-items: stretch;
+  flex-wrap: wrap;
+}
+
+.betaInput {
+  flex: 1 1 360px;
+  min-width: 0;
+  height: 58px;
+  padding: 0 18px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  background: rgba(255, 255, 255, 0.05);
+  color: #ffffff;
+  font-size: 1rem;
+  outline: none;
+  transition:
+    border-color 0.18s ease,
+    background 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.betaInput::placeholder {
+  color: rgba(255, 255, 255, 0.36);
+}
+
+.betaInput:focus {
+  border-color: rgba(255, 255, 255, 0.45);
+  background: rgba(255, 255, 255, 0.07);
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.08);
+}
+
+.betaButton {
+  height: 58px;
+  padding: 0 24px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 16px;
+  background: linear-gradient(180deg, #ffffff 0%, #d9d9d9 100%);
+  color: #0a0a0a;
+  font-size: 0.98rem;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition:
+    transform 0.14s ease,
+    box-shadow 0.14s ease,
+    opacity 0.14s ease;
+  box-shadow: 0 12px 28px rgba(255, 255, 255, 0.12);
+}
+
+.betaButton:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 16px 32px rgba(255, 255, 255, 0.16);
+}
+
+.betaButton:disabled {
+  opacity: 0.72;
+  cursor: default;
+}
+
+.betaMessage {
+  margin-top: 16px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.betaMessage.success {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+}
+
+.betaMessage.error {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #d6d6d6;
+}
+
+.betaMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 26px;
+}
+
+.betaMetaItem {
+  padding: 10px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.84rem;
+  letter-spacing: 0.02em;
+}
+
+@media (max-width: 720px) {
+  .betaWrap {
+    padding: 20px;
+  }
+
+  .betaShell {
+    padding: 30px 24px 24px;
+    border-radius: 24px;
+  }
+
+  .betaForm {
+    flex-direction: column;
+  }
+
+  .betaInput,
+  .betaButton {
+    width: 100%;
+  }
+
+  .betaMeta {
+    gap: 8px;
+  }
+}

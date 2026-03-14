@@ -13,6 +13,7 @@ import GenerateAssets from "./pages/GenerateAssets.jsx";
 import GenerateShots from "./pages/GenerateShots.jsx";
 import GenerateDashboard from "./pages/GenerateDashboard.jsx";
 import GenerateEdit from "./pages/GenerateEdit.jsx";
+import BetaSignup from "./pages/BetaSignup.jsx";
 
 
 export default function App() {
@@ -80,6 +81,10 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
+
+        {/* Landing page OUTSIDE app layout */}
+       <Route path="/" element={<BetaSignup />} />
+
         <Route
           element={
             <AppLayout

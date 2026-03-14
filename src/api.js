@@ -15,6 +15,20 @@ function qs(paramsObj = {}) {
   return s ? `?${s}` : "";
 }
 
+// BETA
+export async function betaSignup(email) {
+  const res = await fetch(`${API_BASE}/api/beta-signup`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify({ email }),
+  });
+
+  const data = await res.json().catch(() => null);
+  if (!res.ok) throw new Error(data?.error || `betaSignup failed: ${res.status}`);
+  return data;
+}
+
 // VIDEOS
 export async function getVideos({ q, category, sort } = {}) {
   const url = `${API_BASE}/api/videos${qs({
