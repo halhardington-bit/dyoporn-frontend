@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, useRef } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useParams, useNavigate, NavLink } from "react-router-dom";
 import {
   getVideo,
@@ -16,7 +16,6 @@ import {
 import StarRating from "../ui/StarRating.jsx";
 import "./Watch.css";
 import ConfirmModal from "../ui/ConfirmModal.jsx";
-import Hls from "hls.js";
 
 const INCLUDE_TEST_DATA =
   String(import.meta.env.VITE_INCLUDE_TEST_DATA || "0") === "1";
@@ -72,7 +71,6 @@ function toNumOrNull(x) {
 export default function Watch({ user, onRequireLogin }) {
   const { id } = useParams();
   const nav = useNavigate();
-  const videoRef = useRef(null);
 
   const [video, setVideo] = useState(null);
   const [suggested, setSuggested] = useState([]);
@@ -118,46 +116,6 @@ export default function Watch({ user, onRequireLogin }) {
     const u = item?.username ? String(item.username).toLowerCase() : null;
     return !!myUsername && !!u && myUsername === u;
   };
-
-  const src = streamUrl(video);
-
-  useEffect(() => {
-    const el = videoRef.current;
-    if (!el || !src) return;
-
-    let hls = null;
-
-    el.pause();
-    el.removeAttribute("src");
-    el.load();
-
-    if (src.includes(".m3u8") && el.canPlayType("application/vnd.apple.mpegurl")) {
-      el.src = src;
-      return;
-    }
-
-    if (src.includes(".m3u8") && Hls.isSupported()) {
-      hls = new Hls({
-        enableWorker: true,
-        lowLatencyMode: false,
-      });
-
-      hls.loadSource(src);
-      hls.attachMedia(el);
-
-      hls.on(Hls.Events.ERROR, (_event, data) => {
-        console.error("HLS error:", data);
-      });
-
-      return () => hls.destroy();
-    }
-
-    el.src = src;
-
-    return () => {
-      if (hls) hls.destroy();
-    };
-  }, [src]);
 
   useEffect(() => {
     setViewRecordedFor(null);
@@ -566,7 +524,7 @@ export default function Watch({ user, onRequireLogin }) {
     <div className="shell">
       <main className="watchLayout">
         <section className="playerArea">
-          <video ref={videoRef} className="player" controls />
+          <video className="player" controls src={streamUrl(video)} />
 
           <h1 className="watchTitle">{video.title}</h1>
 
