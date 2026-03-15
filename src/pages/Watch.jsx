@@ -16,6 +16,7 @@ import {
 import StarRating from "../ui/StarRating.jsx";
 import "./Watch.css";
 import ConfirmModal from "../ui/ConfirmModal.jsx";
+import Hls from "hls.js";
 
 const INCLUDE_TEST_DATA =
   String(import.meta.env.VITE_INCLUDE_TEST_DATA || "0") === "1";
@@ -160,6 +161,56 @@ export default function Watch({ user, onRequireLogin }) {
     });
     return url;
   }, [video, id]);
+
+  useEffect(() => {
+  const el = videoRef.current;
+  if (!el || !resolvedStreamUrl) return;
+
+  let hls;
+
+  const isHls = /\.m3u8($|\?)/i.test(resolvedStreamUrl);
+
+  console.log("[watch] setup playback", {
+    resolvedStreamUrl,
+    isHls,
+    nativeHls: el.canPlayType("application/vnd.apple.mpegurl"),
+    hlsSupported: Hls.isSupported(),
+  });
+
+  if (isHls) {
+    if (el.canPlayType("application/vnd.apple.mpegurl")) {
+      // Safari / native HLS
+      el.src = resolvedStreamUrl;
+    } else if (Hls.isSupported()) {
+      hls = new Hls({
+        enableWorker: true,
+        lowLatencyMode: false,
+      });
+
+      hls.loadSource(resolvedStreamUrl);
+      hls.attachMedia(el);
+
+      hls.on(Hls.Events.MANIFEST_PARSED, () => {
+        console.log("[hls] manifest parsed");
+      });
+
+      hls.on(Hls.Events.ERROR, (event, data) => {
+        console.error("[hls] error", data);
+      });
+    } else {
+      console.error("HLS not supported in this browser");
+    }
+  } else {
+    // plain mp4 or other direct file
+    el.src = resolvedStreamUrl;
+  }
+
+  return () => {
+    if (hls) {
+      hls.destroy();
+    }
+  };
+}, [resolvedStreamUrl]);
 
   useEffect(() => {
     setViewRecordedFor(null);
@@ -727,19 +778,18 @@ export default function Watch({ user, onRequireLogin }) {
     <div className="shell">
       <main className="watchLayout">
         <section className="playerArea">
-          <video
-            ref={videoRef}
-            className="player"
-            controls
-            playsInline
-            preload="metadata"
-            src={resolvedStreamUrl}
-            onClick={() => {
-              const el = videoRef.current;
-              console.log("[video click]");
-              logVideoSnapshot(el, "click");
-            }}
-          />
+         <video
+          ref={videoRef}
+          className="player"
+          controls
+          playsInline
+          preload="metadata"
+          onClick={() => {
+            const el = videoRef.current;
+            console.log("[video click]");
+            logVideoSnapshot(el, "click");
+          }}
+        />
 
           <h1 className="watchTitle">{video.title}</h1>
 
