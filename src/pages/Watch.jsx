@@ -195,7 +195,14 @@ export default function Watch({ user, onRequireLogin }) {
       });
 
       hls.on(Hls.Events.ERROR, (event, data) => {
-        console.error("[hls] error", data);
+        console.error("[hls] error", {
+          type: data.type,
+          details: data.details,
+          fatal: data.fatal,
+          response: data.response,
+          networkDetails: data.networkDetails,
+          url: data.url,
+        });
       });
     } else {
       console.error("HLS not supported in this browser");
@@ -784,6 +791,7 @@ export default function Watch({ user, onRequireLogin }) {
           controls
           playsInline
           preload="metadata"
+          crossOrigin="anonymous"
           onClick={() => {
             const el = videoRef.current;
             console.log("[video click]");
