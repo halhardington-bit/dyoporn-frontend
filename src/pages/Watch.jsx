@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams, useNavigate, NavLink } from "react-router-dom";
 import {
   getVideo,
@@ -19,7 +19,6 @@ import ConfirmModal from "../ui/ConfirmModal.jsx";
 
 const INCLUDE_TEST_DATA =
   String(import.meta.env.VITE_INCLUDE_TEST_DATA || "0") === "1";
-
 
 console.log("VITE_INCLUDE_TEST_DATA =", import.meta.env.VITE_INCLUDE_TEST_DATA);
 console.log("INCLUDE_TEST_DATA =", INCLUDE_TEST_DATA);
@@ -68,9 +67,42 @@ function toNumOrNull(x) {
   return Number.isFinite(n) ? n : null;
 }
 
+function mediaErrorToObject(err) {
+  if (!err) return null;
+  return {
+    code: err.code,
+    message:
+      err.code === 1
+        ? "MEDIA_ERR_ABORTED"
+        : err.code === 2
+        ? "MEDIA_ERR_NETWORK"
+        : err.code === 3
+        ? "MEDIA_ERR_DECODE"
+        : err.code === 4
+        ? "MEDIA_ERR_SRC_NOT_SUPPORTED"
+        : "UNKNOWN_MEDIA_ERROR",
+  };
+}
+
+function logVideoSnapshot(el, label = "snapshot") {
+  if (!el) return;
+  console.log(`[video ${label}]`, {
+    currentSrc: el.currentSrc,
+    readyState: el.readyState,
+    networkState: el.networkState,
+    paused: el.paused,
+    ended: el.ended,
+    duration: el.duration,
+    videoWidth: el.videoWidth,
+    videoHeight: el.videoHeight,
+    error: mediaErrorToObject(el.error),
+  });
+}
+
 export default function Watch({ user, onRequireLogin }) {
   const { id } = useParams();
   const nav = useNavigate();
+  const videoRef = useRef(null);
 
   const [video, setVideo] = useState(null);
   const [suggested, setSuggested] = useState([]);
@@ -117,6 +149,18 @@ export default function Watch({ user, onRequireLogin }) {
     return !!myUsername && !!u && myUsername === u;
   };
 
+  const resolvedStreamUrl = useMemo(() => {
+    const url = streamUrl(video);
+    console.log("[watch] resolvedStreamUrl", {
+      id,
+      videoId: video?.id,
+      title: video?.title,
+      url,
+      video,
+    });
+    return url;
+  }, [video, id]);
+
   useEffect(() => {
     setViewRecordedFor(null);
   }, [id]);
@@ -125,6 +169,8 @@ export default function Watch({ user, onRequireLogin }) {
     let cancelled = false;
 
     (async () => {
+      console.log("[watch] load start", { id, isLoggedIn, viewRecordedFor });
+
       setVideo(null);
       setSuggested([]);
 
@@ -147,13 +193,16 @@ export default function Watch({ user, onRequireLogin }) {
 
       try {
         const v = await getVideo(id);
+        console.log("[watch] getVideo success", v);
         if (cancelled) return;
         setVideo(v);
 
         // record view once per id per mount (logged in only)
         if (isLoggedIn && viewRecordedFor !== id) {
           try {
+            console.log("[watch] recordView start", { id });
             const resp = await recordView(id);
+            console.log("[watch] recordView success", resp);
             if (!cancelled && resp?.views != null) {
               setVideo((prev) => (prev ? { ...prev, views: resp.views } : prev));
               setViewRecordedFor(id);
@@ -164,6 +213,10 @@ export default function Watch({ user, onRequireLogin }) {
         }
 
         const all = await getVideos({ category: v.category });
+        console.log("[watch] getVideos success", {
+          category: v.category,
+          count: Array.isArray(all) ? all.length : null,
+        });
         if (cancelled) return;
         setSuggested(
           all
@@ -172,15 +225,16 @@ export default function Watch({ user, onRequireLogin }) {
             .slice(0, 12)
         );
 
-        // ratings
         if (isLoggedIn) {
           try {
             const mine = await getMyRating(id);
+            console.log("[watch] getMyRating success", mine);
             if (!cancelled) {
               setMyRating(mine?.rating ?? null);
               setMyRatingLoaded(true);
             }
-          } catch {
+          } catch (e) {
+            console.warn("[watch] getMyRating failed", e);
             if (!cancelled) {
               setMyRating(null);
               setMyRatingLoaded(false);
@@ -191,12 +245,12 @@ export default function Watch({ user, onRequireLogin }) {
           setMyRatingLoaded(false);
         }
 
-        // comments
         setCommentsBusy(true);
         const c = await getComments(id);
+        console.log("[watch] getComments success", c);
         if (!cancelled) setComments(c?.items ?? []);
       } catch (e) {
-        console.error(e);
+        console.error("[watch] load failed", e);
       } finally {
         if (!cancelled) setCommentsBusy(false);
       }
@@ -207,20 +261,189 @@ export default function Watch({ user, onRequireLogin }) {
     };
   }, [id, isLoggedIn, viewRecordedFor]);
 
-  // -----------------------
-  // Ratings (optimistic stars only, then reconcile)
-  // -----------------------
+  useEffect(() => {
+    if (!resolvedStreamUrl) return;
+
+    let disposed = false;
+
+    async function probeVideoUrl() {
+      const url = resolvedStreamUrl;
+      console.log("[probe] starting header probe", url);
+
+      try {
+        const res = await fetch(url, {
+          method: "GET",
+          mode: "cors",
+          cache: "no-store",
+        });
+
+        if (disposed) return;
+
+        console.log("[probe] GET response", {
+          url,
+          ok: res.ok,
+          status: res.status,
+          redirected: res.redirected,
+          type: res.type,
+          contentType: res.headers.get("content-type"),
+          contentDisposition: res.headers.get("content-disposition"),
+          acceptRanges: res.headers.get("accept-ranges"),
+          contentLength: res.headers.get("content-length"),
+          contentRange: res.headers.get("content-range"),
+          cacheControl: res.headers.get("cache-control"),
+          accessControlAllowOrigin: res.headers.get("access-control-allow-origin"),
+        });
+      } catch (err) {
+        console.error("[probe] GET failed", {
+          url,
+          err,
+        });
+      }
+
+      try {
+        const rangeRes = await fetch(url, {
+          method: "GET",
+          mode: "cors",
+          cache: "no-store",
+          headers: {
+            Range: "bytes=0-1",
+          },
+        });
+
+        if (disposed) return;
+
+        console.log("[probe] RANGE response", {
+          url,
+          ok: rangeRes.ok,
+          status: rangeRes.status,
+          redirected: rangeRes.redirected,
+          type: rangeRes.type,
+          contentType: rangeRes.headers.get("content-type"),
+          contentDisposition: rangeRes.headers.get("content-disposition"),
+          acceptRanges: rangeRes.headers.get("accept-ranges"),
+          contentLength: rangeRes.headers.get("content-length"),
+          contentRange: rangeRes.headers.get("content-range"),
+          cacheControl: rangeRes.headers.get("cache-control"),
+          accessControlAllowOrigin: rangeRes.headers.get("access-control-allow-origin"),
+        });
+      } catch (err) {
+        console.error("[probe] RANGE failed", {
+          url,
+          err,
+        });
+      }
+    }
+
+    probeVideoUrl();
+
+    return () => {
+      disposed = true;
+    };
+  }, [resolvedStreamUrl]);
+
+  useEffect(() => {
+    const el = videoRef.current;
+    if (!el) return;
+
+    const onLoadStart = () => {
+      console.log("[video event] loadstart");
+      logVideoSnapshot(el, "loadstart");
+    };
+    const onLoadedMetadata = () => {
+      console.log("[video event] loadedmetadata");
+      logVideoSnapshot(el, "loadedmetadata");
+    };
+    const onLoadedData = () => {
+      console.log("[video event] loadeddata");
+      logVideoSnapshot(el, "loadeddata");
+    };
+    const onCanPlay = () => {
+      console.log("[video event] canplay");
+      logVideoSnapshot(el, "canplay");
+    };
+    const onCanPlayThrough = () => {
+      console.log("[video event] canplaythrough");
+      logVideoSnapshot(el, "canplaythrough");
+    };
+    const onPlay = () => {
+      console.log("[video event] play");
+      logVideoSnapshot(el, "play");
+    };
+    const onPlaying = () => {
+      console.log("[video event] playing");
+      logVideoSnapshot(el, "playing");
+    };
+    const onPause = () => {
+      console.log("[video event] pause");
+      logVideoSnapshot(el, "pause");
+    };
+    const onWaiting = () => {
+      console.log("[video event] waiting");
+      logVideoSnapshot(el, "waiting");
+    };
+    const onStalled = () => {
+      console.log("[video event] stalled");
+      logVideoSnapshot(el, "stalled");
+    };
+    const onSuspend = () => {
+      console.log("[video event] suspend");
+      logVideoSnapshot(el, "suspend");
+    };
+    const onAbort = () => {
+      console.log("[video event] abort");
+      logVideoSnapshot(el, "abort");
+    };
+    const onEmptied = () => {
+      console.log("[video event] emptied");
+      logVideoSnapshot(el, "emptied");
+    };
+    const onError = () => {
+      console.log("[video event] error");
+      logVideoSnapshot(el, "error");
+    };
+
+    const listeners = [
+      ["loadstart", onLoadStart],
+      ["loadedmetadata", onLoadedMetadata],
+      ["loadeddata", onLoadedData],
+      ["canplay", onCanPlay],
+      ["canplaythrough", onCanPlayThrough],
+      ["play", onPlay],
+      ["playing", onPlaying],
+      ["pause", onPause],
+      ["waiting", onWaiting],
+      ["stalled", onStalled],
+      ["suspend", onSuspend],
+      ["abort", onAbort],
+      ["emptied", onEmptied],
+      ["error", onError],
+    ];
+
+    listeners.forEach(([name, fn]) => el.addEventListener(name, fn));
+
+    console.log("[video] listeners attached");
+    logVideoSnapshot(el, "initial");
+
+    const timer = window.setInterval(() => {
+      if (!videoRef.current) return;
+      logVideoSnapshot(videoRef.current, "interval");
+    }, 3000);
+
+    return () => {
+      listeners.forEach(([name, fn]) => el.removeEventListener(name, fn));
+      window.clearInterval(timer);
+    };
+  }, [resolvedStreamUrl]);
+
   async function handleRate(n) {
     if (!isLoggedIn) return onRequireLogin?.();
 
-    // optimistic stars (safe)
     setMyRating(n);
 
     try {
       setRatingBusy(true);
       await rateVideo(id, n);
 
-      // reconcile server truth
       const [freshVideo, mine] = await Promise.allSettled([getVideo(id), getMyRating(id)]);
 
       if (freshVideo.status === "fulfilled") {
@@ -235,15 +458,11 @@ export default function Watch({ user, onRequireLogin }) {
       }
     } catch (e) {
       console.error(e);
-      // keep optimistic value; server may not have saved
     } finally {
       setRatingBusy(false);
     }
   }
 
-  // -----------------------
-  // Comments: post
-  // -----------------------
   const canPost = useMemo(() => commentBody.trim().length > 0, [commentBody]);
 
   async function handlePostComment(e) {
@@ -272,13 +491,9 @@ export default function Watch({ user, onRequireLogin }) {
     }
   }
 
-  // -----------------------
-  // Like (supports comments + replies)
-  // -----------------------
   async function handleToggleLike(targetId) {
     if (!isLoggedIn) return onRequireLogin?.();
 
-    // optimistic (top-level + replies)
     setComments((prev) =>
       prev.map((c) => {
         if (c.id === targetId) {
@@ -336,7 +551,6 @@ export default function Watch({ user, onRequireLogin }) {
       );
     } catch (e) {
       console.error(e);
-      // rollback: refetch
       try {
         const c = await getComments(id);
         setComments(c?.items ?? []);
@@ -344,9 +558,6 @@ export default function Watch({ user, onRequireLogin }) {
     }
   }
 
-  // -----------------------
-  // Edit (comment or reply)
-  // -----------------------
   function startEditItem(item, parentId = null) {
     if (!isLoggedIn) return onRequireLogin?.();
     if (!isOwner(item)) return;
@@ -404,9 +615,6 @@ export default function Watch({ user, onRequireLogin }) {
     }
   }
 
-  // -----------------------
-  // Delete (comment or reply)
-  // -----------------------
   function requestDeleteItem(targetId, parentId = null) {
     if (!isLoggedIn) return onRequireLogin?.();
     setDeleteTarget({ id: targetId, parentId });
@@ -438,7 +646,6 @@ export default function Watch({ user, onRequireLogin }) {
 
       if (editing?.id === targetId) cancelEdit();
 
-      // if composer anchored to deleted item, close it
       if (replyingTo?.anchorId === targetId) {
         setReplyingTo(null);
         setReplyBody("");
@@ -448,9 +655,6 @@ export default function Watch({ user, onRequireLogin }) {
     }
   }
 
-  // -----------------------
-  // Replies (placement-aware, still 1-level deep)
-  // -----------------------
   function toggleReplies(commentId) {
     setOpenReplies((prev) => {
       const next = new Set(prev);
@@ -459,15 +663,12 @@ export default function Watch({ user, onRequireLogin }) {
       return next;
     });
 
-    // if collapsing a thread that currently contains the composer, close it
     if (replyingTo?.parentId === commentId && openReplies.has(commentId)) {
       setReplyingTo(null);
       setReplyBody("");
     }
   }
 
-  // parentId = top-level comment id
-  // anchorId = where composer should show (comment id OR reply id)
   function openReplyComposer(parentId, anchorId, prefill = "") {
     if (!isLoggedIn) return onRequireLogin?.();
 
@@ -518,13 +719,27 @@ export default function Watch({ user, onRequireLogin }) {
 
   const avgNum = toNumOrNull(video?.ratingAvg);
   const myNum = toNumOrNull(myRating);
-  //const starValue = myNum ?? avgNum ?? 0;
+  void avgNum;
+  void myNum;
+  void myRatingLoaded;
 
   return (
     <div className="shell">
       <main className="watchLayout">
         <section className="playerArea">
-          <video className="player" controls src={streamUrl(video)} />
+          <video
+            ref={videoRef}
+            className="player"
+            controls
+            playsInline
+            preload="metadata"
+            src={resolvedStreamUrl}
+            onClick={() => {
+              const el = videoRef.current;
+              console.log("[video click]");
+              logVideoSnapshot(el, "click");
+            }}
+          />
 
           <h1 className="watchTitle">{video.title}</h1>
 
@@ -570,7 +785,6 @@ export default function Watch({ user, onRequireLogin }) {
             </div>
           </div>
 
-
           {video.description ? (
             <div className="watchDescriptionBlock">
               <div className="watchDescriptionHeader">Description:</div>
@@ -578,38 +792,31 @@ export default function Watch({ user, onRequireLogin }) {
             </div>
           ) : null}
 
-
           <div className="watchRatingBlock">
-          <StarRating
-            value={myRating}
-            avg={video.ratingAvg ?? null}
-            count={video.ratingCount ?? 0}
-            disabled={ratingBusy}
-            onRate={handleRate}
-          />
+            <StarRating
+              value={myRating}
+              avg={video.ratingAvg ?? null}
+              count={video.ratingCount ?? 0}
+              disabled={ratingBusy}
+              onRate={handleRate}
+            />
 
-          <div className="watchRatingMeta">
-            {myRating ? (
-              <div className="watchYourRating">
-                Your rating: <span className="watchYourRatingValue">{myRating}</span>
+            <div className="watchRatingMeta">
+              {myRating ? (
+                <div className="watchYourRating">
+                  Your rating: <span className="watchYourRatingValue">{myRating}</span>
+                </div>
+              ) : (
+                <div className="watchYourRating watchMuted">Your rating: —</div>
+              )}
+
+              <div className="watchCommunityRating watchMuted">
+                Community: {(Number(video.ratingAvg) || 0).toFixed(2)} •{" "}
+                {video.ratingCount ?? 0} rating{(video.ratingCount ?? 0) === 1 ? "" : "s"}
               </div>
-            ) : (
-              <div className="watchYourRating watchMuted">Your rating: —</div>
-            )}
-
-            <div className="watchCommunityRating watchMuted">
-              Community: {(Number(video.ratingAvg) || 0).toFixed(2)} •{" "}
-              {video.ratingCount ?? 0} rating{(video.ratingCount ?? 0) === 1 ? "" : "s"}
             </div>
           </div>
-        </div>
 
-
-          
-
-          {/* =========================
-              COMMENTS + REPLIES (restored)
-             ========================= */}
           <div className="commentsSection">
             <div className="commentsHeader">
               <h3 className="commentsTitle">
@@ -627,7 +834,6 @@ export default function Watch({ user, onRequireLogin }) {
               ) : null}
             </div>
 
-            {/* Composer */}
             <form className="commentComposer" onSubmit={handlePostComment}>
               <div className="commentComposerBody">
                 <textarea
@@ -682,7 +888,6 @@ export default function Watch({ user, onRequireLogin }) {
                 return (
                   <div key={c.id} className="commentItem">
                     <div className="commentMain">
-                      {/* Avatar + username side-by-side */}
                       <div className="commentMeta">
                         <NavLink
                           to={commentUser ? `/u/${commentUser}` : "#"}
@@ -716,7 +921,6 @@ export default function Watch({ user, onRequireLogin }) {
                         ) : null}
                       </div>
 
-                      {/* body or edit */}
                       {isEditingComment ? (
                         <div className="commentEditBox">
                           <div className="commentEdit">
@@ -746,7 +950,6 @@ export default function Watch({ user, onRequireLogin }) {
                         <div className="commentBody">{c.body}</div>
                       )}
 
-                      {/* actions row */}
                       <div className="commentActions">
                         <button
                           type="button"
@@ -758,7 +961,6 @@ export default function Watch({ user, onRequireLogin }) {
                           <span className="actionCount">({c.likeCount || 0})</span>
                         </button>
 
-                        {/* Reply on COMMENT: composer under comment */}
                         <button
                           type="button"
                           className="actionBtn"
@@ -777,7 +979,6 @@ export default function Watch({ user, onRequireLogin }) {
                           <span className="actionCount">({(c.replies || []).length})</span>
                         </button>
 
-                        {/* owner-only buttons */}
                         {isOwner(c) ? (
                           <>
                             <button
@@ -801,7 +1002,6 @@ export default function Watch({ user, onRequireLogin }) {
                         ) : null}
                       </div>
 
-                      {/* Composer UNDER COMMENT */}
                       {showComposerUnderComment ? (
                         <div className="replyComposer">
                           <textarea
@@ -835,7 +1035,6 @@ export default function Watch({ user, onRequireLogin }) {
                         </div>
                       ) : null}
 
-                      {/* Replies list */}
                       {repliesOpen ? (
                         <div className="replyList">
                           {(c.replies || []).map((r) => {
@@ -851,7 +1050,6 @@ export default function Watch({ user, onRequireLogin }) {
                             return (
                               <div key={r.id} className="replyItem">
                                 <div className="commentMain">
-                                  {/* Reply avatar + username side-by-side */}
                                   <div className="commentMeta">
                                     <NavLink
                                       to={replyUser ? `/u/${replyUser}` : "#"}
@@ -922,7 +1120,6 @@ export default function Watch({ user, onRequireLogin }) {
                                     <div className="commentBody replyBody">{r.body}</div>
                                   )}
 
-                                  {/* reply actions row */}
                                   <div className="replyActionsRow">
                                     <button
                                       type="button"
@@ -934,7 +1131,6 @@ export default function Watch({ user, onRequireLogin }) {
                                       <span className="actionCount">({r.likeCount || 0})</span>
                                     </button>
 
-                                    {/* Reply ON REPLY: composer placed under this reply, but posts to parent comment */}
                                     <button
                                       type="button"
                                       className="actionBtn subtle"
@@ -972,7 +1168,6 @@ export default function Watch({ user, onRequireLogin }) {
                                     ) : null}
                                   </div>
 
-                                  {/* Composer UNDER THIS REPLY */}
                                   {showComposerUnderThisReply ? (
                                     <div className="replyComposer">
                                       <textarea
@@ -1023,20 +1218,20 @@ export default function Watch({ user, onRequireLogin }) {
           <div className="suggestTitle">More in {video.category}</div>
           <div className="suggestList">
             {suggested
-              .filter((v) => INCLUDE_TEST_DATA || !v?.isTestData && !v?.is_test_data)
+              .filter((v) => INCLUDE_TEST_DATA || (!v?.isTestData && !v?.is_test_data))
               .map((v) => (
-              <button
-                key={v.id}
-                className="suggestItem"
-                onClick={() => nav(`/watch/${v.id}`)}
-                type="button"
-              >
-                <div className="suggestText">
-                  <div className="suggestName">{v.title}</div>
-                  <div className="suggestSub">{v.category}</div>
-                </div>
-              </button>
-            ))}
+                <button
+                  key={v.id}
+                  className="suggestItem"
+                  onClick={() => nav(`/watch/${v.id}`)}
+                  type="button"
+                >
+                  <div className="suggestText">
+                    <div className="suggestName">{v.title}</div>
+                    <div className="suggestSub">{v.category}</div>
+                  </div>
+                </button>
+              ))}
           </div>
         </aside>
       </main>
