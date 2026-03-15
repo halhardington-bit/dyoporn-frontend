@@ -15,7 +15,7 @@ import GenerateDashboard from "./pages/GenerateDashboard.jsx";
 import GenerateEdit from "./pages/GenerateEdit.jsx";
 import BetaSignup from "./pages/BetaSignup.jsx";
 
-const BETA_LOCK = false;
+const BETA_LOCK = true;
 
 export default function App() {
   const [user, setUser] = useState(null);
