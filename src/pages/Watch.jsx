@@ -119,51 +119,45 @@ export default function Watch({ user, onRequireLogin }) {
     return !!myUsername && !!u && myUsername === u;
   };
 
-  useEffect(() => {
-  const el = videoRef.current;
   const src = streamUrl(video);
 
-  if (!el || !src) return;
+  useEffect(() => {
+    const el = videoRef.current;
+    if (!el || !src) return;
 
-  let hls = null;
+    let hls = null;
 
-  // Clean any old source first
-  el.pause();
-  el.removeAttribute("src");
-  el.load();
+    el.pause();
+    el.removeAttribute("src");
+    el.load();
 
-  // Safari / native HLS
-  if (el.canPlayType("application/vnd.apple.mpegurl")) {
+    if (src.includes(".m3u8") && el.canPlayType("application/vnd.apple.mpegurl")) {
+      el.src = src;
+      return;
+    }
+
+    if (src.includes(".m3u8") && Hls.isSupported()) {
+      hls = new Hls({
+        enableWorker: true,
+        lowLatencyMode: false,
+      });
+
+      hls.loadSource(src);
+      hls.attachMedia(el);
+
+      hls.on(Hls.Events.ERROR, (_event, data) => {
+        console.error("HLS error:", data);
+      });
+
+      return () => hls.destroy();
+    }
+
     el.src = src;
-    return;
-  }
-
-  // Chrome / Edge / Firefox with hls.js
-  if (Hls.isSupported() && src.includes(".m3u8")) {
-    hls = new Hls({
-      enableWorker: true,
-      lowLatencyMode: false,
-    });
-
-    hls.loadSource(src);
-    hls.attachMedia(el);
-
-    hls.on(Hls.Events.ERROR, (_event, data) => {
-      console.error("HLS error:", data);
-    });
 
     return () => {
-      hls.destroy();
+      if (hls) hls.destroy();
     };
-  }
-
-  // Fallback for mp4/direct files
-  el.src = src;
-
-  return () => {
-    if (hls) hls.destroy();
-  };
-}, [video]);
+  }, [src]);
 
   useEffect(() => {
     setViewRecordedFor(null);
