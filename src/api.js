@@ -87,7 +87,7 @@ export function streamUrl(videoOrId) {
   return `${API_BASE}/videos/${id}/stream`;
 }
 
-console.log("resolvedStreamUrl", resolvedStreamUrl);
+
 
 // RATINGS
 export async function rateVideo(id, rating) {
