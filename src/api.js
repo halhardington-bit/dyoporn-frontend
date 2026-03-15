@@ -16,14 +16,12 @@ function qs(paramsObj = {}) {
 }
 
 // BETA
-// BETA
 export async function betaSignup({ email, watching = false, creating = false }) {
-  const res = await fetch("/api/beta-signup", {
+  const res = await fetch(`${API_BASE}/api/beta-signup`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    credentials: "include",
     body: JSON.stringify({
       email,
       watching,
