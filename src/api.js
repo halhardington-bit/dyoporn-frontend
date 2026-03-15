@@ -16,6 +16,7 @@ function qs(paramsObj = {}) {
 }
 
 // BETA
+// BETA
 export async function betaSignup({ email, watching = false, creating = false }) {
   const res = await fetch("/api/beta-signup", {
     method: "POST",
@@ -37,6 +38,19 @@ export async function betaSignup({ email, watching = false, creating = false }) 
   }
 
   return data;
+}
+
+// VIDEOS
+export async function getVideos({ q, category, sort } = {}) {
+  const url = `${API_BASE}/api/videos${qs({
+    q,
+    category,
+    sort,
+    includeTest: INCLUDE_TEST ? "1" : undefined,
+  })}`;
+  const res = await fetch(url, { credentials: "include" });
+  if (!res.ok) throw new Error(`getVideos failed: ${res.status}`);
+  return res.json();
 }
 
 export async function getVideo(id) {
