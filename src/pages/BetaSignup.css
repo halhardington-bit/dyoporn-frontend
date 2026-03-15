@@ -3,9 +3,9 @@
   min-height: 100vh;
   overflow: hidden;
   background:
-    radial-gradient(circle at top left, rgba(255, 255, 255, 0.06), transparent 34%),
-    radial-gradient(circle at bottom right, rgba(255, 255, 255, 0.04), transparent 28%),
-    linear-gradient(180deg, #050505 0%, #0b0b0b 45%, #111111 100%);
+    radial-gradient(circle at top left, rgba(255, 255, 255, 0.12), transparent 22%),
+    radial-gradient(circle at bottom right, rgba(255, 255, 255, 0.08), transparent 22%),
+    linear-gradient(180deg, #020202 0%, #060606 48%, #090909 100%);
   color: #f5f5f5;
 }
 
@@ -13,37 +13,37 @@
   position: absolute;
   inset: 0;
   pointer-events: none;
-  opacity: 0.06;
+  opacity: 0.05;
   background-image:
-    linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
-  background-size: 30px 30px;
-  mask-image: radial-gradient(circle at center, black 45%, transparent 100%);
-  -webkit-mask-image: radial-gradient(circle at center, black 45%, transparent 100%);
+    linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+  background-size: 28px 28px;
+  mask-image: radial-gradient(circle at center, black 42%, transparent 100%);
+  -webkit-mask-image: radial-gradient(circle at center, black 42%, transparent 100%);
 }
 
 .betaGlow {
   position: absolute;
   border-radius: 999px;
-  filter: blur(90px);
   pointer-events: none;
+  filter: blur(110px);
   opacity: 0.12;
 }
 
 .betaGlowA {
-  top: -140px;
+  top: -100px;
   left: -80px;
-  width: 420px;
-  height: 420px;
+  width: 340px;
+  height: 340px;
   background: #ffffff;
 }
 
 .betaGlowB {
-  right: -120px;
-  bottom: -120px;
-  width: 360px;
-  height: 360px;
-  background: #9a9a9a;
+  right: -90px;
+  bottom: -90px;
+  width: 320px;
+  height: 320px;
+  background: #a6a6a6;
 }
 
 .betaWrap {
@@ -53,35 +53,35 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 36px;
+  padding: 28px;
 }
 
 .betaShell {
   width: 100%;
-  max-width: 860px;
-  padding: 56px 56px 42px;
+  max-width: 820px;
+  padding: 54px 54px 34px;
+  border-radius: 34px;
   border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 32px;
   background: linear-gradient(
     180deg,
-    rgba(255, 255, 255, 0.06) 0%,
+    rgba(255, 255, 255, 0.065) 0%,
     rgba(255, 255, 255, 0.03) 100%
   );
   box-shadow:
-    0 30px 100px rgba(0, 0, 0, 0.55),
+    0 30px 100px rgba(0, 0, 0, 0.58),
     inset 0 1px 0 rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
 }
 
 .betaTopline {
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-bottom: 26px;
-  color: rgba(255, 255, 255, 0.6);
-  font-size: 0.78rem;
-  letter-spacing: 0.14em;
+  margin-bottom: 28px;
+  color: rgba(255, 255, 255, 0.58);
+  font-size: 0.8rem;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
 }
 
@@ -94,11 +94,11 @@
   width: 5px;
   height: 5px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.45);
 }
 
 .betaSmall {
-  font-weight: 500;
+  font-weight: 700;
 }
 
 .betaBrandRow {
@@ -113,10 +113,10 @@
 .betaBrand {
   position: relative;
   z-index: 2;
-  font-size: clamp(2.6rem, 7vw, 5.8rem);
+  font-size: clamp(3rem, 7vw, 5.9rem);
   line-height: 0.9;
   font-weight: 900;
-  letter-spacing: -0.06em;
+  letter-spacing: -0.07em;
   color: #ffffff;
 }
 
@@ -124,89 +124,86 @@
   position: absolute;
   inset: 0;
   z-index: 1;
-  transform: translate(6px, 6px);
-  font-size: clamp(2.6rem, 7vw, 5.8rem);
+  transform: translate(7px, 6px);
+  font-size: clamp(3rem, 7vw, 5.9rem);
   line-height: 0.9;
   font-weight: 900;
-  letter-spacing: -0.06em;
-  color: rgba(255, 255, 255, 0.08);
+  letter-spacing: -0.07em;
+  color: rgba(255, 255, 255, 0.12);
   user-select: none;
   pointer-events: none;
 }
 
-.betaTitle {
-  margin: 0 0 18px;
-  max-width: 760px;
-  font-size: clamp(2.1rem, 4.7vw, 4.2rem);
-  line-height: 0.96;
-  font-weight: 800;
-  letter-spacing: -0.05em;
-  color: #f3f3f3;
-}
-
-.betaSubtitle {
-  margin: 0 0 32px;
-  max-width: 650px;
-  font-size: 1.04rem;
-  line-height: 1.7;
-  color: rgba(255, 255, 255, 0.72);
-}
-
 .betaForm {
   display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  max-width: 760px;
+}
+
+.betaInputRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   gap: 12px;
-  align-items: stretch;
-  flex-wrap: wrap;
+  align-items: center;
 }
 
 .betaInput {
-  flex: 1 1 360px;
-  min-width: 0;
+  display: block;
+  width: 100%;
   height: 58px;
   padding: 0 18px;
-  border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.13);
-  background: rgba(255, 255, 255, 0.05);
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.045) 0%,
+    rgba(255, 255, 255, 0.03) 100%
+  );
   color: #ffffff;
   font-size: 1rem;
   outline: none;
+  box-sizing: border-box;
   transition:
     border-color 0.18s ease,
     background 0.18s ease,
-    box-shadow 0.18s ease;
+    box-shadow 0.18s ease,
+    transform 0.18s ease;
 }
 
 .betaInput::placeholder {
-  color: rgba(255, 255, 255, 0.36);
+  color: rgba(255, 255, 255, 0.38);
 }
 
 .betaInput:focus {
-  border-color: rgba(255, 255, 255, 0.45);
+  border-color: rgba(255, 255, 255, 0.26);
   background: rgba(255, 255, 255, 0.07);
-  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.08);
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.05);
 }
 
 .betaButton {
   height: 58px;
-  padding: 0 24px;
+  min-width: 160px;
+  padding: 0 26px;
   border: 1px solid rgba(255, 255, 255, 0.14);
-  border-radius: 16px;
-  background: linear-gradient(180deg, #ffffff 0%, #d9d9d9 100%);
+  border-radius: 18px;
+  background: linear-gradient(180deg, #ffffff 0%, #dddddd 100%);
   color: #0a0a0a;
-  font-size: 0.98rem;
+  font-size: 1rem;
   font-weight: 800;
   letter-spacing: 0.01em;
   cursor: pointer;
+  box-shadow: 0 12px 30px rgba(255, 255, 255, 0.14);
   transition:
     transform 0.14s ease,
     box-shadow 0.14s ease,
     opacity 0.14s ease;
-  box-shadow: 0 12px 28px rgba(255, 255, 255, 0.12);
 }
 
 .betaButton:hover:not(:disabled) {
   transform: translateY(-1px);
-  box-shadow: 0 16px 32px rgba(255, 255, 255, 0.16);
+  box-shadow: 0 16px 36px rgba(255, 255, 255, 0.18);
 }
 
 .betaButton:disabled {
@@ -214,11 +211,65 @@
   cursor: default;
 }
 
+.betaOptional {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 2px;
+}
+
+.betaOptionalLabel {
+  font-size: 0.93rem;
+  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.64);
+}
+
+.betaChecks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.betaCheck {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  background: rgba(255, 255, 255, 0.035);
+  color: rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+  user-select: none;
+  transition:
+    background 0.16s ease,
+    border-color 0.16s ease,
+    transform 0.16s ease;
+}
+
+.betaCheck:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.14);
+  transform: translateY(-1px);
+}
+
+.betaCheck.isChecked {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+.betaCheck input {
+  flex: 0 0 auto;
+  accent-color: white;
+  margin: 0;
+}
+
 .betaMessage {
-  margin-top: 16px;
-  padding: 14px 16px;
+  margin-top: 2px;
+  padding: 13px 15px;
   border-radius: 14px;
-  font-size: 0.95rem;
+  font-size: 0.94rem;
   font-weight: 600;
 }
 
@@ -231,46 +282,68 @@
 .betaMessage.error {
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #d6d6d6;
+  color: #d8d8d8;
 }
 
-.betaMeta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 26px;
-}
-
-.betaMetaItem {
-  padding: 10px 14px;
-  border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(255, 255, 255, 0.04);
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 0.84rem;
-  letter-spacing: 0.02em;
-}
-
-@media (max-width: 720px) {
+@media (max-width: 760px) {
   .betaWrap {
     padding: 20px;
   }
 
   .betaShell {
-    padding: 30px 24px 24px;
-    border-radius: 24px;
+    padding: 34px 24px 24px;
+    border-radius: 26px;
   }
 
-  .betaForm {
-    flex-direction: column;
+  .betaInputRow {
+    grid-template-columns: 1fr;
   }
 
-  .betaInput,
   .betaButton {
     width: 100%;
+    min-width: 0;
   }
 
-  .betaMeta {
-    gap: 8px;
+  .betaChecks {
+    flex-direction: column;
+    align-items: stretch;
   }
+
+  .betaCheck {
+    width: 100%;
+    justify-content: flex-start;
+  }
+}
+
+.betaButtonPrimary {
+  margin-top: 10px;
+  width: 220px;
+}
+
+.betaButtonPrimary {
+  margin-top: 10px;
+  align-self: flex-start;
+}
+
+.betaBrand {
+  position: relative;
+  z-index: 2;
+  font-family: "Space Grotesk", sans-serif;
+  font-size: clamp(3rem, 7vw, 5.8rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: white;
+  line-height: 0.9;
+}
+
+.betaBrandShadow {
+  position: absolute;
+  inset: 0;
+  transform: translate(6px, 6px);
+  font-family: "Space Grotesk", sans-serif;
+  font-size: clamp(3rem, 7vw, 5.8rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: rgba(255,255,255,0.05);
+  pointer-events: none;
 }

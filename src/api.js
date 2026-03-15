@@ -16,18 +16,21 @@ function qs(paramsObj = {}) {
 }
 
 // BETA
-export async function betaSignup(email) {
-  const res = await fetch(`${API_BASE}/api/beta-signup`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    credentials: "include",
-    body: JSON.stringify({ email }),
-  });
-
-  const data = await res.json().catch(() => null);
-  if (!res.ok) throw new Error(data?.error || `betaSignup failed: ${res.status}`);
-  return data;
-}
+app.get("/api/beta-signups", async (_req, res) => {
+  try {
+    const result = await pool.query(
+      `
+      SELECT id, email, watching, creating, created_at
+      FROM beta_waitlist
+      ORDER BY created_at DESC
+      `
+    );
+    res.json(result.rows);
+  } catch (e) {
+    console.error("GET /api/beta-signups error:", e);
+    res.status(500).json({ error: "Failed to load beta signups" });
+  }
+});
 
 // VIDEOS
 export async function getVideos({ q, category, sort } = {}) {

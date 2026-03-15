@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useEffect, useState, useCallback } from "react";
-import { me } from "./api"; 
+import { me } from "./api";
 
 import AppLayout from "./layouts/AppLayout.jsx";
 import Home from "./pages/Home.jsx";
@@ -15,6 +15,7 @@ import GenerateDashboard from "./pages/GenerateDashboard.jsx";
 import GenerateEdit from "./pages/GenerateEdit.jsx";
 import BetaSignup from "./pages/BetaSignup.jsx";
 
+const BETA_LOCK = false;
 
 export default function App() {
   const [user, setUser] = useState(null);
@@ -30,7 +31,6 @@ export default function App() {
     })();
   }, []);
 
-  // ✅ single source of truth for restoring session user
   const refreshMe = useCallback(async () => {
     try {
       const res = await fetch("/auth/me", { credentials: "include" });
@@ -73,24 +73,32 @@ export default function App() {
     setUser(null);
   };
 
-  // ✅ restore login on refresh
   useEffect(() => {
     refreshMe();
   }, [refreshMe]);
 
+  if (BETA_LOCK) {
+    return (
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<BetaSignup />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </BrowserRouter>
+    );
+  }
+
   return (
     <BrowserRouter>
       <Routes>
-
-        {/* Landing page OUTSIDE app layout */}
-       <Route path="/" element={<BetaSignup />} />
+        <Route path="/" element={<BetaSignup />} />
 
         <Route
           element={
             <AppLayout
               user={user}
-              setUser={setUser}        // ✅ allow children to update user after profile edits
-              refreshMe={refreshMe}     // ✅ or just refetch /auth/me
+              setUser={setUser}
+              refreshMe={refreshMe}
               onLogout={handleLogout}
               authOpen={authOpen}
               authMode={authMode}
@@ -103,56 +111,31 @@ export default function App() {
             />
           }
         >
-          <Route path="/" element={<Navigate to="/watch" replace />} />
-          <Route
-            path="/watch"
-            element={<Home user={user} onRequireLogin={openLogin} />}
-          />
-          <Route
-            path="/watch/:id"
-            element={<Watch user={user} onRequireLogin={openLogin} />}
-          />
-          <Route
-            path="/create"
-            element={<Create user={user} onRequireLogin={openLogin} />}
-          />
+          <Route path="/watch" element={<Home user={user} onRequireLogin={openLogin} />} />
+          <Route path="/watch/:id" element={<Watch user={user} onRequireLogin={openLogin} />} />
+          <Route path="/create" element={<Create user={user} onRequireLogin={openLogin} />} />
 
-         <Route
-          path="/generate"
-          element={<Generate user={user} onRequireLogin={openLogin} />}
-        >
-          <Route index element={<Navigate to="assets" replace />} />
-          <Route path="assets" element={<GenerateAssets />} />
-          <Route path="shots" element={<GenerateShots />} />
+          <Route path="/generate" element={<Generate user={user} onRequireLogin={openLogin} />}>
+            <Route index element={<Navigate to="assets" replace />} />
+            <Route path="assets" element={<GenerateAssets />} />
+            <Route path="shots" element={<GenerateShots />} />
+            <Route path="projects" element={<GenerateDashboard />} />
+            <Route path="edit/:projectId" element={<GenerateEdit user={user} />} />
+          </Route>
 
-          {/* Edit tab goes here */}
-          <Route path="projects" element={<GenerateDashboard />} />
-
-          {/* Editor also lives under the same layout so tabs stay visible */}
-          <Route path="edit/:projectId" element={<GenerateEdit user={user} />} />
-        </Route>
-
-          {/* ✅ Edit profile (logged in) */}
           <Route
             path="/me/profile"
             element={
               <EditProfile
                 user={user}
                 onRequireLogin={openLogin}
-                onUserUpdated={setUser} // ✅ simplest: edit page can call this with fresh /auth/me or returned profile
-                refreshMe={refreshMe}   // ✅ preferred: call refreshMe() after saving username
+                onUserUpdated={setUser}
+                refreshMe={refreshMe}
               />
             }
           />
 
-          {/* ✅ Public profiles */}
-          <Route
-            path="/u/:username"
-            element={<Profile user={user} onRequireLogin={openLogin} />}
-          />
-
-          
-
+          <Route path="/u/:username" element={<Profile user={user} onRequireLogin={openLogin} />} />
         </Route>
       </Routes>
     </BrowserRouter>
