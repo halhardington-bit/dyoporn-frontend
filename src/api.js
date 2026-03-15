@@ -16,33 +16,27 @@ function qs(paramsObj = {}) {
 }
 
 // BETA
-app.get("/api/beta-signups", async (_req, res) => {
-  try {
-    const result = await pool.query(
-      `
-      SELECT id, email, watching, creating, created_at
-      FROM beta_waitlist
-      ORDER BY created_at DESC
-      `
-    );
-    res.json(result.rows);
-  } catch (e) {
-    console.error("GET /api/beta-signups error:", e);
-    res.status(500).json({ error: "Failed to load beta signups" });
-  }
-});
+export async function betaSignup({ email, watching = false, creating = false }) {
+  const res = await fetch("/api/beta-signup", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+    body: JSON.stringify({
+      email,
+      watching,
+      creating,
+    }),
+  });
 
-// VIDEOS
-export async function getVideos({ q, category, sort } = {}) {
-  const url = `${API_BASE}/api/videos${qs({
-    q,
-    category,
-    sort,
-    includeTest: INCLUDE_TEST ? "1" : undefined,
-  })}`;
-  const res = await fetch(url, { credentials: "include" });
-  if (!res.ok) throw new Error(`getVideos failed: ${res.status}`);
-  return res.json();
+  const data = await res.json().catch(() => null);
+
+  if (!res.ok) {
+    throw new Error(data?.error || "Beta signup failed");
+  }
+
+  return data;
 }
 
 export async function getVideo(id) {
