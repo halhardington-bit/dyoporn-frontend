@@ -365,3 +365,9 @@
   touch-action: manipulation;
 }
 
+.betaNoise,
+.betaGlow,
+.betaGlowA,
+.betaGlowB {
+  pointer-events: none !important;
+}
