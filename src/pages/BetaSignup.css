@@ -347,3 +347,21 @@
   color: rgba(255,255,255,0.05);
   pointer-events: none;
 }
+
+.betaCheck input {
+  width: 18px;
+  height: 18px;
+  accent-color: white;
+  margin: 0;
+}
+
+.betaCheck.isChecked {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.32);
+}
+
+.betaCheck {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
