@@ -371,3 +371,49 @@
 .betaGlowB {
   pointer-events: none !important;
 }
+
+.betaCheck {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  position: relative;
+  user-select: none;
+}
+
+/* hide the native checkbox */
+.betaCheck input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* custom square */
+.betaCheck::before {
+  content: "";
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  border: 2px solid rgba(255,255,255,0.5);
+  background: transparent;
+  transition: all 0.15s ease;
+}
+
+/* checked state */
+.betaCheck.isChecked::before {
+  background: white;
+  border-color: white;
+}
+
+/* checkmark */
+.betaCheck.isChecked::after {
+  content: "";
+  position: absolute;
+  left: 21px;
+  top: 11px;
+  width: 6px;
+  height: 14px;
+  border: solid black;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
