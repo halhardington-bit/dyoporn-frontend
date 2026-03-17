@@ -240,14 +240,7 @@ export default function Profile({ user, onRequireLogin }) {
   return (
     <div className="shell">
       <div className="profileCard">
-        <div
-          className="profileBanner"
-          style={
-            profile.bannerUrl
-              ? { backgroundImage: `url(${profile.bannerUrl})` }
-              : undefined
-          }
-        />
+        
 
         <div className="profileTop">
           <div className="avatarWrap">

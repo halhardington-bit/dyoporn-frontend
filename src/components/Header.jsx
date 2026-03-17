@@ -1,8 +1,7 @@
 import "./Header.css";
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { getMyProfile, whoami } from "../api.js";
-
 
 export default function Header({
   user,
@@ -12,59 +11,100 @@ export default function Header({
   q,
   setQ,
 }) {
-
   const nav = useNavigate();
   const location = useLocation();
 
   const [meProfile, setMeProfile] = useState(null);
   const [sessionUser, setSessionUser] = useState(null);
+  const [mobileUserMenuOpen, setMobileUserMenuOpen] = useState(false);
+
+  const mobileMenuRef = useRef(null);
+  const mobileMenuButtonRef = useRef(null);
 
   useEffect(() => {
-  let alive = true;
+    let alive = true;
 
-  (async () => {
-    if (!user) {
-      setSessionUser(null);
-      return;
-    }
-    try {
-      const u = await whoami();
-      if (alive) setSessionUser(u);
-    } catch {
-      if (alive) setSessionUser(null);
-    }
-  })();
+    (async () => {
+      if (!user) {
+        setSessionUser(null);
+        setMeProfile(null);
+        return;
+      }
 
-  return () => {
-    alive = false;
-  };
+      try {
+        const [u, profile] = await Promise.allSettled([
+          whoami(),
+          getMyProfile(),
+        ]);
+
+        if (!alive) return;
+
+        if (u.status === "fulfilled") setSessionUser(u.value || null);
+        else setSessionUser(null);
+
+        if (profile.status === "fulfilled") setMeProfile(profile.value || null);
+        else setMeProfile(null);
+      } catch {
+        if (!alive) return;
+        setSessionUser(null);
+        setMeProfile(null);
+      }
+    })();
+
+    return () => {
+      alive = false;
+    };
   }, [user?.id]);
 
+  useEffect(() => {
+    setMobileUserMenuOpen(false);
+  }, [location.pathname, location.search, user?.id]);
 
-  const ratingVal = sessionUser?.rating ?? user?.rating;
-  const reviewCountVal = sessionUser?.reviewCount ?? user?.reviewCount ?? 0;
-  const tokensVal = sessionUser?.tokens ?? user?.tokens ?? 0;
+  useEffect(() => {
+    function handlePointerDown(e) {
+      if (!mobileUserMenuOpen) return;
 
+      const panelEl = mobileMenuRef.current;
+      const buttonEl = mobileMenuButtonRef.current;
+      const target = e.target;
 
+      if (panelEl?.contains(target) || buttonEl?.contains(target)) return;
+      setMobileUserMenuOpen(false);
+    }
 
+    function handleKeyDown(e) {
+      if (e.key === "Escape") {
+        setMobileUserMenuOpen(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handlePointerDown);
+    document.addEventListener("touchstart", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("mousedown", handlePointerDown);
+      document.removeEventListener("touchstart", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [mobileUserMenuOpen]);
 
   function submitSearch(e) {
-  e.preventDefault();
-  const query = String(q ?? "").trim();
-  const url = query ? `/watch?q=${encodeURIComponent(query)}` : "/watch";
-  if (location.pathname + location.search !== url) nav(url);
-}
+    e.preventDefault();
+    const query = String(q ?? "").trim();
+    const url = query ? `/watch?q=${encodeURIComponent(query)}` : "/watch";
+    if (location.pathname + location.search !== url) nav(url);
+  }
 
-  const headerRating = useMemo(() => {
-  if (!user) return null;
+  const ratingVal = sessionUser?.rating ?? user?.rating ?? meProfile?.rating ?? null;
+  const reviewCountVal =
+    sessionUser?.reviewCount ??
+    user?.reviewCount ??
+    user?.review_count ??
+    meProfile?.reviewCount ??
+    0;
 
-  const rating = meProfile?.rating ?? user.rating ?? null;
-  const reviewCount = meProfile?.reviewCount ?? user.reviewCount ?? user.review_count ?? 0;
-  console.log(rating)
-
-  return { rating, reviewCount };
-}, [user, meProfile]);
-
+  const tokensVal = sessionUser?.tokens ?? user?.tokens ?? meProfile?.tokens ?? 0;
 
   const headerName = useMemo(() => {
     if (!user) return "";
@@ -76,6 +116,11 @@ export default function Header({
     ).trim();
   }, [user, meProfile]);
 
+  function handleMobileLogout() {
+    setMobileUserMenuOpen(false);
+    onLogout?.();
+  }
+
   return (
     <header className="header">
       <div className="header-inner">
@@ -84,15 +129,11 @@ export default function Header({
           <NavLink to="/watch" className="logo">
             DYOPorn
           </NavLink>
-
         </div>
 
         {/* CENTER */}
         <div className="header-center">
-          <form
-            className="searchForm"
-            onSubmit={submitSearch}
-          >
+          <form className="searchForm" onSubmit={submitSearch}>
             <input
               className="search"
               placeholder="Search"
@@ -106,47 +147,70 @@ export default function Header({
         <div className="header-right">
           {!user ? (
             <div className="auth-actions">
-              <button
-                className="login-btn"
-                onClick={onOpenLogin}
-              >
+              <button className="login-btn" onClick={onOpenLogin}>
                 Log in
               </button>
-              <button
-                className="signup-link"
-                onClick={onOpenRegister}
-              >
+              <button className="signup-link" onClick={onOpenRegister}>
                 Sign up
               </button>
             </div>
           ) : (
             <div className="user-info">
-              <NavLink
-                className="username"
-                to={`/u/${user.username}`}
-              >
+              <NavLink className="username" to={`/u/${user.username}`}>
                 {headerName}
               </NavLink>
 
-              <span className="tokens">
-                🪙 {user.tokens}
-              </span>
-              <span className="rating">
-                ⭐ {ratingVal == null ? "—" : Number(ratingVal).toFixed(2)} ({reviewCountVal})
-              </span>
+              <div className="userDesktopMeta">
+                <span className="tokens">🪙 {tokensVal}</span>
+                <span className="rating">
+                  ⭐ {ratingVal == null ? "—" : Number(ratingVal).toFixed(2)} ({reviewCountVal})
+                </span>
+
+                <button className="signup-link" onClick={onLogout}>
+                  Log out
+                </button>
+              </div>
 
               <button
-                className="signup-link"
-                onClick={onLogout}
+                ref={mobileMenuButtonRef}
+                type="button"
+                className="userMenuButton"
+                aria-label="Open account menu"
+                aria-expanded={mobileUserMenuOpen}
+                onClick={() => setMobileUserMenuOpen((v) => !v)}
               >
-                Log out
+                ⋯
               </button>
+
+              {mobileUserMenuOpen ? (
+                <div
+                  ref={mobileMenuRef}
+                  className="userMenuPanel"
+                  role="menu"
+                  aria-label="Account menu"
+                >
+                  <div className="userMenuItem" role="presentation">
+                    🪙 {tokensVal}
+                  </div>
+
+                  <div className="userMenuItem" role="presentation">
+                    ⭐ {ratingVal == null ? "—" : Number(ratingVal).toFixed(2)} ({reviewCountVal})
+                  </div>
+
+                  <button
+                    type="button"
+                    className="userMenuItem userMenuLogout"
+                    role="menuitem"
+                    onClick={handleMobileLogout}
+                  >
+                    Log out
+                  </button>
+                </div>
+              ) : null}
             </div>
           )}
         </div>
       </div>
     </header>
-
   );
-
 }

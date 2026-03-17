@@ -141,8 +141,9 @@
 
 
 .tokens {
-  opacity: 0.85;
+  opacity: 1;
   font-size: 12px;
+  color: rgba(255, 255, 255, 0.82);
 }
 
 .auth-actions {
@@ -153,8 +154,9 @@
 
 
 .rating {
-  opacity: 0.85;
+  opacity: 1;
   font-size: 12px;
+  color: rgba(255, 255, 255, 0.82);
 }
 
 
@@ -188,4 +190,96 @@
 .header .user-info .rating * {
   outline: 0 !important;
   box-shadow: none !important;
+}
+
+.user-info {
+  position: relative;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.userDesktopMeta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.userMenuButton {
+  display: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.10);
+  background: rgba(255,255,255,0.04);
+  color: var(--text);
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 700;
+  align-items: center;
+  justify-content: center;
+}
+
+.userMenuButton:hover {
+  background: rgba(255,255,255,0.08);
+  border-color: rgba(255,255,255,0.16);
+}
+
+.userMenuPanel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 170px;
+  padding: 8px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.10);
+  background: rgba(10,10,10,0.96);
+  box-shadow: 0 18px 40px rgba(0,0,0,0.45);
+  backdrop-filter: blur(12px);
+  z-index: 100;
+}
+
+.userMenuItem {
+  display: block;
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  color: var(--text);
+  font-size: 13px;
+  text-align: left;
+  background: transparent;
+  border: 0;
+}
+
+.userMenuLogout {
+  cursor: pointer;
+}
+
+.userMenuLogout:hover,
+.userMenuItem:hover {
+  background: rgba(255,255,255,0.06);
+}
+
+@media (max-width: 700px) {
+  .userDesktopMeta {
+    display: none;
+  }
+
+  .userMenuButton {
+    display: inline-flex;
+  }
+
+  .user {
+    gap: 8px;
+  }
+
+  .username {
+    max-width: 110px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
 }

@@ -281,3 +281,71 @@
 .thumbImg.isHidden {
   opacity: 0;
 }
+
+
+
+@media (max-width: 520px) {
+  .video-card {
+    gap: 8px;
+  }
+
+  .video-meta {
+    gap: 3px;
+  }
+
+  .video-title {
+    font-size: 12px;
+    line-height: 1.15;
+  }
+
+  .vTitleRow {
+    gap: 6px;
+  }
+
+  .vTitleRight {
+    gap: 6px;
+  }
+
+  .vRating {
+    gap: 3px;
+    margin-right: 0;
+  }
+
+  .vStar,
+  .vAvg,
+  .vCount {
+    font-size: 10px;
+  }
+
+  .video-sub {
+    font-size: 10px;
+    gap: 4px;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+
+  .video-creator,
+  .video-views,
+  .dot {
+    white-space: nowrap;
+    flex-shrink: 1;
+    min-width: 0;
+  }
+
+  .video-creator {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .video-views {
+    flex-shrink: 0;
+  }
+
+  .durationBadge {
+    right: 6px;
+    bottom: 6px;
+    font-size: 10px;
+    padding: 3px 5px;
+  }
+}

@@ -20,10 +20,6 @@ import ConfirmModal from "../ui/ConfirmModal.jsx";
 const INCLUDE_TEST_DATA =
   String(import.meta.env.VITE_INCLUDE_TEST_DATA || "0") === "1";
 
-
-console.log("VITE_INCLUDE_TEST_DATA =", import.meta.env.VITE_INCLUDE_TEST_DATA);
-console.log("INCLUDE_TEST_DATA =", INCLUDE_TEST_DATA);
-
 function timeAgo(iso) {
   const t = new Date(iso).getTime();
   if (!Number.isFinite(t)) return "";
@@ -74,43 +70,32 @@ export default function Watch({ user, onRequireLogin }) {
 
   const [video, setVideo] = useState(null);
   const [suggested, setSuggested] = useState([]);
-
-  // record view once per mount per id
   const [viewRecordedFor, setViewRecordedFor] = useState(null);
 
-  // ratings
   const [myRating, setMyRating] = useState(null);
   const [myRatingLoaded, setMyRatingLoaded] = useState(false);
   const [ratingBusy, setRatingBusy] = useState(false);
 
-  // comments
   const [comments, setComments] = useState([]);
   const [commentBody, setCommentBody] = useState("");
   const [commentsBusy, setCommentsBusy] = useState(false);
   const [commentPostBusy, setCommentPostBusy] = useState(false);
   const [commentError, setCommentError] = useState("");
 
-  // edit
-  const [editing, setEditing] = useState(null); // { id, parentId }
+  const [editing, setEditing] = useState(null);
   const [editingBody, setEditingBody] = useState("");
   const [editBusy, setEditBusy] = useState(false);
 
-  // delete confirm
-  const [deleteTarget, setDeleteTarget] = useState(null); // { id, parentId }
+  const [deleteTarget, setDeleteTarget] = useState(null);
 
-  // replies (placement-aware)
-  // parentId = top-level comment id to post under
-  // anchorId = which item the composer is visually under (comment id OR reply id)
-  const [replyingTo, setReplyingTo] = useState(null); // { parentId, anchorId }
+  const [replyingTo, setReplyingTo] = useState(null);
   const [replyBody, setReplyBody] = useState("");
   const [replyBusy, setReplyBusy] = useState(false);
 
-  // collapsed/expanded threads
   const [openReplies, setOpenReplies] = useState(() => new Set());
 
   const isLoggedIn = !!user?.id;
 
-  // ownership check (username-based)
   const myUsername = user?.username ? String(user.username).toLowerCase() : null;
   const isOwner = (item) => {
     const u = item?.username ? String(item.username).toLowerCase() : null;
@@ -150,7 +135,6 @@ export default function Watch({ user, onRequireLogin }) {
         if (cancelled) return;
         setVideo(v);
 
-        // record view once per id per mount (logged in only)
         if (isLoggedIn && viewRecordedFor !== id) {
           try {
             const resp = await recordView(id);
@@ -172,7 +156,6 @@ export default function Watch({ user, onRequireLogin }) {
             .slice(0, 12)
         );
 
-        // ratings
         if (isLoggedIn) {
           try {
             const mine = await getMyRating(id);
@@ -191,7 +174,6 @@ export default function Watch({ user, onRequireLogin }) {
           setMyRatingLoaded(false);
         }
 
-        // comments
         setCommentsBusy(true);
         const c = await getComments(id);
         if (!cancelled) setComments(c?.items ?? []);
@@ -207,20 +189,15 @@ export default function Watch({ user, onRequireLogin }) {
     };
   }, [id, isLoggedIn, viewRecordedFor]);
 
-  // -----------------------
-  // Ratings (optimistic stars only, then reconcile)
-  // -----------------------
   async function handleRate(n) {
     if (!isLoggedIn) return onRequireLogin?.();
 
-    // optimistic stars (safe)
     setMyRating(n);
 
     try {
       setRatingBusy(true);
       await rateVideo(id, n);
 
-      // reconcile server truth
       const [freshVideo, mine] = await Promise.allSettled([getVideo(id), getMyRating(id)]);
 
       if (freshVideo.status === "fulfilled") {
@@ -235,15 +212,11 @@ export default function Watch({ user, onRequireLogin }) {
       }
     } catch (e) {
       console.error(e);
-      // keep optimistic value; server may not have saved
     } finally {
       setRatingBusy(false);
     }
   }
 
-  // -----------------------
-  // Comments: post
-  // -----------------------
   const canPost = useMemo(() => commentBody.trim().length > 0, [commentBody]);
 
   async function handlePostComment(e) {
@@ -272,13 +245,9 @@ export default function Watch({ user, onRequireLogin }) {
     }
   }
 
-  // -----------------------
-  // Like (supports comments + replies)
-  // -----------------------
   async function handleToggleLike(targetId) {
     if (!isLoggedIn) return onRequireLogin?.();
 
-    // optimistic (top-level + replies)
     setComments((prev) =>
       prev.map((c) => {
         if (c.id === targetId) {
@@ -336,7 +305,6 @@ export default function Watch({ user, onRequireLogin }) {
       );
     } catch (e) {
       console.error(e);
-      // rollback: refetch
       try {
         const c = await getComments(id);
         setComments(c?.items ?? []);
@@ -344,9 +312,6 @@ export default function Watch({ user, onRequireLogin }) {
     }
   }
 
-  // -----------------------
-  // Edit (comment or reply)
-  // -----------------------
   function startEditItem(item, parentId = null) {
     if (!isLoggedIn) return onRequireLogin?.();
     if (!isOwner(item)) return;
@@ -404,9 +369,6 @@ export default function Watch({ user, onRequireLogin }) {
     }
   }
 
-  // -----------------------
-  // Delete (comment or reply)
-  // -----------------------
   function requestDeleteItem(targetId, parentId = null) {
     if (!isLoggedIn) return onRequireLogin?.();
     setDeleteTarget({ id: targetId, parentId });
@@ -438,7 +400,6 @@ export default function Watch({ user, onRequireLogin }) {
 
       if (editing?.id === targetId) cancelEdit();
 
-      // if composer anchored to deleted item, close it
       if (replyingTo?.anchorId === targetId) {
         setReplyingTo(null);
         setReplyBody("");
@@ -448,9 +409,6 @@ export default function Watch({ user, onRequireLogin }) {
     }
   }
 
-  // -----------------------
-  // Replies (placement-aware, still 1-level deep)
-  // -----------------------
   function toggleReplies(commentId) {
     setOpenReplies((prev) => {
       const next = new Set(prev);
@@ -459,15 +417,12 @@ export default function Watch({ user, onRequireLogin }) {
       return next;
     });
 
-    // if collapsing a thread that currently contains the composer, close it
     if (replyingTo?.parentId === commentId && openReplies.has(commentId)) {
       setReplyingTo(null);
       setReplyBody("");
     }
   }
 
-  // parentId = top-level comment id
-  // anchorId = where composer should show (comment id OR reply id)
   function openReplyComposer(parentId, anchorId, prefill = "") {
     if (!isLoggedIn) return onRequireLogin?.();
 
@@ -516,29 +471,25 @@ export default function Watch({ user, onRequireLogin }) {
   const channelDisplay = video.channelDisplayName || channelUsername;
   const channelAvatarUrl = video.channelAvatarUrl || "";
 
-  const avgNum = toNumOrNull(video?.ratingAvg);
-  const myNum = toNumOrNull(myRating);
-  //const starValue = myNum ?? avgNum ?? 0;
-
   return (
     <div className="shell">
-      <main className="watchLayout">
-        <section className="playerArea">
-          <video className="player" controls src={streamUrl(video)} />
+      <main className="watchPageLayout">
+        <section className="watchPageMain">
+          <video className="watchPagePlayer" controls src={streamUrl(video)} />
 
-          <h1 className="watchTitle">{video.title}</h1>
+          <h1 className="watchPageTitle">{video.title}</h1>
 
-          <div className="watchChannelRow">
-            <div className="watchChannelLeft">
+          <div className="watchPageChannelRow">
+            <div className="watchPageChannelLeft">
               <NavLink
                 to={channelUsername ? `/u/${channelUsername}` : "#"}
-                className="watchChannelAvatarLink"
+                className="watchPageChannelAvatarLink"
                 onClick={(e) => {
                   if (!channelUsername) e.preventDefault();
                 }}
               >
                 <div
-                  className="watchChannelAvatar"
+                  className="watchPageChannelAvatar"
                   style={channelAvatarUrl ? { backgroundImage: `url(${channelAvatarUrl})` } : undefined}
                   aria-label="Channel avatar"
                 >
@@ -546,18 +497,18 @@ export default function Watch({ user, onRequireLogin }) {
                 </div>
               </NavLink>
 
-              <div className="watchChannelMeta">
+              <div className="watchPageChannelMeta">
                 <NavLink
                   to={channelUsername ? `/u/${channelUsername}` : "#"}
-                  className="watchChannelNameLink"
+                  className="watchPageChannelNameLink"
                   onClick={(e) => {
                     if (!channelUsername) e.preventDefault();
                   }}
                 >
-                  <div className="watchChannelName">{channelDisplay}</div>
+                  <div className="watchPageChannelName">{channelDisplay}</div>
                 </NavLink>
 
-                <div className="watchChannelSub">
+                <div className="watchPageChannelSub">
                   <span>{formatInt(video.views)} views</span>
                   {video.createdAt ? (
                     <>
@@ -570,55 +521,47 @@ export default function Watch({ user, onRequireLogin }) {
             </div>
           </div>
 
-
           {video.description ? (
-            <div className="watchDescriptionBlock">
-              <div className="watchDescriptionHeader">Description:</div>
-              <div className="watchDesc">{video.description}</div>
+            <div className="watchPageDescriptionBlock">
+              <div className="watchPageDescriptionHeader">Description:</div>
+              <div className="watchPageDesc">{video.description}</div>
             </div>
           ) : null}
 
+          <div className="watchPageRatingBlock">
+            <StarRating
+              value={myRating}
+              avg={video.ratingAvg ?? null}
+              count={video.ratingCount ?? 0}
+              disabled={ratingBusy}
+              onRate={handleRate}
+            />
 
-          <div className="watchRatingBlock">
-          <StarRating
-            value={myRating}
-            avg={video.ratingAvg ?? null}
-            count={video.ratingCount ?? 0}
-            disabled={ratingBusy}
-            onRate={handleRate}
-          />
+            <div className="watchPageRatingMeta">
+              {myRating ? (
+                <div className="watchPageYourRating">
+                  Your rating: <span className="watchPageYourRatingValue">{myRating}</span>
+                </div>
+              ) : (
+                <div className="watchPageYourRating watchPageMuted">Your rating: —</div>
+              )}
 
-          <div className="watchRatingMeta">
-            {myRating ? (
-              <div className="watchYourRating">
-                Your rating: <span className="watchYourRatingValue">{myRating}</span>
+              <div className="watchPageCommunityRating watchPageMuted">
+                Community: {(Number(video.ratingAvg) || 0).toFixed(2)} •{" "}
+                {video.ratingCount ?? 0} rating{(video.ratingCount ?? 0) === 1 ? "" : "s"}
               </div>
-            ) : (
-              <div className="watchYourRating watchMuted">Your rating: —</div>
-            )}
-
-            <div className="watchCommunityRating watchMuted">
-              Community: {(Number(video.ratingAvg) || 0).toFixed(2)} •{" "}
-              {video.ratingCount ?? 0} rating{(video.ratingCount ?? 0) === 1 ? "" : "s"}
             </div>
           </div>
-        </div>
 
-
-          
-
-          {/* =========================
-              COMMENTS + REPLIES (restored)
-             ========================= */}
-          <div className="commentsSection">
-            <div className="commentsHeader">
-              <h3 className="commentsTitle">
+          <div className="watchPageCommentsSection">
+            <div className="watchPageCommentsHeader">
+              <h3 className="watchPageCommentsTitle">
                 Comments {commentsBusy ? "…" : `(${comments.length})`}
               </h3>
 
               {!isLoggedIn ? (
                 <button
-                  className="commentsLoginHint"
+                  className="watchPageCommentsLoginHint"
                   onClick={() => onRequireLogin?.()}
                   type="button"
                 >
@@ -627,21 +570,20 @@ export default function Watch({ user, onRequireLogin }) {
               ) : null}
             </div>
 
-            {/* Composer */}
-            <form className="commentComposer" onSubmit={handlePostComment}>
-              <div className="commentComposerBody">
+            <form className="watchPageCommentComposer" onSubmit={handlePostComment}>
+              <div className="watchPageCommentComposerBody">
                 <textarea
-                  className="commentTextarea commentInput"
+                  className="watchPageCommentTextarea"
                   value={commentBody}
                   onChange={(e) => setCommentBody(e.target.value)}
                   placeholder={isLoggedIn ? "Add a comment…" : "Log in to comment…"}
                   rows={3}
                   disabled={!isLoggedIn || commentPostBusy}
                 />
-                <div className="commentComposerActions">
-                  <div className="commentComposerButtons">
+                <div className="watchPageCommentComposerActions">
+                  <div className="watchPageCommentComposerButtons">
                     <button
-                      className="btnPrimary commentPostBtn"
+                      className="watchPageBtnPrimary"
                       type="submit"
                       disabled={!isLoggedIn || !canPost || commentPostBusy}
                     >
@@ -650,7 +592,7 @@ export default function Watch({ user, onRequireLogin }) {
 
                     {!isLoggedIn ? (
                       <button
-                        className="btnGhost commentLoginBtn"
+                        className="watchPageBtnGhost"
                         type="button"
                         onClick={() => onRequireLogin?.()}
                       >
@@ -659,109 +601,103 @@ export default function Watch({ user, onRequireLogin }) {
                     ) : null}
                   </div>
 
-                  {commentError ? <div className="commentError">{commentError}</div> : null}
+                  {commentError ? <div className="watchPageCommentError">{commentError}</div> : null}
                 </div>
               </div>
             </form>
 
             {comments.length === 0 && !commentsBusy ? (
-              <div className="commentEmpty commentsEmpty">No comments yet.</div>
+              <div className="watchPageCommentEmpty">No comments yet.</div>
             ) : null}
 
-            <div className="commentList">
+            <div className="watchPageCommentList">
               {comments.map((c) => {
                 const repliesOpen = openReplies.has(c.id);
                 const isEditingComment = editing?.id === c.id && editing?.parentId == null;
-
                 const commentName = c.displayName || c.username;
                 const commentUser = c.username || "";
-
                 const showComposerUnderComment =
                   replyingTo?.parentId === c.id && replyingTo?.anchorId === c.id;
 
                 return (
-                  <div key={c.id} className="commentItem">
-                    <div className="commentMain">
-                      {/* Avatar + username side-by-side */}
-                      <div className="commentMeta">
+                  <div key={c.id} className="watchPageCommentItem">
+                    <div className="watchPageCommentMain">
+                      <div className="watchPageCommentMeta">
                         <NavLink
                           to={commentUser ? `/u/${commentUser}` : "#"}
-                          className="commentAvatarLink"
+                          className="watchPageCommentAvatarLink"
                           onClick={(e) => {
                             if (!commentUser) e.preventDefault();
                           }}
                           title={commentName}
                         >
-                          <div className="commentAvatar">{initialLetter(commentName)}</div>
+                          <div className="watchPageCommentAvatar">{initialLetter(commentName)}</div>
                         </NavLink>
 
                         <NavLink
                           to={commentUser ? `/u/${commentUser}` : "#"}
-                          className="commentUserLink"
+                          className="watchPageCommentUserLink"
                           onClick={(e) => {
                             if (!commentUser) e.preventDefault();
                           }}
                         >
-                          <span className="commentAuthor">{commentName}</span>
+                          <span className="watchPageCommentAuthor">{commentName}</span>
                         </NavLink>
 
                         <span className="dot">•</span>
-                        <span className="commentTime">{c.createdAt ? timeAgo(c.createdAt) : ""}</span>
+                        <span className="watchPageCommentTime">{c.createdAt ? timeAgo(c.createdAt) : ""}</span>
 
                         {c.updatedAt && c.updatedAt !== c.createdAt ? (
                           <>
                             <span className="dot">•</span>
-                            <span className="commentEdited">edited</span>
+                            <span className="watchPageCommentEdited">edited</span>
                           </>
                         ) : null}
                       </div>
 
-                      {/* body or edit */}
                       {isEditingComment ? (
-                        <div className="commentEditBox">
-                          <div className="commentEdit">
+                        <div className="watchPageCommentEditBox">
+                          <div className="watchPageCommentEdit">
                             <textarea
-                              className="commentEditInput"
+                              className="watchPageCommentEditInput"
                               value={editingBody}
                               onChange={(e) => setEditingBody(e.target.value)}
                               rows={3}
                               disabled={editBusy}
                             />
-                            <div className="commentEditActions">
+                            <div className="watchPageCommentEditActions">
                               <button
-                                className="commentMiniBtn primary"
+                                className="watchPageMiniBtn primary"
                                 type="button"
                                 disabled={!canSaveEdit || editBusy}
                                 onClick={() => saveEditItem(c.id, null)}
                               >
                                 {editBusy ? "Saving…" : "Save"}
                               </button>
-                              <button className="commentMiniBtn" type="button" onClick={cancelEdit}>
+                              <button className="watchPageMiniBtn" type="button" onClick={cancelEdit}>
                                 Cancel
                               </button>
                             </div>
                           </div>
                         </div>
                       ) : (
-                        <div className="commentBody">{c.body}</div>
+                        <div className="watchPageCommentBody">{c.body}</div>
                       )}
 
-                      {/* actions row */}
-                      <div className="commentActions">
+                      <div className="watchPageCommentActions">
                         <button
                           type="button"
-                          className={`actionBtn ${c.likedByMe ? "isActive" : ""}`}
+                          className={`watchPageActionBtn ${c.likedByMe ? "isActive" : ""}`}
                           onClick={() => handleToggleLike(c.id)}
                           disabled={!isLoggedIn}
                         >
                           {c.likedByMe ? "♥" : "♡"} Like{" "}
-                          <span className="actionCount">({c.likeCount || 0})</span>
+                          <span className="watchPageActionCount">({c.likeCount || 0})</span>
                         </button>
 
-                        {/* Reply on COMMENT: composer under comment */}
                         <button
                           type="button"
-                          className="actionBtn"
+                          className="watchPageActionBtn"
                           onClick={() => openReplyComposer(c.id, c.id)}
                           disabled={!isLoggedIn}
                         >
@@ -770,19 +706,18 @@ export default function Watch({ user, onRequireLogin }) {
 
                         <button
                           type="button"
-                          className="actionBtn subtle"
+                          className="watchPageActionBtn subtle"
                           onClick={() => toggleReplies(c.id)}
                         >
                           {repliesOpen ? "Hide replies" : "Show replies"}{" "}
-                          <span className="actionCount">({(c.replies || []).length})</span>
+                          <span className="watchPageActionCount">({(c.replies || []).length})</span>
                         </button>
 
-                        {/* owner-only buttons */}
                         {isOwner(c) ? (
                           <>
                             <button
                               type="button"
-                              className="actionBtn subtle"
+                              className="watchPageActionBtn subtle"
                               onClick={() => startEditItem(c, null)}
                               disabled={!isLoggedIn}
                             >
@@ -791,7 +726,7 @@ export default function Watch({ user, onRequireLogin }) {
 
                             <button
                               type="button"
-                              className="actionBtn danger"
+                              className="watchPageActionBtn danger"
                               onClick={() => requestDeleteItem(c.id, null)}
                               disabled={!isLoggedIn}
                             >
@@ -801,20 +736,19 @@ export default function Watch({ user, onRequireLogin }) {
                         ) : null}
                       </div>
 
-                      {/* Composer UNDER COMMENT */}
                       {showComposerUnderComment ? (
-                        <div className="replyComposer">
+                        <div className="watchPageReplyComposer">
                           <textarea
-                            className="replyInput"
+                            className="watchPageReplyInput"
                             value={replyBody}
                             onChange={(e) => setReplyBody(e.target.value)}
                             placeholder="Write a reply…"
                             rows={3}
                             disabled={!isLoggedIn || replyBusy}
                           />
-                          <div className="replyActions">
+                          <div className="watchPageReplyActions">
                             <button
-                              className="commentMiniBtn primary"
+                              className="watchPageMiniBtn primary"
                               type="button"
                               disabled={!replyBody.trim() || replyBusy}
                               onClick={() => handlePostReply(c.id)}
@@ -822,7 +756,7 @@ export default function Watch({ user, onRequireLogin }) {
                               {replyBusy ? "Posting…" : "Post reply"}
                             </button>
                             <button
-                              className="commentMiniBtn"
+                              className="watchPageMiniBtn"
                               type="button"
                               onClick={() => {
                                 setReplyingTo(null);
@@ -835,9 +769,8 @@ export default function Watch({ user, onRequireLogin }) {
                         </div>
                       ) : null}
 
-                      {/* Replies list */}
                       {repliesOpen ? (
-                        <div className="replyList">
+                        <div className="watchPageReplyList">
                           {(c.replies || []).map((r) => {
                             const isEditingReply =
                               editing?.id === r.id && String(editing?.parentId) === String(c.id);
@@ -849,59 +782,58 @@ export default function Watch({ user, onRequireLogin }) {
                               replyingTo?.parentId === c.id && replyingTo?.anchorId === r.id;
 
                             return (
-                              <div key={r.id} className="replyItem">
-                                <div className="commentMain">
-                                  {/* Reply avatar + username side-by-side */}
-                                  <div className="commentMeta">
+                              <div key={r.id} className="watchPageReplyItem">
+                                <div className="watchPageCommentMain">
+                                  <div className="watchPageCommentMeta">
                                     <NavLink
                                       to={replyUser ? `/u/${replyUser}` : "#"}
-                                      className="replyAvatarLink"
+                                      className="watchPageReplyAvatarLink"
                                       onClick={(e) => {
                                         if (!replyUser) e.preventDefault();
                                       }}
                                       title={replyName}
                                     >
-                                      <div className="commentAvatar small">
+                                      <div className="watchPageCommentAvatar small">
                                         {initialLetter(replyName)}
                                       </div>
                                     </NavLink>
 
                                     <NavLink
                                       to={replyUser ? `/u/${replyUser}` : "#"}
-                                      className="replyUserLink"
+                                      className="watchPageReplyUserLink"
                                       onClick={(e) => {
                                         if (!replyUser) e.preventDefault();
                                       }}
                                     >
-                                      <span className="commentAuthor">{replyName}</span>
+                                      <span className="watchPageCommentAuthor">{replyName}</span>
                                     </NavLink>
 
                                     <span className="dot">•</span>
-                                    <span className="commentTime">
+                                    <span className="watchPageCommentTime">
                                       {r.createdAt ? timeAgo(r.createdAt) : ""}
                                     </span>
 
                                     {r.updatedAt && r.updatedAt !== r.createdAt ? (
                                       <>
                                         <span className="dot">•</span>
-                                        <span className="commentEdited">edited</span>
+                                        <span className="watchPageCommentEdited">edited</span>
                                       </>
                                     ) : null}
                                   </div>
 
                                   {isEditingReply ? (
-                                    <div className="commentEditBox">
-                                      <div className="commentEdit">
+                                    <div className="watchPageCommentEditBox">
+                                      <div className="watchPageCommentEdit">
                                         <textarea
-                                          className="commentEditInput"
+                                          className="watchPageCommentEditInput"
                                           value={editingBody}
                                           onChange={(e) => setEditingBody(e.target.value)}
                                           rows={3}
                                           disabled={editBusy}
                                         />
-                                        <div className="commentEditActions">
+                                        <div className="watchPageCommentEditActions">
                                           <button
-                                            className="commentMiniBtn primary"
+                                            className="watchPageMiniBtn primary"
                                             type="button"
                                             disabled={!canSaveEdit || editBusy}
                                             onClick={() => saveEditItem(r.id, c.id)}
@@ -909,7 +841,7 @@ export default function Watch({ user, onRequireLogin }) {
                                             {editBusy ? "Saving…" : "Save"}
                                           </button>
                                           <button
-                                            className="commentMiniBtn"
+                                            className="watchPageMiniBtn"
                                             type="button"
                                             onClick={cancelEdit}
                                           >
@@ -919,25 +851,23 @@ export default function Watch({ user, onRequireLogin }) {
                                       </div>
                                     </div>
                                   ) : (
-                                    <div className="commentBody replyBody">{r.body}</div>
+                                    <div className="watchPageCommentBody watchPageReplyBody">{r.body}</div>
                                   )}
 
-                                  {/* reply actions row */}
-                                  <div className="replyActionsRow">
+                                  <div className="watchPageReplyActionsRow">
                                     <button
                                       type="button"
-                                      className={`actionBtn ${r.likedByMe ? "isActive" : ""}`}
+                                      className={`watchPageActionBtn ${r.likedByMe ? "isActive" : ""}`}
                                       onClick={() => handleToggleLike(r.id)}
                                       disabled={!isLoggedIn}
                                     >
                                       {r.likedByMe ? "♥" : "♡"} Like{" "}
-                                      <span className="actionCount">({r.likeCount || 0})</span>
+                                      <span className="watchPageActionCount">({r.likeCount || 0})</span>
                                     </button>
 
-                                    {/* Reply ON REPLY: composer placed under this reply, but posts to parent comment */}
                                     <button
                                       type="button"
-                                      className="actionBtn subtle"
+                                      className="watchPageActionBtn subtle"
                                       onClick={() =>
                                         openReplyComposer(
                                           c.id,
@@ -951,10 +881,10 @@ export default function Watch({ user, onRequireLogin }) {
                                     </button>
 
                                     {isOwner(r) ? (
-                                      <div className="replyMenu">
+                                      <div className="watchPageReplyMenu">
                                         <button
                                           type="button"
-                                          className="actionBtn subtle"
+                                          className="watchPageActionBtn subtle"
                                           onClick={() => startEditItem(r, c.id)}
                                           disabled={!isLoggedIn}
                                         >
@@ -962,7 +892,7 @@ export default function Watch({ user, onRequireLogin }) {
                                         </button>
                                         <button
                                           type="button"
-                                          className="actionBtn danger"
+                                          className="watchPageActionBtn danger"
                                           onClick={() => requestDeleteItem(r.id, c.id)}
                                           disabled={!isLoggedIn}
                                         >
@@ -972,20 +902,19 @@ export default function Watch({ user, onRequireLogin }) {
                                     ) : null}
                                   </div>
 
-                                  {/* Composer UNDER THIS REPLY */}
                                   {showComposerUnderThisReply ? (
-                                    <div className="replyComposer">
+                                    <div className="watchPageReplyComposer">
                                       <textarea
-                                        className="replyInput"
+                                        className="watchPageReplyInput"
                                         value={replyBody}
                                         onChange={(e) => setReplyBody(e.target.value)}
                                         placeholder="Write a reply…"
                                         rows={3}
                                         disabled={!isLoggedIn || replyBusy}
                                       />
-                                      <div className="replyActions">
+                                      <div className="watchPageReplyActions">
                                         <button
-                                          className="commentMiniBtn primary"
+                                          className="watchPageMiniBtn primary"
                                           type="button"
                                           disabled={!replyBody.trim() || replyBusy}
                                           onClick={() => handlePostReply(c.id)}
@@ -993,7 +922,7 @@ export default function Watch({ user, onRequireLogin }) {
                                           {replyBusy ? "Posting…" : "Post reply"}
                                         </button>
                                         <button
-                                          className="commentMiniBtn"
+                                          className="watchPageMiniBtn"
                                           type="button"
                                           onClick={() => {
                                             setReplyingTo(null);
@@ -1018,27 +947,6 @@ export default function Watch({ user, onRequireLogin }) {
             </div>
           </div>
         </section>
-
-        <aside className="suggestArea">
-          <div className="suggestTitle">More in {video.category}</div>
-          <div className="suggestList">
-            {suggested
-              .filter((v) => INCLUDE_TEST_DATA || !v?.isTestData && !v?.is_test_data)
-              .map((v) => (
-              <button
-                key={v.id}
-                className="suggestItem"
-                onClick={() => nav(`/watch/${v.id}`)}
-                type="button"
-              >
-                <div className="suggestText">
-                  <div className="suggestName">{v.title}</div>
-                  <div className="suggestSub">{v.category}</div>
-                </div>
-              </button>
-            ))}
-          </div>
-        </aside>
       </main>
 
       {deleteTarget && (
