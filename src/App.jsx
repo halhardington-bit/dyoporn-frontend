@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useEffect, useState, useCallback } from "react";
-import { me } from "./api";
+import { me, logout } from "./api";
 
 import AppLayout from "./layouts/AppLayout.jsx";
 import Home from "./pages/Home.jsx";
@@ -33,15 +33,13 @@ export default function App() {
 
   const refreshMe = useCallback(async () => {
     try {
-      const res = await fetch("/auth/me", { credentials: "include" });
-      if (res.ok) {
-        const me = await res.json();
-        setUser(me);
-        return me;
-      }
-    } catch {}
-    setUser(null);
-    return null;
+      const currentUser = await me();
+      setUser(currentUser);
+      return currentUser;
+    } catch {
+      setUser(null);
+      return null;
+    }
   }, []);
 
   const openLogin = (redirectTo = null) => {
@@ -65,10 +63,7 @@ export default function App() {
 
   const handleLogout = async () => {
     try {
-      await fetch("/auth/logout", {
-        method: "POST",
-        credentials: "include",
-      });
+      await logout();
     } catch {}
     setUser(null);
   };

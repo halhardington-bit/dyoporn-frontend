@@ -566,11 +566,18 @@
     padding: 0 12px 12px;
   }
 
-  .profileSearchInput,
+  .profileSearchInput{
+    font-size: 13px;
+    padding-top: 11px;
+    padding-bottom: 11px;
+  }
+
+
   .profileSortSelect {
     font-size: 13px;
     padding-top: 11px;
     padding-bottom: 11px;
+    width: 1px;
   }
 
   .profileUploadsGrid {
