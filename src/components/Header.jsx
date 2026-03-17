@@ -156,11 +156,10 @@ export default function Header({
             </div>
           ) : (
             <div className="user-info">
-              <NavLink className="username" to={`/u/${user.username}`}>
+              <div className="userDesktopMeta">
+                <NavLink className="username" to={`/u/${user.username}`}>
                 {headerName}
               </NavLink>
-
-              <div className="userDesktopMeta">
                 <span className="tokens">🪙 {tokensVal}</span>
                 <span className="rating">
                   ⭐ {ratingVal == null ? "—" : Number(ratingVal).toFixed(2)} ({reviewCountVal})
@@ -183,12 +182,20 @@ export default function Header({
               </button>
 
               {mobileUserMenuOpen ? (
+                
                 <div
                   ref={mobileMenuRef}
                   className="userMenuPanel"
                   role="menu"
                   aria-label="Account menu"
                 >
+                  <NavLink
+                      className="userMenuHeading"
+                      to={`/u/${user.username}`}
+                      onClick={() => setMobileUserMenuOpen(false)}
+                    >
+                      {headerName}
+                    </NavLink>
                   <div className="userMenuItem" role="presentation">
                     🪙 {tokensVal}
                   </div>
