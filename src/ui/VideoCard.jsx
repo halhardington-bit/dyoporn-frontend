@@ -1,4 +1,3 @@
-// VideoCard.jsx
 import "./VideoCard.css";
 import { useNavigate, NavLink } from "react-router-dom";
 import { thumbUrl, streamUrl } from "../api.js";
@@ -35,7 +34,6 @@ export default function VideoCard({
 
   const src = thumbUrl(video) || null;
 
-  // Preview src (must be directly playable by <video> for this approach)
   const previewSrc = useMemo(() => {
     try {
       return streamUrl?.(video) || null;
@@ -71,7 +69,7 @@ export default function VideoCard({
       ownerUserId != null &&
       Number(currentUser.id) === Number(ownerUserId));
 
-  const canDelete = isOwner && typeof onRequestDelete === "function";
+  const canManage = isOwner && typeof onRequestDelete === "function";
 
   function handleClick() {
     if (locked) return onRequireLogin?.();
@@ -88,7 +86,14 @@ export default function VideoCard({
   function handleDeleteClick(e) {
     e.preventDefault();
     e.stopPropagation();
+    setManageMenuOpen(false);
     onRequestDelete?.(video);
+  }
+
+  function handlePlaceholderAction(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    setManageMenuOpen(false);
   }
 
   // -----------------------
@@ -96,16 +101,13 @@ export default function VideoCard({
   // -----------------------
   const videoRef = useRef(null);
   const hoverTimerRef = useRef(null);
-  const [isHovering, setIsHovering] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
 
   const previewEnabled = !locked && !!previewSrc;
 
   function startPreviewSoon() {
     if (!previewEnabled) return;
-    setIsHovering(true);
 
-    // Add a tiny delay like YouTube (prevents accidental flicker)
     clearTimeout(hoverTimerRef.current);
     hoverTimerRef.current = setTimeout(() => {
       setShowPreview(true);
@@ -113,7 +115,6 @@ export default function VideoCard({
   }
 
   function stopPreview() {
-    setIsHovering(false);
     setShowPreview(false);
     clearTimeout(hoverTimerRef.current);
 
@@ -126,36 +127,61 @@ export default function VideoCard({
     }
   }
 
-  // When preview becomes visible, try to play
   useEffect(() => {
     const el = videoRef.current;
-    if (!el) return;
+    if (!el || !showPreview) return;
 
-    if (!showPreview) return;
-
-    // Always muted for autoplay policies
     el.muted = true;
     el.playsInline = true;
 
     const play = async () => {
       try {
-        // Start a bit in (optional). Comment out if you want frame 0.
-        // el.currentTime = 0.25;
         await el.play();
-      } catch {
-        // Autoplay can fail; in that case user will still see the thumb.
-      }
+      } catch {}
     };
 
     play();
   }, [showPreview]);
 
-  // Cleanup
   useEffect(() => {
     return () => {
       clearTimeout(hoverTimerRef.current);
     };
   }, []);
+
+  // -----------------------
+  // Owner manage menu
+  // -----------------------
+  const [manageMenuOpen, setManageMenuOpen] = useState(false);
+  const manageMenuRef = useRef(null);
+  const manageButtonRef = useRef(null);
+
+  useEffect(() => {
+    if (!manageMenuOpen) return;
+
+    function handlePointerDown(e) {
+      const panel = manageMenuRef.current;
+      const button = manageButtonRef.current;
+      const target = e.target;
+
+      if (panel?.contains(target) || button?.contains(target)) return;
+      setManageMenuOpen(false);
+    }
+
+    function handleKeyDown(e) {
+      if (e.key === "Escape") setManageMenuOpen(false);
+    }
+
+    document.addEventListener("mousedown", handlePointerDown);
+    document.addEventListener("touchstart", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("mousedown", handlePointerDown);
+      document.removeEventListener("touchstart", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [manageMenuOpen]);
 
   return (
     <div
@@ -169,8 +195,62 @@ export default function VideoCard({
       onFocus={startPreviewSoon}
       onBlur={stopPreview}
     >
+      {canManage && (
+        <div className="vManageWrap" onClick={(e) => e.stopPropagation()}>
+          <button
+            ref={manageButtonRef}
+            type="button"
+            className="vManageButton"
+            aria-label="Open video options"
+            aria-expanded={manageMenuOpen}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setManageMenuOpen((v) => !v);
+            }}
+          >
+            ⋯
+          </button>
+
+          {manageMenuOpen ? (
+            <div
+              ref={manageMenuRef}
+              className="vManageMenu"
+              role="menu"
+              aria-label="Video options"
+            >
+              <button
+                type="button"
+                className="vManageItem"
+                role="menuitem"
+                onClick={handlePlaceholderAction}
+              >
+                Rename Title
+              </button>
+
+              <button
+                type="button"
+                className="vManageItem"
+                role="menuitem"
+                onClick={handlePlaceholderAction}
+              >
+                Change Visibility
+              </button>
+
+              <button
+                type="button"
+                className="vManageItem danger"
+                role="menuitem"
+                onClick={handleDeleteClick}
+              >
+                Delete
+              </button>
+            </div>
+          ) : null}
+        </div>
+      )}
+
       <div className="thumb-wrapper">
-        {/* Thumbnail */}
         {src ? (
           <img
             className={`thumbImg ${showPreview ? "isHidden" : ""}`}
@@ -180,7 +260,6 @@ export default function VideoCard({
           />
         ) : null}
 
-        {/* Hover preview */}
         {previewEnabled ? (
           <video
             ref={videoRef}
@@ -215,17 +294,6 @@ export default function VideoCard({
               <span className="vAvg">{ratingAvg}</span>
               <span className="vCount">({ratingCount})</span>
             </div>
-
-            {canDelete && (
-              <button
-                type="button"
-                className="vDeleteBtn"
-                onClick={handleDeleteClick}
-                title="Delete video"
-              >
-                Delete
-              </button>
-            )}
           </div>
         </div>
 

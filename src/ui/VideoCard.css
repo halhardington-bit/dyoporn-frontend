@@ -1,46 +1,3 @@
-.video-meta {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.video-title {
-  margin: 0;
-  font-size: 13px;
-  font-weight: 600;
-  line-height: 1.2;
-  margin-top: 0px;
-}
-
-.video-sub {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 11px;
-  opacity: 0.85;
-}
-
-.dot {
-  opacity: 0.6;
-}
-
-.thumb-wrapper {
-  position: relative;
-  overflow: hidden;
-  border-radius: 14px;
-  border: 2px solid rgba(255,255,255,0.10);
-  background: rgba(255,255,255,0.03);
-  aspect-ratio: 16 / 9;
-}
-
-.thumb-wrapper img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-  border-radius: 12px;
-}
-
 .video-card {
   transition: transform 140ms ease, box-shadow 140ms ease, filter 140ms ease;
   display: flex;
@@ -58,7 +15,6 @@
   border-radius: 14px;
   border: 1px solid rgba(255,255,255,0.10);
   background: rgba(255,255,255,0.03);
-
   aspect-ratio: 16 / 9;
 }
 
@@ -67,11 +23,12 @@
   box-shadow: 0 10px 30px rgba(0,0,0,0.35);
 }
 
-.thumb-wrapper img {
+.thumb-wrapper img,
+.thumb-wrapper video {
   width: 100%;
   height: 100%;
-  object-fit: cover;
   display: block;
+  object-fit: cover;
 }
 
 .video-card:hover .thumb-wrapper img {
@@ -79,124 +36,63 @@
   filter: brightness(1.05) contrast(1.02);
 }
 
-.durationBadge {
-  position: absolute;
-  right: 8px;
-  bottom: 8px;
+.video-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
 
-  padding: 3px 6px;
-  border-radius: 6px;
+.vTitleRow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
 
-  background: rgba(0, 0, 0, 0.75);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-
-  color: rgba(232, 236, 241, 0.95);
-  font-size: 11px;
+.video-title {
+  flex: 1;
+  margin: 0;
+  font-size: 13px;
   font-weight: 600;
-  line-height: 1;
-
-  pointer-events: none;
+  line-height: 1.2;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
-/* --- Locked / blurred state --- */
-.video-card.locked .thumb-wrapper img {
-  filter: blur(10px) brightness(0.65);
-  transform: scale(1.06);
-}
-
-.lockOverlay {
-  position: absolute;
-  inset: 0;
-
-  display: grid;
-  place-items: center;
-
-  background: rgba(0, 0, 0, 0.25);
-  backdrop-filter: blur(1px);
-  -webkit-backdrop-filter: blur(1px);
-
-  pointer-events: none;
-}
-
-.lockPill {
+.vTitleRight {
+  margin-left: auto;
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
+}
 
-  padding: 8px 10px;
-  border-radius: 999px;
+.vRating {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+  margin-top: 1px;
+  margin-right: 0;
+}
 
-  background: rgba(0, 0, 0, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-
-  color: rgba(232, 236, 241, 0.95);
+.vStar {
+  color: #ffcc00;
   font-size: 12px;
-  font-weight: 600;
+  line-height: 1;
 }
 
-.lockIcon {
-  font-size: 13px;
+.vAvg {
+  font-size: 12px;
+  line-height: 1;
 }
 
-.vTitleRow{
-  display:flex;
-  align-items:flex-start;
-  justify-content:space-between;
-  gap:10px;
-}
-
-.video-title{
-  flex:1;
-  margin:0;
-
-  display:-webkit-box;
-  -webkit-line-clamp:2;
-  -webkit-box-orient:vertical;
-  overflow:hidden;
-}
-
-/* rating block on the right of the title */
-.vRating{
-  display:flex;
-  align-items:center;
-  gap:4px;
-  white-space:nowrap;
-  margin-top:1px;
-  margin-right: 6px; 
-}
-
-.vStar{
-  color:#ffcc00;
-  font-size:12px;
-  line-height:1;
-}
-
-.vAvg{
-  font-size:12px;
-  line-height:1;
-}
-
-.vCount{
-  font-size:12px;
-  line-height:1;
-  color:rgba(255,255,255,0.55);
-}
-
-.video-creator {
-  color: inherit;            /* don't use browser link colors */
-  text-decoration: none;     /* remove underline */
-  cursor: pointer;
-  opacity: 0.85;
-  transition: opacity 0.15s ease;
-}
-
-.video-creator:visited {
-  color: inherit;            /* stop purple visited color */
-}
-
-.video-creator:hover {
-  text-decoration: underline;
-  opacity: 1;
+.vCount {
+  font-size: 12px;
+  line-height: 1;
+  color: rgba(255,255,255,0.55);
 }
 
 .video-sub {
@@ -205,6 +101,24 @@
   display: flex;
   align-items: center;
   gap: 6px;
+  min-width: 0;
+}
+
+.video-creator {
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  opacity: 0.85;
+  transition: opacity 0.15s ease;
+}
+
+.video-creator:visited {
+  color: inherit;
+}
+
+.video-creator:hover {
+  text-decoration: underline;
+  opacity: 1;
 }
 
 .video-views {
@@ -215,57 +129,61 @@
   opacity: 0.6;
 }
 
-
-.video-card .thumb-wrapper {
-  cursor: pointer;
+.durationBadge {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  padding: 3px 6px;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: rgba(232, 236, 241, 0.95);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
+  pointer-events: none;
 }
 
-.vTitleRight {
-  margin-left: auto;
+/* Locked state */
+.video-card.locked .thumb-wrapper img {
+  filter: blur(10px) brightness(0.65);
+  transform: scale(1.06);
+}
+
+.lockOverlay {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(1px);
+  -webkit-backdrop-filter: blur(1px);
+  pointer-events: none;
+}
+
+.lockPill {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-}
-
-.vDeleteBtn {
-  appearance: none;
-  border: 1px solid rgba(255, 100, 100, 0.35);
-  background: rgba(255, 100, 100, 0.12);
-  color: rgba(255, 200, 200, 0.95);
-  padding: 6px 10px;
-  border-radius: 10px;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: rgba(232, 236, 241, 0.95);
   font-size: 12px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: background 120ms ease, border-color 120ms ease, opacity 120ms ease;
+  font-weight: 600;
 }
 
-.vDeleteBtn:hover {
-  background: rgba(255, 100, 100, 0.18);
-  border-color: rgba(255, 100, 100, 0.50);
+.lockIcon {
+  font-size: 13px;
 }
 
-/* Ensure overlay positioning works */
-.thumb-wrapper {
-  position: relative;
-  overflow: hidden;
-}
-
-/* Make both fill the same box */
-.thumb-wrapper img,
-.thumb-wrapper video {
-  width: 100%;
-  height: 100%;
-  display: block;
-  object-fit: cover;
-}
-
-/* Layer the preview video on top of the image */
+/* Hover preview */
 .thumbPreview {
   position: absolute;
   inset: 0;
   opacity: 0;
-  pointer-events: none; /* clicks still go to card */
+  pointer-events: none;
   transition: opacity 120ms ease;
 }
 
@@ -273,7 +191,6 @@
   opacity: 1;
 }
 
-/* Fade the image out when preview shows */
 .thumbImg {
   transition: opacity 120ms ease;
 }
@@ -282,70 +199,191 @@
   opacity: 0;
 }
 
+/* Owner manage menu */
+.vManageWrap {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 4;
+}
 
+.vManageButton {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(0,0,0,0.58);
+  color: rgba(255,255,255,0.95);
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
 
-@media (max-width: 520px) {
+.vManageButton:hover {
+  background: rgba(0,0,0,0.72);
+  border-color: rgba(255,255,255,0.22);
+}
+
+.vManageMenu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+
+  min-width: 200px;   /* 👈 bigger */
+  padding: 10px;      /* 👈 more breathing room */
+
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.10);
+  background: rgba(10,10,10,0.96);
+  box-shadow: 0 18px 40px rgba(0,0,0,0.45);
+  backdrop-filter: blur(12px);
+  z-index: 999;       /* 👈 important */
+}
+
+.vManageItem {
+  width: 100%;
+  display: block;
+  text-align: left;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 0;
+  background: transparent;
+  color: rgba(255,255,255,0.92);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.vManageItem:hover {
+  background: rgba(255,255,255,0.06);
+}
+
+.vManageItem.danger {
+  color: rgba(255, 150, 150, 0.95);
+}
+
+.video-card {
+  position: relative;
+  overflow: visible;
+  transition: transform 140ms ease, box-shadow 140ms ease, filter 140ms ease;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.thumb-wrapper {
+  position: relative;
+  overflow: hidden;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.10);
+  background: rgba(255,255,255,0.03);
+  aspect-ratio: 16 / 9;
+}
+
+.vManageWrap {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 40;
+}
+
+.vManageButton {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(0,0,0,0.58);
+  color: rgba(255,255,255,0.95);
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.vManageButton:hover {
+  background: rgba(0,0,0,0.72);
+  border-color: rgba(255,255,255,0.22);
+}
+
+.vManageMenu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 200px;
+  padding: 10px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.10);
+  background: rgba(10,10,10,0.96);
+  box-shadow: 0 18px 40px rgba(0,0,0,0.45);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  z-index: 999;
+}
+
+.vManageItem {
+  width: 100%;
+  display: block;
+  text-align: left;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 0;
+  background: transparent;
+  color: rgba(255,255,255,0.92);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.vManageItem:hover {
+  background: rgba(255,255,255,0.06);
+}
+
+.vManageItem.danger {
+  color: rgba(255, 150, 150, 0.95);
+}
+
+@media (max-width: 700px) {
   .video-card {
-    gap: 8px;
-  }
-
-  .video-meta {
-    gap: 3px;
+    gap: 10px;
   }
 
   .video-title {
     font-size: 12px;
-    line-height: 1.15;
   }
 
-  .vTitleRow {
-    gap: 6px;
-  }
-
-  .vTitleRight {
-    gap: 6px;
-  }
-
-  .vRating {
-    gap: 3px;
-    margin-right: 0;
+  .video-sub {
+    font-size: 11px;
+    gap: 5px;
   }
 
   .vStar,
   .vAvg,
   .vCount {
-    font-size: 10px;
+    font-size: 11px;
   }
 
-  .video-sub {
-    font-size: 10px;
-    gap: 4px;
-    flex-wrap: nowrap;
-    white-space: nowrap;
-    overflow: hidden;
+  .vManageButton {
+    width: 30px;
+    height: 30px;
+    font-size: 17px;
+    border-radius: 9px;
   }
 
-  .video-creator,
-  .video-views,
-  .dot {
-    white-space: nowrap;
-    flex-shrink: 1;
-    min-width: 0;
+  .vManageMenu {
+    min-width: 160px;
   }
 
-  .video-creator {
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .video-views {
-    flex-shrink: 0;
-  }
-
-  .durationBadge {
-    right: 6px;
-    bottom: 6px;
-    font-size: 10px;
-    padding: 3px 5px;
+  .vManageItem {
+    font-size: 12px;
+    padding: 9px 11px;
   }
 }
