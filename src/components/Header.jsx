@@ -116,22 +116,34 @@ export default function Header({
     ).trim();
   }, [user, meProfile]);
 
-  function handleMobileLogout() {
+  function closeMobileMenu() {
     setMobileUserMenuOpen(false);
+  }
+
+  function handleMobileLogout() {
+    closeMobileMenu();
     onLogout?.();
+  }
+
+  function handleMobileLogin() {
+    closeMobileMenu();
+    onOpenLogin?.();
+  }
+
+  function handleMobileRegister() {
+    closeMobileMenu();
+    onOpenRegister?.();
   }
 
   return (
     <header className="header">
       <div className="header-inner">
-        {/* LEFT */}
         <div className="header-left">
           <NavLink to="/watch" className="logo">
             DYOPorn
           </NavLink>
         </div>
 
-        {/* CENTER */}
         <div className="header-center">
           <form className="searchForm" onSubmit={submitSearch}>
             <input
@@ -143,23 +155,63 @@ export default function Header({
           </form>
         </div>
 
-        {/* RIGHT */}
         <div className="header-right">
           {!user ? (
-            <div className="auth-actions">
-              <button className="login-btn" onClick={onOpenLogin}>
-                Log in
+            <div className="guest-menu">
+              <div className="auth-actions">
+                <button className="login-btn" onClick={onOpenLogin}>
+                  Log in
+                </button>
+                <button className="signup-link" onClick={onOpenRegister}>
+                  Sign up
+                </button>
+              </div>
+
+              <button
+                ref={mobileMenuButtonRef}
+                type="button"
+                className="userMenuButton"
+                aria-label="Open sign in menu"
+                aria-expanded={mobileUserMenuOpen}
+                onClick={() => setMobileUserMenuOpen((v) => !v)}
+              >
+                ⋯
               </button>
-              <button className="signup-link" onClick={onOpenRegister}>
-                Sign up
-              </button>
+
+              {mobileUserMenuOpen ? (
+                <div
+                  ref={mobileMenuRef}
+                  className="userMenuPanel"
+                  role="menu"
+                  aria-label="Guest menu"
+                >
+                  <button
+                    type="button"
+                    className="userMenuItem"
+                    role="menuitem"
+                    onClick={handleMobileLogin}
+                  >
+                    Log in
+                  </button>
+
+                  <button
+                    type="button"
+                    className="userMenuItem"
+                    role="menuitem"
+                    onClick={handleMobileRegister}
+                  >
+                    Sign up
+                  </button>
+                </div>
+              ) : null}
             </div>
           ) : (
             <div className="user-info">
               <div className="userDesktopMeta">
                 <NavLink className="username" to={`/u/${user.username}`}>
-                {headerName}
-              </NavLink>
+                  {headerName}
+                </NavLink>
+
                 <span className="tokens">🪙 {tokensVal}</span>
                 <span className="rating">
                   ⭐ {ratingVal == null ? "—" : Number(ratingVal).toFixed(2)} ({reviewCountVal})
@@ -182,7 +234,6 @@ export default function Header({
               </button>
 
               {mobileUserMenuOpen ? (
-                
                 <div
                   ref={mobileMenuRef}
                   className="userMenuPanel"
@@ -190,12 +241,13 @@ export default function Header({
                   aria-label="Account menu"
                 >
                   <NavLink
-                      className="userMenuHeading"
-                      to={`/u/${user.username}`}
-                      onClick={() => setMobileUserMenuOpen(false)}
-                    >
-                      {headerName}
-                    </NavLink>
+                    className="userMenuHeading"
+                    to={`/u/${user.username}`}
+                    onClick={closeMobileMenu}
+                  >
+                    {headerName}
+                  </NavLink>
+
                   <div className="userMenuItem" role="presentation">
                     🪙 {tokensVal}
                   </div>

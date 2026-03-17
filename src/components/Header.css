@@ -264,6 +264,108 @@
   background: rgba(255,255,255,0.06);
 }
 
+.guest-menu {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+/* desktop guest buttons stay visible */
+.auth-actions {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+/* shared mobile menu button */
+.userMenuButton {
+  display: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.10);
+  background: rgba(255,255,255,0.04);
+  color: var(--text);
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 700;
+  align-items: center;
+  justify-content: center;
+}
+
+.userMenuButton:hover {
+  background: rgba(255,255,255,0.08);
+  border-color: rgba(255,255,255,0.16);
+}
+
+.userMenuPanel {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: -6px;
+  min-width: 190px;
+  padding: 10px;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(10,10,10,0.97);
+  box-shadow: 0 22px 50px rgba(0,0,0,0.52);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  z-index: 100;
+}
+
+.userMenuItem {
+  display: block;
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  color: var(--text);
+  font-size: 13px;
+  text-align: left;
+  background: transparent;
+  border: 0;
+}
+
+.userMenuItem:hover,
+.userMenuLogout:hover {
+  background: rgba(255,255,255,0.06);
+}
+
+.userMenuHeading {
+  display: block;
+  padding: 8px 10px 10px;
+  text-decoration: none;
+  color: white;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.2;
+  border-radius: 10px;
+}
+
+.userMenuHeading:hover {
+  background: rgba(255,255,255,0.05);
+}
+
+@media (max-width: 700px) {
+  .userDesktopMeta {
+    display: none;
+  }
+
+  .auth-actions {
+    display: none;
+  }
+
+  .userMenuButton {
+    display: inline-flex;
+  }
+
+  .username {
+    max-width: 110px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
 @media (max-width: 700px) {
   .userDesktopMeta {
     display: none;
