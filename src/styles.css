@@ -1,8 +1,8 @@
 :root {
-  --bg: #1a191b;
+  --bg: #0c0a0e;
   --bg2: #000000;
 
-  --panel: rgba(255, 255, 255, 0.025);
+  --panel: rgba(14, 12, 12, 0.025);
   --panel2: rgba(255, 255, 255, 0.04);
 
   --stroke: rgba(255, 255, 255, 0.08);
@@ -30,9 +30,9 @@ body {
   margin: 0;
   color: var(--text);
   background:
-    radial-gradient(90vw 55vw at 30% -10%, rgba(230, 211, 243, 0.05), transparent 62%),
-    radial-gradient(75vw 50vw at 110% 20%, rgba(83, 0, 43, 0.12), transparent 62%),
-    radial-gradient(80vw 55vw at 20% 110%, rgba(65, 54, 70, 0.10), transparent 62%),
+    radial-gradient(90vw 55vw at 30% -10%, rgba(134, 133, 134, 0.05), transparent 62%),
+    radial-gradient(75vw 50vw at 110% 20%, rgba(134, 133, 134, 0.05), transparent 62%),
+    radial-gradient(80vw 55vw at 20% 110%, rgba(134, 133, 134, 0.05), transparent 62%),
     var(--bg);
   background-repeat: no-repeat;
   background-attachment: fixed;
