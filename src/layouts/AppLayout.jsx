@@ -2,6 +2,7 @@ import { useState } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import Header from "../components/Header.jsx";
 import AuthModal from "../components/AuthModal.jsx";
+import Sidebar from "../components/Sidebar.jsx";
 
 export default function AppLayout({
   user,
@@ -29,49 +30,57 @@ export default function AppLayout({
         setQ={setQ}
       />
 
-      <div className="folderShell">
-        <nav className="folderTabs">
-          <NavLink
-            to="/watch"
-            end
-            className={({ isActive }) => `folderTab ${isActive ? "active" : ""}`}
-          >
-            Watch
-          </NavLink>
+      <div className="appShell">
+        <Sidebar user={user} onOpenLogin={onOpenLogin} />
 
-          <NavLink
-            to="/create"
-            className={({ isActive }) =>
-              `folderTab ${isActive ? "active" : ""} ${!user ? "lockedTab" : ""}`
-            }
-            onClick={(e) => {
-              if (!user) {
-                e.preventDefault();
-                onOpenLogin("/create"); // ✅ set redirect target
-              }
-            }}
-          >
-            Upload
-          </NavLink>
+        <div className="appMain">
+          <div className="appContent">
+          <div className="folderShell">
+            <nav className="folderTabs">
+              <NavLink
+                to="/watch"
+                end
+                className={({ isActive }) => `folderTab ${isActive ? "active" : ""}`}
+              >
+                Watch
+              </NavLink>
 
-          <NavLink
-            to="/generate"
-            className={({ isActive }) =>
-              `folderTab ${isActive ? "active" : ""} ${!user ? "lockedTab" : ""}`
-            }
-            onClick={(e) => {
-              if (!user) {
-                e.preventDefault();
-                onOpenLogin("/generate"); // ✅ set redirect target
-              }
-            }}
-          >
-            Generate
-          </NavLink>
-        </nav>
+              <NavLink
+                to="/create"
+                className={({ isActive }) =>
+                  `folderTab ${isActive ? "active" : ""} ${!user ? "lockedTab" : ""}`
+                }
+                onClick={(e) => {
+                  if (!user) {
+                    e.preventDefault();
+                    onOpenLogin("/create");
+                  }
+                }}
+              >
+                Upload
+              </NavLink>
 
-        <div className="folderBody">
-          <Outlet context={{ q, setQ, user }} />
+              <NavLink
+                to="/generate"
+                className={({ isActive }) =>
+                  `folderTab ${isActive ? "active" : ""} ${!user ? "lockedTab" : ""}`
+                }
+                onClick={(e) => {
+                  if (!user) {
+                    e.preventDefault();
+                    onOpenLogin("/generate");
+                  }
+                }}
+              >
+                Generate
+              </NavLink>
+            </nav>
+
+            <div className="folderBody">
+              <Outlet context={{ q, setQ, user }} />
+            </div>
+            </div>
+          </div>
         </div>
       </div>
 
