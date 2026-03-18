@@ -15,6 +15,42 @@ function qs(paramsObj = {}) {
   return s ? `?${s}` : "";
 }
 
+export async function recordHistory(id, progressSeconds = 0) {
+  const res = await fetch(`${API_BASE}/api/videos/${id}/history`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify({ progressSeconds }),
+  });
+
+  const data = await res.json().catch(() => null);
+  if (!res.ok) throw new Error(data?.error || "Failed to record history");
+  return data;
+}
+
+export async function removeHistoryItem(videoId) {
+  const res = await fetch(`${API_BASE}/api/me/history/${videoId}`, {
+    method: "DELETE",
+    credentials: "include",
+  });
+
+  const data = await res.json().catch(() => null);
+  if (!res.ok) throw new Error(data?.error || "Failed to remove history item");
+  return data;
+}
+
+export async function clearHistory() {
+  const res = await fetch(`${API_BASE}/api/me/history`, {
+    method: "DELETE",
+    credentials: "include",
+  });
+
+  const data = await res.json().catch(() => null);
+  if (!res.ok) throw new Error(data?.error || "Failed to clear history");
+  return data;
+}
+
+
 // BETA
 export async function betaSignup({ email, watching = false, creating = false }) {
   const res = await fetch(`${API_BASE}/api/beta-signup`, {
@@ -39,11 +75,12 @@ export async function betaSignup({ email, watching = false, creating = false }) 
 }
 
 // VIDEOS
-export async function getVideos({ q, category, sort } = {}) {
+export async function getVideos({ q, category, sort, filter } = {}) {
   const url = `${API_BASE}/api/videos${qs({
     q,
     category,
     sort,
+    filter,
     includeTest: INCLUDE_TEST ? "1" : undefined,
   })}`;
   const res = await fetch(url, { credentials: "include" });
@@ -58,6 +95,64 @@ export async function getVideo(id) {
   const res = await fetch(url, { credentials: "include" });
   if (!res.ok) throw new Error(`getVideo failed: ${res.status}`);
   return res.json();
+}
+
+export async function getChannelSubscription(channelId) {
+  const res = await fetch(`${API_BASE}/api/channels/${channelId}/subscription`, {
+    credentials: "include",
+  });
+
+  const data = await res.json().catch(() => ({}));
+
+  if (!res.ok) {
+    throw new Error(data?.error || "Failed to fetch subscription info");
+  }
+
+  return data;
+}
+
+export async function subscribeToChannel(channelId) {
+  const res = await fetch(`${API_BASE}/api/channels/${channelId}/subscribe`, {
+    method: "POST",
+    credentials: "include",
+  });
+
+  const data = await res.json().catch(() => ({}));
+
+  if (!res.ok) {
+    throw new Error(data?.error || "Failed to subscribe");
+  }
+
+  return data;
+}
+
+export async function unsubscribeFromChannel(channelId) {
+  const res = await fetch(`${API_BASE}/api/channels/${channelId}/subscribe`, {
+    method: "DELETE",
+    credentials: "include",
+  });
+
+  const data = await res.json().catch(() => ({}));
+
+  if (!res.ok) {
+    throw new Error(data?.error || "Failed to unsubscribe");
+  }
+
+  return data;
+}
+
+export async function getMySubscriptions() {
+  const res = await fetch(`${API_BASE}/api/me/subscriptions`, {
+    credentials: "include",
+  });
+
+  const data = await res.json().catch(() => ([]));
+
+  if (!res.ok) {
+    throw new Error(data?.error || "Failed to load subscriptions");
+  }
+
+  return data;
 }
 
 

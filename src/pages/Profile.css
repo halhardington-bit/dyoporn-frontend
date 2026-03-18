@@ -420,6 +420,55 @@
   width: 100%;
 }
 
+.profileSubRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.profileSubMeta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.profileSubscriberCount {
+  font-size: 0.95rem;
+  opacity: 0.85;
+}
+
+.profileSubscribeBtn {
+  border: 0;
+  border-radius: 999px;
+  padding: 10px 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.12s ease, opacity 0.12s ease;
+}
+
+.profileSubscribeBtn:hover {
+  transform: translateY(-1px);
+}
+
+.profileSubscribeBtn:disabled {
+  opacity: 0.7;
+  cursor: default;
+  transform: none;
+}
+
+.profileSubscribeBtn.subscribed {
+  opacity: 0.85;
+}
+
+.profileSubError {
+  margin-top: 8px;
+  color: #ff7b7b;
+  font-size: 0.9rem;
+}
+
+
 /* =========================
    Tablet
    ========================= */

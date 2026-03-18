@@ -2,7 +2,15 @@ import { useEffect, useMemo, useState } from "react";
 import { useParams, NavLink, useSearchParams } from "react-router-dom";
 import VideoCard from "../ui/VideoCard.jsx";
 import "./Profile.css";
-import { getProfileByUsername, getUserVideos, deleteVideo, whoami } from "../api.js";
+import {
+  getProfileByUsername,
+  getUserVideos,
+  deleteVideo,
+  whoami,
+  getChannelSubscription,
+  subscribeToChannel,
+  unsubscribeFromChannel,
+} from "../api.js";
 
 function norm(s) {
   return String(s || "").toLowerCase().trim();
@@ -10,10 +18,26 @@ function norm(s) {
 
 function tokenize(q) {
   const STOP = new Set([
-    "a", "an", "the", "and", "or", "to", "of", "in", "on", "for", "with", "it", "is",
-    "are", "was", "were",
+    "a",
+    "an",
+    "the",
+    "and",
+    "or",
+    "to",
+    "of",
+    "in",
+    "on",
+    "for",
+    "with",
+    "it",
+    "is",
+    "are",
+    "was",
+    "were",
   ]);
-  return norm(q).split(/\s+/).filter((t) => t.length >= 2 && !STOP.has(t));
+  return norm(q)
+    .split(/\s+/)
+    .filter((t) => t.length >= 2 && !STOP.has(t));
 }
 
 function matchesQuery(video, q) {
@@ -60,30 +84,30 @@ export default function Profile({ user, onRequireLogin }) {
   const [uploadsBusy, setUploadsBusy] = useState(false);
   const [uploadsErr, setUploadsErr] = useState("");
 
-  // ✅ session truth (same as Header)
+  // Session truth
   const [sessionUser, setSessionUser] = useState(null);
 
-  // ✅ MODAL STATE
+  // Delete modal
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [deleteBusy, setDeleteBusy] = useState(false);
   const [deleteErr, setDeleteErr] = useState("");
 
-  // -----------------------
-  // Keep localQ in sync with URL
-  // -----------------------
+  // Subscription state
+  const [subscribed, setSubscribed] = useState(false);
+  const [subscriberCount, setSubscriberCount] = useState(0);
+  const [subBusy, setSubBusy] = useState(false);
+  const [subErr, setSubErr] = useState("");
+
   useEffect(() => {
     setLocalQ(urlQ);
   }, [urlQ]);
 
-  // -----------------------
-  // whoami -> sessionUser
-  // -----------------------
   useEffect(() => {
     let alive = true;
 
     (async () => {
       if (!user?.id) {
-        setSessionUser(null);
+        if (alive) setSessionUser(null);
         return;
       }
 
@@ -100,7 +124,6 @@ export default function Profile({ user, onRequireLogin }) {
     };
   }, [user?.id]);
 
-  // Use the same “truthy” user object everywhere in Profile
   const me = sessionUser || user;
   const isLoggedIn = !!me?.id;
 
@@ -115,18 +138,17 @@ export default function Profile({ user, onRequireLogin }) {
   }
 
   function isLibraryAsset(video) {
-  const scope = String(video?.asset_scope ?? video?.assetScope ?? "").toLowerCase().trim();
-  return scope === "library";
-}
+    const scope = String(
+      video?.asset_scope ?? video?.assetScope ?? ""
+    ).toLowerCase().trim();
+    return scope === "library";
+  }
 
   function handleSearchSubmit(e) {
     e.preventDefault();
     setParam({ q: localQ });
   }
 
-  // -----------------------
-  // Delete modal
-  // -----------------------
   function openDeleteModal(video) {
     setDeleteErr("");
     setDeleteTarget(video);
@@ -156,13 +178,11 @@ export default function Profile({ user, onRequireLogin }) {
     function onKeyDown(e) {
       if (e.key === "Escape") closeDeleteModal();
     }
+
     if (deleteTarget) window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [deleteTarget, deleteBusy]);
 
-  // -----------------------
-  // Load profile + uploads
-  // -----------------------
   useEffect(() => {
     let alive = true;
 
@@ -178,7 +198,6 @@ export default function Profile({ user, onRequireLogin }) {
         if (!alive) return;
         setProfile(p);
 
-        // pass sort so backend can sort too (you already support it)
         const vids = await getUserVideos(p.username, { sort });
         if (!alive) return;
         setUploadsRaw(Array.isArray(vids) ? vids : []);
@@ -194,12 +213,71 @@ export default function Profile({ user, onRequireLogin }) {
     };
   }, [username, sort]);
 
+  const isMe =
+    !!me?.username &&
+    me.username.toLowerCase() === String(profile?.username || "").toLowerCase();
+
+  useEffect(() => {
+    let alive = true;
+
+    (async () => {
+      if (!profile?.id) {
+        if (alive) {
+          setSubscribed(false);
+          setSubscriberCount(0);
+          setSubErr("");
+        }
+        return;
+      }
+
+      try {
+        setSubErr("");
+        const data = await getChannelSubscription(profile.id);
+        if (!alive) return;
+
+        setSubscribed(!!data?.subscribed);
+        setSubscriberCount(Number(data?.subscriberCount || 0));
+      } catch (e) {
+        if (!alive) return;
+        setSubErr(e?.message || "Failed to load subscription info");
+      }
+    })();
+
+    return () => {
+      alive = false;
+    };
+  }, [profile?.id, me?.id]);
+
+  async function handleToggleSubscription() {
+    if (!profile?.id || !isLoggedIn || isMe || subBusy) return;
+
+    try {
+      setSubBusy(true);
+      setSubErr("");
+
+      if (subscribed) {
+        const data = await unsubscribeFromChannel(profile.id);
+        setSubscribed(false);
+        setSubscriberCount(Number(data?.subscriberCount || 0));
+      } else {
+        const data = await subscribeToChannel(profile.id);
+        setSubscribed(true);
+        setSubscriberCount(Number(data?.subscriberCount || 0));
+      }
+    } catch (e) {
+      setSubErr(e?.message || "Failed to update subscription");
+    } finally {
+      setSubBusy(false);
+    }
+  }
+
   const uploads = useMemo(() => {
     const filtered = uploadsRaw
-    .filter((v) => !isLibraryAsset(v))      // ✅ hide library assets on profile
-    .filter((v) => matchesQuery(v, urlQ));
+      .filter((v) => !isLibraryAsset(v))
+      .filter((v) => matchesQuery(v, urlQ));
 
     const sorted = [...filtered];
+
     if (sort === "oldest") {
       sorted.sort((a, b) => toTime(a.createdAt) - toTime(b.createdAt));
     } else if (sort === "views") {
@@ -226,22 +304,14 @@ export default function Profile({ user, onRequireLogin }) {
   if (err) return <div className="shell">{err}</div>;
   if (!profile) return <div className="shell">Loading…</div>;
 
-  const isMe =
-    !!me?.username &&
-    me.username.toLowerCase() === String(profile.username || "").toLowerCase();
-  
-    const meta = isMe && me ? me : profile;
+  const meta = isMe && me ? me : profile;
 
   const displayRating = Number(meta?.rating ?? 0);
   const displayReviewCount = Number(meta?.reviewCount ?? meta?.review_count ?? 0);
-  const displayTokens = Number(meta?.tokens ?? 0);
-
 
   return (
     <div className="shell">
       <div className="profileCard">
-        
-
         <div className="profileTop">
           <div className="avatarWrap">
             <div
@@ -280,11 +350,40 @@ export default function Profile({ user, onRequireLogin }) {
               <span>{displayReviewCount} reviews</span>
             </div>
 
-            {profile.bio && <div className="bio">{profile.bio}</div>}
+            <div className="profileSubRow">
+              <div className="profileSubMeta">
+                <div className="profileSubscriberCount">
+                  {subscriberCount} {subscriberCount === 1 ? "subscriber" : "subscribers"}
+                </div>
+              </div>
+
+              {!isMe &&
+                (isLoggedIn ? (
+                  <button
+                    className={`profileSubscribeBtn ${subscribed ? "subscribed" : ""}`}
+                    onClick={handleToggleSubscription}
+                    disabled={subBusy}
+                    type="button"
+                  >
+                    {subBusy ? "Working..." : subscribed ? "Subscribed" : "Subscribe"}
+                  </button>
+                ) : (
+                  <button
+                    className="profileSubscribeBtn"
+                    type="button"
+                    onClick={() => onRequireLogin?.(`/profile/${profile.username}`)}
+                  >
+                    Subscribe
+                  </button>
+                ))}
+            </div>
+
+            {subErr ? <div className="profileSubError">{subErr}</div> : null}
+
+            {profile.bio ? <div className="bio">{profile.bio}</div> : null}
           </div>
         </div>
 
-        {/* Uploads */}
         <div className="profileSection">
           <div className="profileSectionTitle">Uploads</div>
 
@@ -352,7 +451,7 @@ export default function Profile({ user, onRequireLogin }) {
                     key={v.id}
                     video={v}
                     locked={locked}
-                    user={me} // ✅ important: pass session truth so delete ownership works
+                    user={me}
                     onRequireLogin={() => onRequireLogin?.(`/watch/${v.id}`)}
                     onRequestDelete={openDeleteModal}
                   />
@@ -363,7 +462,6 @@ export default function Profile({ user, onRequireLogin }) {
         </div>
       </div>
 
-      {/* Modal */}
       {deleteTarget && (
         <div className="modalOverlay" onMouseDown={closeDeleteModal}>
           <div className="modalCard" onMouseDown={(e) => e.stopPropagation()}>

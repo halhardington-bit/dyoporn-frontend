@@ -22,8 +22,8 @@ function titleTag(t) {
 }
 
 function buildRowsByTags(videos, { maxRows = 8, minCount = 2 } = {}) {
-  // 1) count tags
   const counts = new Map();
+
   for (const v of videos) {
     const tags = Array.isArray(v.tags) ? v.tags : [];
     for (const raw of tags) {
@@ -33,14 +33,12 @@ function buildRowsByTags(videos, { maxRows = 8, minCount = 2 } = {}) {
     }
   }
 
-  // 2) pick top tags
   const topTags = [...counts.entries()]
     .filter(([, c]) => c >= minCount)
     .sort((a, b) => b[1] - a[1])
     .slice(0, maxRows)
     .map(([t]) => t);
 
-  // 3) build rows (videos can appear in multiple rows)
   const rows = topTags.map((tag) => ({
     title: titleTag(tag),
     key: `tag:${tag}`,
@@ -49,7 +47,6 @@ function buildRowsByTags(videos, { maxRows = 8, minCount = 2 } = {}) {
     ),
   }));
 
-  // 4) “Other” bucket (no tags OR none of the top tags)
   const other = videos.filter((v) => {
     const tags = Array.isArray(v.tags) ? v.tags : [];
     if (!tags.length) return true;
@@ -68,13 +65,18 @@ export default function Home({ user, onRequireLogin }) {
   const setQ = outlet.setQ || (() => {});
 
   const [params] = useSearchParams();
+
   const urlQ = (params.get("q") || "").trim();
+  const filter = (params.get("filter") || "").trim().toLowerCase();
+  const sort = (params.get("sort") || "").trim().toLowerCase();
 
   const [videos, setVideos] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const isSearching = urlQ.length > 0;
   const isLoggedIn = !!user?.id;
+  const isRatedMode = filter === "rated";
+  const isHistoryMode = filter === "history";
+  const isSearching = urlQ.length > 0 || isRatedMode || isHistoryMode;
 
   useEffect(() => {
     setQ(urlQ);
@@ -85,10 +87,26 @@ export default function Home({ user, onRequireLogin }) {
 
     (async () => {
       setLoading(true);
+
       try {
-        // If your backend supports ?q filtering, this will work.
-        // If it doesn't, it still returns all videos and your UI can filter/sort later.
-        const vids = await getVideos(isSearching ? { q: urlQ } : {});
+        let vids = [];
+
+        if (isRatedMode) {
+            vids = await getVideos({
+              filter: "rated",
+              sort: sort || "recent-rating",
+            });
+          } else if (isHistoryMode) {
+            vids = await getVideos({
+              filter: "history",
+              sort: sort || "recent-history",
+            });
+          } else if (urlQ) {
+          vids = await getVideos({ q: urlQ });
+        } else {
+          vids = await getVideos({});
+        }
+
         if (!alive) return;
         setVideos(Array.isArray(vids) ? vids : []);
       } catch (e) {
@@ -103,49 +121,70 @@ export default function Home({ user, onRequireLogin }) {
     return () => {
       alive = false;
     };
-  }, [isSearching, urlQ]);
+  }, [urlQ, filter, sort, isRatedMode]);
 
-  // -----------------------
-  // Tag shelves (Home mode)
-  // -----------------------
   const tagRows = useMemo(() => {
     if (isSearching) return [];
     return buildRowsByTags(videos, { maxRows: 8, minCount: 2 });
   }, [isSearching, videos]);
 
-  // -----------------------
-  // Search Grid Mode
-  // -----------------------
   if (isSearching) {
+    const headerLabel = isRatedMode
+      ? "Recently Rated"
+      : isHistoryMode
+      ? "Watch History"
+      : `Results for “${urlQ}”`;
+
     return (
       <div className="page">
         <div className="resultsHeader">
           {loading ? (
-            <span>Searching…</span>
+            <span>
+              {isRatedMode
+                ? "Loading recently rated…"
+                : isHistoryMode
+                ? "Loading history…"
+                : "Searching…"}
+            </span>
           ) : (
             <span>
-              Results for <strong>“{urlQ}”</strong> ({videos.length})
+              {headerLabel} ({videos.length})
             </span>
           )}
         </div>
 
         {!loading && videos.length === 0 ? (
           <div className="emptyState">
-            <div className="emptyTitle">No results</div>
+           <div className="emptyTitle">
+              {isRatedMode
+                ? "No rated videos yet"
+                : isHistoryMode
+                ? "No watch history yet"
+                : "No results"}
+            </div>
+
             <div className="emptySub">
-              Would you like to{" "}
-              {user ? (
-                <Link to="/create" className="createLink">
-                  create it?
-                </Link>
+              {isRatedMode ? (
+                "Videos you rate will appear here."
+              ) : isHistoryMode ? (
+                "Videos you watch will appear here."
               ) : (
-                <button
-                  type="button"
-                  className="plainBtn"
-                  onClick={() => onRequireLogin?.("/create")}
-                >
-                  create it?
-                </button>
+                <>
+                  Would you like to{" "}
+                  {user ? (
+                    <Link to="/create" className="createLink">
+                      create it?
+                    </Link>
+                  ) : (
+                    <button
+                      type="button"
+                      className="plainBtn"
+                      onClick={() => onRequireLogin?.("/create")}
+                    >
+                      create it?
+                    </button>
+                  )}
+                </>
               )}
             </div>
           </div>
@@ -165,9 +204,6 @@ export default function Home({ user, onRequireLogin }) {
     );
   }
 
-  // -----------------------
-  // Home Shelves Mode (GLOBAL lock after 2)
-  // -----------------------
   let cursor = 0;
 
   return (

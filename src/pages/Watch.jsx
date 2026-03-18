@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams, useNavigate, NavLink } from "react-router-dom";
 import {
   getVideo,
@@ -12,6 +12,7 @@ import {
   editComment,
   deleteComment,
   recordView,
+  recordHistory,
 } from "../api.js";
 import StarRating from "../ui/StarRating.jsx";
 import "./Watch.css";
@@ -67,6 +68,7 @@ function toNumOrNull(x) {
 export default function Watch({ user, onRequireLogin }) {
   const { id } = useParams();
   const nav = useNavigate();
+  const videoRef = useRef(null);
 
   const [video, setVideo] = useState(null);
   const [suggested, setSuggested] = useState([]);
@@ -105,6 +107,55 @@ export default function Watch({ user, onRequireLogin }) {
   useEffect(() => {
     setViewRecordedFor(null);
   }, [id]);
+
+  useEffect(() => {
+    if (!user?.id || !video?.id) return;
+
+    const el = videoRef.current;
+    if (!el) return;
+
+    let sent = false;
+
+    function maybeRecord() {
+      if (sent) return;
+      if (el.currentTime >= 5) {
+        sent = true;
+        recordHistory(video.id, el.currentTime).catch((e) => {
+          console.error("recordHistory failed:", e);
+        });
+      }
+    }
+
+    const onTimeUpdate = () => maybeRecord();
+
+    const onPause = () => {
+      if (el.currentTime > 0) {
+        recordHistory(video.id, el.currentTime).catch((e) => {
+          console.error("recordHistory failed:", e);
+        });
+      }
+    };
+
+    const onEnded = () => {
+      recordHistory(video.id, el.duration || el.currentTime || 0).catch((e) => {
+        console.error("recordHistory failed:", e);
+      });
+    };
+
+    el.addEventListener("timeupdate", onTimeUpdate);
+    el.addEventListener("pause", onPause);
+    el.addEventListener("ended", onEnded);
+
+    return () => {
+      el.removeEventListener("timeupdate", onTimeUpdate);
+      el.removeEventListener("pause", onPause);
+      el.removeEventListener("ended", onEnded);
+
+      if (el.currentTime > 0) {
+        recordHistory(video.id, el.currentTime).catch(() => {});
+      }
+    };
+  }, [user?.id, video?.id]);
 
   useEffect(() => {
     let cancelled = false;
@@ -475,7 +526,12 @@ export default function Watch({ user, onRequireLogin }) {
     <div className="shell">
       <main className="watchPageLayout">
         <section className="watchPageMain">
-          <video className="watchPagePlayer" controls src={streamUrl(video)} />
+          <video
+            ref={videoRef}
+            className="watchPagePlayer"
+            controls
+            src={streamUrl(video)}
+          />
 
           <h1 className="watchPageTitle">{video.title}</h1>
 

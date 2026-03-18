@@ -68,8 +68,21 @@
 
 }
 
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
 
+.topbarLeft {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
 
+.sidebarMobileToggle.topbarSidebarToggle {
+  display: none;
+}
 
 /* LEFT */
 
@@ -345,6 +358,61 @@
   background: rgba(255,255,255,0.05);
 }
 
+
+
+@media (max-width: 900px) {
+  .sidebarMobileToggle.topbarSidebarToggle {
+    display: inline-flex;
+    position: static !important;
+    left: auto !important;
+    top: auto !important;
+    bottom: auto !important;
+    right: auto !important;
+    transform: none !important;
+    z-index: auto !important;
+
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 4px;
+
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 10px;
+    background: rgba(255,255,255,0.04);
+    cursor: pointer;
+    flex-shrink: 0;
+    box-shadow: none !important;
+  }
+
+  .sidebarMobileToggleLine {
+    width: 16px;
+    height: 2px;
+    background: rgba(255,255,255,0.9);
+    border-radius: 999px;
+    display: block;
+  }
+
+  .header-inner {
+    padding: 14px 16px;
+    grid-template-columns: auto 1fr auto;
+    column-gap: 10px;
+  }
+
+  .header-left {
+    gap: 8px;
+  }
+
+  .searchForm {
+    padding: 0 8px;
+  }
+
+
+}
+
+
 @media (max-width: 700px) {
   .userDesktopMeta {
     display: none;
@@ -363,6 +431,23 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+
+  .header-inner {
+    padding: 12px 12px;
+    column-gap: 8px;
+  }
+
+  .header-left {
+    gap: 16px;
+  }
+
+  .searchForm {
+    padding: 0 4px;
+  }
+
+  .logo {
+    font-size: 18px;
   }
 }
 
@@ -401,6 +486,32 @@
   background: rgba(255,255,255,0.05);
 }
 
+
+@media (max-width: 520px) {
+  .header-inner {
+    padding: 10px 10px;
+    column-gap: 18px;
+  }
+
+  .searchForm {
+    padding: 0;
+  }
+
+  .search {
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+
+  .sidebarMobileToggle.topbarSidebarToggle {
+    width: 34px;
+    height: 34px;
+  }
+
+  .userMenuButton {
+    width: 34px;
+    height: 34px;
+  }
+}
 
   
 }

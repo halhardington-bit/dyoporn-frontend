@@ -8,6 +8,7 @@ export default function Header({
   onOpenLogin,
   onOpenRegister,
   onLogout,
+  onToggleSidebar,
   q,
   setQ,
 }) {
@@ -32,10 +33,7 @@ export default function Header({
       }
 
       try {
-        const [u, profile] = await Promise.allSettled([
-          whoami(),
-          getMyProfile(),
-        ]);
+        const [u, profile] = await Promise.allSettled([whoami(), getMyProfile()]);
 
         if (!alive) return;
 
@@ -108,12 +106,7 @@ export default function Header({
 
   const headerName = useMemo(() => {
     if (!user) return "";
-    return (
-      meProfile?.displayName ||
-      user.displayName ||
-      user.username ||
-      ""
-    ).trim();
+    return (meProfile?.displayName || user.displayName || user.username || "").trim();
   }, [user, meProfile]);
 
   function closeMobileMenu() {
@@ -139,6 +132,17 @@ export default function Header({
     <header className="header">
       <div className="header-inner">
         <div className="header-left">
+          <button
+            type="button"
+            className="sidebarMobileToggle topbarSidebarToggle"
+            onClick={onToggleSidebar}
+            aria-label="Open sidebar menu"
+          >
+            <span className="sidebarMobileToggleLine" />
+            <span className="sidebarMobileToggleLine" />
+            <span className="sidebarMobileToggleLine" />
+          </button>
+
           <NavLink to="/watch" className="logo">
             DYOPorn
           </NavLink>
