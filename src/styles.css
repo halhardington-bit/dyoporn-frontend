@@ -1063,6 +1063,112 @@ body {
   justify-content: center;
 }
 
+.verifyBanner {
+  margin: 0 0 14px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.10);
+  background: rgba(255,255,255,0.04);
+  color: rgba(255,255,255,0.92);
+  display: grid;
+  gap: 10px;
+}
+
+.verifyBannerText {
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.verifyBannerActions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.verifyBannerBtn {
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.06);
+  color: white;
+  border-radius: 10px;
+  padding: 9px 12px;
+  cursor: pointer;
+}
+
+.verifyBannerBtn:hover {
+  background: rgba(255,255,255,0.10);
+}
+
+.verifyBannerBtn:disabled {
+  opacity: 0.7;
+  cursor: default;
+}
+
+.verifyBannerMsg {
+  font-size: 13px;
+  color: rgba(255,255,255,0.72);
+}
+
+@media (max-width: 700px) {
+  .verifyBanner {
+    padding: 10px 12px;
+    border-radius: 12px;
+  }
+
+  .verifyBannerText,
+  .verifyBannerMsg {
+    font-size: 13px;
+  }
+
+  .verifyBannerBtn {
+    width: 100%;
+  }
+
+  .verifyBannerActions {
+    display: block;
+  }
+}
+
+.verifyPage {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #0f172a;
+}
+
+.verifyCard {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px;
+  padding: 30px;
+  text-align: center;
+  color: white;
+  max-width: 420px;
+  width: 100%;
+}
+
+.verifyCard h2 {
+  margin-bottom: 12px;
+}
+
+.verifyCard p {
+  opacity: 0.8;
+}
+
+.verifyBtn {
+  margin-top: 16px;
+  padding: 10px 16px;
+  border-radius: 8px;
+  background: #2563eb;
+  border: none;
+  color: white;
+  cursor: pointer;
+}
+
+.verifyBtn:hover {
+  background: #1d4ed8;
+}
+
 .appContent {
   width: 100%;
   max-width: var(--site-width);

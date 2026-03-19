@@ -14,6 +14,7 @@ import GenerateShots from "./pages/GenerateShots.jsx";
 import GenerateDashboard from "./pages/GenerateDashboard.jsx";
 import GenerateEdit from "./pages/GenerateEdit.jsx";
 import BetaSignup from "./pages/BetaSignup.jsx";
+import VerifyEmail from "./pages/VerifyEmail.jsx";
 
 const BETA_LOCK = false;
 
@@ -23,7 +24,6 @@ export default function App() {
 
   const [authOpen, setAuthOpen] = useState(false);
   const [authMode, setAuthMode] = useState("login");
-  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -110,6 +110,7 @@ export default function App() {
           <Route path="/watch" element={<Home user={user} onRequireLogin={openLogin} />} />
           <Route path="/watch/:id" element={<Watch user={user} onRequireLogin={openLogin} />} />
           <Route path="/create" element={<Create user={user} onRequireLogin={openLogin} />} />
+          <Route path="/verify-email" element={<VerifyEmail />} />
 
           <Route path="/generate" element={<Generate user={user} onRequireLogin={openLogin} />}>
             <Route index element={<Navigate to="assets" replace />} />

@@ -3,6 +3,7 @@ import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import Header from "../components/Header.jsx";
 import AuthModal from "../components/AuthModal.jsx";
 import Sidebar from "../components/Sidebar.jsx";
+import { resendVerificationEmail } from "../api.js";
 
 export default function AppLayout({
   user,
@@ -18,7 +19,22 @@ export default function AppLayout({
 }) {
   const [q, setQ] = useState("");
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [verifyBusy, setVerifyBusy] = useState(false);
+  const [verifyMsg, setVerifyMsg] = useState("");
   const nav = useNavigate();
+
+  async function handleResendVerification() {
+    try {
+      setVerifyBusy(true);
+      setVerifyMsg("");
+      await resendVerificationEmail();
+      setVerifyMsg("Verification email sent.");
+    } catch (err) {
+      setVerifyMsg(err?.message || "Failed to resend verification email.");
+    } finally {
+      setVerifyBusy(false);
+    }
+  }
 
   return (
     <div className="shell">
@@ -42,6 +58,27 @@ export default function AppLayout({
 
         <div className="appMain">
           <div className="appContent">
+            {user && user.emailVerified === false && (
+              <div className="verifyBanner">
+                <div className="verifyBannerText">
+                  Verify your email to unlock uploads, comments, ratings, subscriptions, and history.
+                </div>
+
+                <div className="verifyBannerActions">
+                  <button
+                    type="button"
+                    className="verifyBannerBtn"
+                    onClick={handleResendVerification}
+                    disabled={verifyBusy}
+                  >
+                    {verifyBusy ? "Sending..." : "Resend verification email"}
+                  </button>
+                </div>
+
+                {verifyMsg ? <div className="verifyBannerMsg">{verifyMsg}</div> : null}
+              </div>
+            )}
+
             <div className="folderShell">
               <nav className="folderTabs">
                 <NavLink

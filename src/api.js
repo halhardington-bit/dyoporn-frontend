@@ -51,6 +51,31 @@ export async function clearHistory() {
 }
 
 
+export async function resendVerificationEmail() {
+  const res = await fetch(`${API_BASE}/auth/resend-verification`, {
+    method: "POST",
+    credentials: "include",
+  });
+
+  const data = await res.json().catch(() => null);
+  if (!res.ok) throw new Error(data?.error || "Failed to resend verification email");
+  return data;
+}
+
+export async function verifyEmail(token) {
+  const res = await fetch(`${API_BASE}/auth/verify-email`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify({ token }),
+  });
+
+  const data = await res.json().catch(() => null);
+  if (!res.ok) throw new Error(data?.error || "Failed to verify email");
+  return data;
+}
+
+
 // BETA
 export async function betaSignup({ email, watching = false, creating = false }) {
   const res = await fetch(`${API_BASE}/api/beta-signup`, {
