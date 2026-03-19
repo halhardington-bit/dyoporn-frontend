@@ -158,7 +158,7 @@ export default function AuthModal({
 
           {!isLogin && (
             <label className="field">
-              <span className="label">Confirm password</span>
+              <span className="label">Confirmm password</span>
               <input
                 value={confirm}
                 onChange={(e) => setConfirm(e.target.value)}
@@ -167,6 +167,21 @@ export default function AuthModal({
               />
             </label>
           )}
+
+          {isLogin ? (
+            <div style={{ marginTop: 8 }}>
+              <button
+                type="button"
+                className="signup-link"
+                onClick={() => {
+                  onClose?.();
+                  window.location.href = "/forgot-password";
+                }}
+              >
+                Forgot password?
+              </button>
+            </div>
+          ) : null}
 
           {error && (
             <div style={{ marginTop: 8, opacity: 0.9 }}>

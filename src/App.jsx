@@ -15,6 +15,9 @@ import GenerateDashboard from "./pages/GenerateDashboard.jsx";
 import GenerateEdit from "./pages/GenerateEdit.jsx";
 import BetaSignup from "./pages/BetaSignup.jsx";
 import VerifyEmail from "./pages/VerifyEmail.jsx";
+import ForgotPassword from "./pages/ForgotPassword.jsx";
+import ResetPassword from "./pages/ResetPassword.jsx";
+
 
 const BETA_LOCK = false;
 
@@ -88,6 +91,9 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<BetaSignup />} />
+        <Route path="/verify-email" element={<VerifyEmail />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
 
         <Route
           element={
@@ -110,7 +116,6 @@ export default function App() {
           <Route path="/watch" element={<Home user={user} onRequireLogin={openLogin} />} />
           <Route path="/watch/:id" element={<Watch user={user} onRequireLogin={openLogin} />} />
           <Route path="/create" element={<Create user={user} onRequireLogin={openLogin} />} />
-          <Route path="/verify-email" element={<VerifyEmail />} />
 
           <Route path="/generate" element={<Generate user={user} onRequireLogin={openLogin} />}>
             <Route index element={<Navigate to="assets" replace />} />

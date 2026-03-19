@@ -50,6 +50,32 @@ export async function clearHistory() {
   return data;
 }
 
+export async function forgotPassword(email) {
+  const res = await fetch(`${API_BASE}/auth/forgot-password`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify({ email }),
+  });
+
+  const data = await res.json().catch(() => null);
+  if (!res.ok) throw new Error(data?.error || "Failed to request password reset");
+  return data;
+}
+
+export async function resetPassword(token, password) {
+  const res = await fetch(`${API_BASE}/auth/reset-password`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify({ token, password }),
+  });
+
+  const data = await res.json().catch(() => null);
+  if (!res.ok) throw new Error(data?.error || "Failed to reset password");
+  return data;
+}
+
 
 export async function resendVerificationEmail() {
   const res = await fetch(`${API_BASE}/auth/resend-verification`, {

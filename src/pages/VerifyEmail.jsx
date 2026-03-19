@@ -49,7 +49,7 @@ export default function VerifyEmail() {
 
         {status === "success" && (
           <>
-            <h2>✅ Email verified</h2>
+            <h2>✅ DYOP - Email verified</h2>
             <p>{message}</p>
             <p>Redirecting you back...</p>
           </>
@@ -57,7 +57,7 @@ export default function VerifyEmail() {
 
         {status === "error" && (
           <>
-            <h2>❌ Verification failed</h2>
+            <h2>❌ DYOP - Verification failed</h2>
             <p>{message}</p>
 
             <button
