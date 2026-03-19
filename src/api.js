@@ -39,6 +39,16 @@ export async function removeHistoryItem(videoId) {
   return data;
 }
 
+export async function getHomeRows() {
+  const res = await fetch(`${API_BASE}/api/home`, {
+    credentials: "include",
+  });
+
+  const data = await res.json().catch(() => null);
+  if (!res.ok) throw new Error(data?.error || "Failed to load home rows");
+  return Array.isArray(data) ? data : [];
+}
+
 export async function clearHistory() {
   const res = await fetch(`${API_BASE}/api/me/history`, {
     method: "DELETE",

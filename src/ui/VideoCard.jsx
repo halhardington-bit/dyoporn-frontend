@@ -71,6 +71,18 @@ export default function VideoCard({
 
   const canManage = isOwner && typeof onRequestDelete === "function";
 
+  const progressSeconds = Number(video.progressSeconds || 0);
+  const durationSeconds = Number(video.durationSeconds || 0);
+
+  const showProgressBar =
+    progressSeconds > 0 &&
+    durationSeconds > 0 &&
+    progressSeconds < durationSeconds;
+
+  const progressPct = showProgressBar
+    ? Math.max(0, Math.min(100, (progressSeconds / durationSeconds) * 100))
+    : 0;
+
   function handleClick() {
     if (locked) return onRequireLogin?.();
     navigate(`/watch/${video.id}`);
@@ -273,6 +285,15 @@ export default function VideoCard({
         ) : null}
 
         {duration && <div className="durationBadge">{duration}</div>}
+
+        {showProgressBar && (
+          <div className="videoProgressBar" aria-hidden="true">
+            <div
+              className="videoProgressFill"
+              style={{ width: `${progressPct}%` }}
+            />
+          </div>
+        )}
 
         {locked && (
           <div className="lockOverlay">

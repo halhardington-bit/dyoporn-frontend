@@ -13,6 +13,7 @@ import {
   deleteComment,
   recordView,
   recordHistory,
+  removeHistoryItem,
 } from "../api.js";
 import StarRating from "../ui/StarRating.jsx";
 import "./Watch.css";
@@ -98,6 +99,11 @@ export default function Watch({ user, onRequireLogin }) {
 
   const isLoggedIn = !!user?.id;
 
+  const restoreAttemptedRef = useRef(false);
+  const pendingResumeRef = useRef(0);
+
+  
+
   const myUsername = user?.username ? String(user.username).toLowerCase() : null;
   const isOwner = (item) => {
     const u = item?.username ? String(item.username).toLowerCase() : null;
@@ -105,57 +111,109 @@ export default function Watch({ user, onRequireLogin }) {
   };
 
   useEffect(() => {
-    setViewRecordedFor(null);
-  }, [id]);
+    restoreAttemptedRef.current = false;
+    pendingResumeRef.current = 0;
 
-  useEffect(() => {
     if (!user?.id || !video?.id) return;
 
-    const el = videoRef.current;
-    if (!el) return;
+    const saved = Number(video.progressSeconds || 0);
+    if (!Number.isFinite(saved) || saved <= 5) return;
 
-    let sent = false;
+    pendingResumeRef.current = saved;
+  }, [id, user?.id, video?.id, video?.progressSeconds]);
 
-    function maybeRecord() {
-      if (sent) return;
-      if (el.currentTime >= 5) {
+
+
+  useEffect(() => {
+  if (!user?.id || !video?.id) return;
+
+  let sent = false;
+  let finished = false;
+
+  const el = videoRef.current;
+  if (!el) return;
+
+  async function markFinished() {
+    if (finished) return;
+    finished = true;
+
+    try {
+      await removeHistoryItem(video.id);
+    } catch (e) {
+      console.error("removeHistoryItem failed:", e);
+    }
+  }
+
+  function maybeRecord() {
+    if (!el.duration || !Number.isFinite(el.duration)) {
+      if (!sent && el.currentTime >= 5) {
         sent = true;
         recordHistory(video.id, el.currentTime).catch((e) => {
           console.error("recordHistory failed:", e);
         });
       }
+      return;
     }
 
-    const onTimeUpdate = () => maybeRecord();
+    const progress = el.currentTime / el.duration;
 
-    const onPause = () => {
-      if (el.currentTime > 0) {
-        recordHistory(video.id, el.currentTime).catch((e) => {
-          console.error("recordHistory failed:", e);
-        });
-      }
-    };
+    if (progress >= 0.98) {
+      markFinished();
+      return;
+    }
 
-    const onEnded = () => {
-      recordHistory(video.id, el.duration || el.currentTime || 0).catch((e) => {
+    if (!sent && el.currentTime >= 5) {
+      sent = true;
+      recordHistory(video.id, el.currentTime).catch((e) => {
         console.error("recordHistory failed:", e);
       });
-    };
+    }
+  }
 
-    el.addEventListener("timeupdate", onTimeUpdate);
-    el.addEventListener("pause", onPause);
-    el.addEventListener("ended", onEnded);
+  const onTimeUpdate = () => {
+    maybeRecord();
+  };
 
-    return () => {
-      el.removeEventListener("timeupdate", onTimeUpdate);
-      el.removeEventListener("pause", onPause);
-      el.removeEventListener("ended", onEnded);
-
-      if (el.currentTime > 0) {
-        recordHistory(video.id, el.currentTime).catch(() => {});
+  const onPause = () => {
+    if (finished) return;
+    if (el.duration && Number.isFinite(el.duration)) {
+      const progress = el.currentTime / el.duration;
+      if (progress >= 0.98) {
+        markFinished();
+        return;
       }
-    };
-  }, [user?.id, video?.id]);
+    }
+
+    if (el.currentTime > 0) {
+      recordHistory(video.id, el.currentTime).catch((e) => {
+        console.error("recordHistory failed:", e);
+      });
+    }
+  };
+
+  const onEnded = () => {
+    markFinished();
+  };
+
+  el.addEventListener("timeupdate", onTimeUpdate);
+  el.addEventListener("pause", onPause);
+  el.addEventListener("ended", onEnded);
+
+  return () => {
+    el.removeEventListener("timeupdate", onTimeUpdate);
+    el.removeEventListener("pause", onPause);
+    el.removeEventListener("ended", onEnded);
+
+    if (!finished && el.currentTime > 0) {
+      if (el.duration && Number.isFinite(el.duration)) {
+        const progress = el.currentTime / el.duration;
+        if (progress >= 0.98) return;
+      }
+
+      recordHistory(video.id, el.currentTime).catch(() => {});
+    }
+  };
+}, [user?.id, video?.id]);
 
   useEffect(() => {
     let cancelled = false;
@@ -487,6 +545,36 @@ export default function Watch({ user, onRequireLogin }) {
     setReplyBody(prefill);
   }
 
+  function tryRestorePlaybackPosition() {
+    const el = videoRef.current;
+    if (!el) return;
+
+    if (restoreAttemptedRef.current) return;
+
+    const saved = Number(pendingResumeRef.current || 0);
+    if (!Number.isFinite(saved) || saved <= 5) return;
+
+    try {
+      // If the duration is known and the saved time is basically finished,
+      // don't resume.
+      if (Number.isFinite(el.duration) && el.duration > 0) {
+        if (saved >= el.duration - 3) {
+          restoreAttemptedRef.current = true;
+          return;
+        }
+      }
+
+      el.currentTime = saved;
+
+      // mark success if the seek sticks
+      if (Math.abs(el.currentTime - saved) < 2 || el.currentTime > 0) {
+        restoreAttemptedRef.current = true;
+      }
+    } catch (e) {
+      console.warn("Resume seek failed:", e);
+    }
+  }
+
   async function handlePostReply(parentCommentId) {
     if (!isLoggedIn) return onRequireLogin?.();
 
@@ -527,10 +615,13 @@ export default function Watch({ user, onRequireLogin }) {
       <main className="watchPageLayout">
         <section className="watchPageMain">
           <video
+            key={video.id}
             ref={videoRef}
             className="watchPagePlayer"
             controls
             src={streamUrl(video)}
+            onLoadedMetadata={tryRestorePlaybackPosition}
+            onCanPlay={tryRestorePlaybackPosition}
           />
 
           <h1 className="watchPageTitle">{video.title}</h1>

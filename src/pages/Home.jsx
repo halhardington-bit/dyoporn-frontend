@@ -1,12 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { useOutletContext, useSearchParams, Link } from "react-router-dom";
-import { getVideos } from "../api.js";
+import { getVideos, getHomeRows } from "../api.js";
 import { VideoShelf } from "../ui/VideoShelf.jsx";
 import VideoCard from "../ui/VideoCard.jsx";
 
-// -----------------------
-// Tags -> shelves helpers
-// -----------------------
 function normTag(t) {
   return String(t || "").trim().toLowerCase();
 }
@@ -71,6 +68,7 @@ export default function Home({ user, onRequireLogin }) {
   const sort = (params.get("sort") || "").trim().toLowerCase();
 
   const [videos, setVideos] = useState([]);
+  const [homeRows, setHomeRows] = useState([]);
   const [loading, setLoading] = useState(false);
 
   const isLoggedIn = !!user?.id;
@@ -89,9 +87,10 @@ export default function Home({ user, onRequireLogin }) {
       setLoading(true);
 
       try {
-        let vids = [];
+        if (isSearching) {
+          let vids = [];
 
-        if (isRatedMode) {
+          if (isRatedMode) {
             vids = await getVideos({
               filter: "rated",
               sort: sort || "recent-rating",
@@ -101,18 +100,33 @@ export default function Home({ user, onRequireLogin }) {
               filter: "history",
               sort: sort || "recent-history",
             });
-          } else if (urlQ) {
-          vids = await getVideos({ q: urlQ });
-        } else {
-          vids = await getVideos({});
+          } else {
+            vids = await getVideos({ q: urlQ });
+          }
+
+          if (!alive) return;
+          setVideos(Array.isArray(vids) ? vids : []);
+          setHomeRows([]);
+          return;
         }
 
+        if (isLoggedIn) {
+          const rows = await getHomeRows();
+          if (!alive) return;
+          setHomeRows(Array.isArray(rows) ? rows : []);
+          setVideos([]);
+          return;
+        }
+
+        const vids = await getVideos({});
         if (!alive) return;
         setVideos(Array.isArray(vids) ? vids : []);
+        setHomeRows([]);
       } catch (e) {
         console.error("Home fetch failed:", e);
         if (!alive) return;
         setVideos([]);
+        setHomeRows([]);
       } finally {
         if (alive) setLoading(false);
       }
@@ -121,12 +135,12 @@ export default function Home({ user, onRequireLogin }) {
     return () => {
       alive = false;
     };
-  }, [urlQ, filter, sort, isRatedMode]);
+  }, [urlQ, filter, sort, isRatedMode, isHistoryMode, isSearching, isLoggedIn]);
 
   const tagRows = useMemo(() => {
-    if (isSearching) return [];
+    if (isSearching || isLoggedIn) return [];
     return buildRowsByTags(videos, { maxRows: 8, minCount: 2 });
-  }, [isSearching, videos]);
+  }, [isSearching, isLoggedIn, videos]);
 
   if (isSearching) {
     const headerLabel = isRatedMode
@@ -155,7 +169,7 @@ export default function Home({ user, onRequireLogin }) {
 
         {!loading && videos.length === 0 ? (
           <div className="emptyState">
-           <div className="emptyTitle">
+            <div className="emptyTitle">
               {isRatedMode
                 ? "No rated videos yet"
                 : isHistoryMode
@@ -212,22 +226,39 @@ export default function Home({ user, onRequireLogin }) {
         <div className="loading">Loading…</div>
       ) : (
         <div className="feedInner">
-          {tagRows.map((row) => {
-            const startIndex = cursor;
-            cursor += row.videos.length;
+          {isLoggedIn
+            ? homeRows.map((row) => {
+                const startIndex = cursor;
+                cursor += (row.videos || []).length;
 
-            return (
-              <VideoShelf
-                key={row.key}
-                title={row.title}
-                videos={row.videos}
-                user={user}
-                onRequireLogin={onRequireLogin}
-                startIndex={startIndex}
-                lockAfter={2}
-              />
-            );
-          })}
+                return (
+                  <VideoShelf
+                    key={row.key}
+                    title={row.title}
+                    videos={row.videos || []}
+                    user={user}
+                    onRequireLogin={onRequireLogin}
+                    startIndex={startIndex}
+                    lockAfter={2}
+                  />
+                );
+              })
+            : tagRows.map((row) => {
+                const startIndex = cursor;
+                cursor += row.videos.length;
+
+                return (
+                  <VideoShelf
+                    key={row.key}
+                    title={row.title}
+                    videos={row.videos}
+                    user={user}
+                    onRequireLogin={onRequireLogin}
+                    startIndex={startIndex}
+                    lockAfter={2}
+                  />
+                );
+              })}
         </div>
       )}
     </div>

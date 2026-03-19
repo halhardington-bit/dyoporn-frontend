@@ -310,6 +310,44 @@
   -webkit-backdrop-filter: blur(10px);
 }
 
+.thumb-wrapper {
+  position: relative;
+}
+
+.videoProgressBar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.14);
+  overflow: hidden;
+  z-index: 3;
+}
+
+.videoProgressFill {
+  height: 100%;
+  background: #ff2d55;
+  width: 0%;
+}
+
+.videoProgressBar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.18);
+  overflow: hidden;
+  z-index: 3;
+}
+
+.videoProgressFill {
+  height: 100%;
+  width: 0;
+  background: #ff2b2b;
+}
+
 .vManageButton:hover {
   background: rgba(0,0,0,0.72);
   border-color: rgba(255,255,255,0.22);
