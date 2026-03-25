@@ -2,7 +2,8 @@
   width: 100%;
   max-width: 1280px;
   margin: 0 auto;
-  padding: 0;
+  padding: 0 12px;
+  box-sizing: border-box;
 }
 
 .watchPageMain {
@@ -19,6 +20,7 @@
   background: rgba(255, 255, 255, 0.02);
   box-shadow: 0 18px 50px rgba(0, 0, 0, 0.28);
   box-sizing: border-box;
+  overflow-x: clip;
 }
 
 .watchPagePlayer {
@@ -29,15 +31,125 @@
   background: #000;
 }
 
+.watchPageTitleRow {
+  margin-top: 18px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-radius: 14px;
+  transition: background 0.18s ease, box-shadow 0.18s ease;
+}
+
+.watchPageTitleRow.isOwner:hover {
+  background: rgba(255, 255, 255, 0.025);
+}
+
 .watchPageTitle {
-  margin: 2px 0 4px;
-  font-size: 24px;
+  margin: 0;
+  font-size: clamp(28px, 4vw, 40px);
   font-weight: 800;
-  line-height: 1.2;
+  line-height: 1.08;
+  letter-spacing: -0.02em;
   color: rgba(232, 236, 241, 0.95);
 }
 
+.watchPageTitleEditBtn {
+  opacity: 0;
+  pointer-events: none;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.72);
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition:
+    opacity 0.15s ease,
+    background 0.15s ease,
+    color 0.15s ease,
+    border-color 0.15s ease,
+    transform 0.15s ease;
+}
+
+.watchPageTitleRow.isOwner:hover .watchPageTitleEditBtn,
+.watchPageTitleEditBtn:focus-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.watchPageTitleEditBtn:hover {
+  background: rgba(255, 255, 255, 0.07);
+  color: rgba(255, 255, 255, 0.95);
+  border-color: rgba(255, 255, 255, 0.12);
+  transform: translateY(-1px);
+}
+
+.watchPageTitleEditor {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.watchPageTitleInput {
+  flex: 1;
+  min-width: 0;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.045);
+  color: #fff;
+  border-radius: 12px;
+  padding: 12px 14px;
+  font: inherit;
+  font-size: clamp(24px, 3.3vw, 34px);
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+}
+
+.watchPageTitleInput:focus {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.watchPageTitleEditorActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.watchPageTitleIconBtn {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.8);
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.watchPageTitleIconBtn:hover {
+  background: rgba(255, 255, 255, 0.07);
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.14);
+}
+
+.watchPageTitleIconBtn.save {
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.watchPageInlineError {
+  margin-top: -6px;
+  font-size: 12px;
+  color: #ff8c8c;
+}
+
 .watchPageChannelRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
   margin: 4px 0 6px;
 }
 
@@ -105,21 +217,145 @@
   box-sizing: border-box;
 }
 
-.watchPageDescriptionHeader {
+.watchPageDescriptionArea {
+  border-radius: 12px;
+  transition: background 0.18s ease;
+}
+
+.watchPageDescriptionArea.isOwner:hover {
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.watchPageDescriptionHeader,
+.watchPageTagsHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.watchPageSectionLabel {
   font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.4px;
   opacity: 0.75;
-  margin-bottom: 6px;
 }
 
-.watchPageDesc {
+.watchPageDescriptionEditBtn,
+.watchPageTagsEditBtn {
+  position: absolute; /* key change */
+  top: 50%;
+  right: 8px;
+  transform: translateY(-50%); /* vertically center */
+
+  opacity: 0;
+  width: 28px;
+  height: 28px;
+
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.04);
+  color: rgba(255,255,255,0.7);
+
+  display: grid;
+  place-items: center;
+
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.watchPageDescriptionArea.isOwner:hover .watchPageDescriptionEditBtn,
+.watchPageTagsBlock.isOwner:hover .watchPageTagsEditBtn {
+  opacity: 1;
+}
+
+.watchPageDescriptionEditBtn:hover,
+.watchPageTagsEditBtn:hover {
+  background: rgba(255, 255, 255, 0.07);
+  color: #fff;
+}
+
+.watchPageDescription {
   color: rgba(232, 236, 241, 0.82);
   font-size: 14px;
   line-height: 1.6;
   white-space: pre-wrap;
   word-break: break-word;
   opacity: 0.92;
+}
+
+.watchPageDescriptionEditor,
+.watchPageTagsEditor {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.watchPageDescriptionTextarea,
+.watchPageTagsInput {
+  width: 100%;
+  border-radius: 10px;
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: white;
+  font: inherit;
+  box-sizing: border-box;
+}
+
+.watchPageDescriptionTextarea {
+  resize: vertical;
+  min-height: 110px;
+}
+
+.watchPageDescriptionTextarea:focus,
+.watchPageTagsInput:focus {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.watchPageDescriptionActions,
+.watchPageTagsActions {
+  display: flex;
+  gap: 8px;
+}
+
+.watchPageTagsHint {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.watchPageTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  opacity: 0.75;
+}
+
+.watchPageTag {
+  appearance: none;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.03);
+  color: rgba(255, 255, 255, 0.55);
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  line-height: 1.1;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.watchPageTag:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.82);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.watchPageTag:focus-visible {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
 .watchPageRatingMeta {
@@ -187,7 +423,7 @@
   gap: 10px;
   margin-bottom: 16px;
   padding: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.10);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 14px;
   background: rgba(0, 0, 0, 0.18);
   box-sizing: border-box;
@@ -203,15 +439,19 @@
 .watchPageReplyInput {
   width: 100%;
   min-height: 70px;
+  max-width: 100%;
   resize: vertical;
   padding: 12px;
   border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.10);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   background: rgba(0, 0, 0, 0.35);
   color: rgba(255, 255, 255, 0.92);
   font: inherit;
   outline: none;
-  transition: border-color 120ms ease, box-shadow 120ms ease, background 120ms ease;
+  transition:
+    border-color 120ms ease,
+    box-shadow 120ms ease,
+    background 120ms ease;
   box-sizing: border-box;
 }
 
@@ -316,7 +556,7 @@
   display: grid;
   place-items: center;
   background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.10);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   color: rgba(255, 255, 255, 0.92);
   font-weight: 800;
 }
@@ -334,7 +574,8 @@
   text-decoration: none;
 }
 
-.watchPageCommentMain {
+.watchPageCommentMain,
+.watchPageChannelMeta {
   flex: 1;
   min-width: 0;
 }
@@ -433,7 +674,7 @@
 .watchPageMiniBtn {
   appearance: none;
   background: rgba(255, 255, 255, 0.05);
-  color: rgba(232, 236, 241, 0.80);
+  color: rgba(232, 236, 241, 0.8);
   font-size: 12px;
   transition: background 120ms ease, border-color 120ms ease, opacity 120ms ease;
 }
@@ -470,7 +711,7 @@
   margin-top: 10px;
   margin-left: 0;
   padding-left: 14px;
-  border-left: 1px solid rgba(255, 255, 255, 0.10);
+  border-left: 1px solid rgba(255, 255, 255, 0.1);
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -483,24 +724,15 @@
   gap: 8px;
 }
 
-@media (max-width: 1100px) {
-  .watchPageLayout {
-    max-width: 1000px;
-  }
-
-  .watchPageMain {
-    max-width: 920px;
-  }
-}
-
 @media (max-width: 900px) {
   .watchPageLayout {
-    max-width: none;
-    width: calc(100vw - 24px);
+    width: 100%;
+    max-width: 100%;
+    padding: 0 12px;
   }
 
   .watchPageMain {
-    max-width: none;
+    max-width: 100%;
     width: 100%;
     padding: 14px;
   }
@@ -508,13 +740,13 @@
 
 @media (max-width: 700px) {
   .watchPageLayout {
-    width: calc(100vw - 12px);
-    margin: 0 auto;
+    width: 100%;
+    padding: 0 8px;
   }
 
   .watchPageMain {
-    max-width: none;
     width: 100%;
+    max-width: 100%;
     padding: 12px;
     gap: 12px;
     border-radius: 16px;
@@ -555,7 +787,7 @@
     border-radius: 12px;
   }
 
-  .watchPageDesc,
+  .watchPageDescription,
   .watchPageCommentBody,
   .watchPageReplyBody {
     font-size: 13px;
@@ -587,10 +819,13 @@
 
 @media (max-width: 520px) {
   .watchPageLayout {
-    width: calc(100vw - 8px);
+    width: 100%;
+    padding: 0 6px;
   }
 
   .watchPageMain {
+    width: 100%;
+    max-width: 100%;
     padding: 10px;
     gap: 10px;
   }
@@ -604,10 +839,6 @@
     gap: 8px;
   }
 
-  .watchPageChannelMeta {
-    min-width: 0;
-  }
-
   .watchPageChannelName {
     font-size: 13px;
   }
@@ -617,11 +848,11 @@
     gap: 5px;
   }
 
-  .watchPageDescriptionHeader {
+  .watchPageSectionLabel {
     font-size: 12px;
   }
 
-  .watchPageDesc {
+  .watchPageDescription {
     font-size: 13px;
   }
 
@@ -649,118 +880,90 @@
 
   .watchPageReplyList {
     padding-left: 10px;
-  }
-}
-
-
-.watchPageLayout {
-  width: 100%;
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 0 12px;
-  box-sizing: border-box;
-}
-
-.watchPageMain {
-  width: 100%;
-  max-width: 960px;
-  margin: 0 auto;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  padding: 18px;
-  border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.02);
-  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.28);
-  box-sizing: border-box;
-  overflow-x: clip;
-}
-
-.watchPageDescriptionBlock,
-.watchPageRatingBlock,
-.watchPageCommentsSection,
-.watchPageCommentComposer,
-.watchPageCommentList,
-.watchPageCommentItem,
-.watchPageReplyItem,
-.watchPageCommentEdit,
-.watchPageReplyComposer,
-.watchPageReplyList {
-  max-width: 100%;
-  min-width: 0;
-}
-
-.watchPageCommentMain,
-.watchPageCommentComposerBody,
-.watchPageChannelMeta {
-  min-width: 0;
-}
-
-.watchPageCommentTextarea,
-.watchPageCommentEditInput,
-.watchPageReplyInput {
-  width: 100%;
-  max-width: 100%;
-  box-sizing: border-box;
-}
-
-@media (max-width: 900px) {
-  .watchPageLayout {
-    width: 100%;
-    max-width: 100%;
-    padding: 0 12px;
-  }
-
-  .watchPageMain {
-    max-width: 100%;
-    width: 100%;
-    padding: 14px;
-  }
-}
-
-@media (max-width: 700px) {
-  .watchPageLayout {
-    width: 100%;
-    padding: 0 8px;
-  }
-
-  .watchPageMain {
-    width: 100%;
-    max-width: 100%;
-    padding: 12px;
-    gap: 12px;
-    border-radius: 16px;
-  }
-
-  .watchPageDescriptionBlock,
-  .watchPageRatingBlock,
-  .watchPageCommentComposer,
-  .watchPageCommentItem,
-  .watchPageReplyItem,
-  .watchPageCommentEdit,
-  .watchPageReplyComposer {
-    padding: 10px;
-    border-radius: 12px;
-  }
-}
-
-@media (max-width: 520px) {
-  .watchPageLayout {
-    width: 100%;
-    padding: 0 6px;
-  }
-
-  .watchPageMain {
-    width: 100%;
-    max-width: 100%;
-    padding: 10px;
-    gap: 10px;
-  }
-
-  .watchPageReplyList {
-    padding-left: 10px;
     min-width: 0;
   }
+}
+
+
+.watchPageTagsBlock.isOwner:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.watchPageTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  opacity: 0.75;
+  align-items: center;
+}
+
+.watchPageTag {
+  appearance: none;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.03);
+  color: rgba(255, 255, 255, 0.55);
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  line-height: 1.1;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.watchPageTagsBlock.isOwner:hover .watchPageTagsEditBtn {
+  opacity: 1;
+}
+
+.watchPageDescriptionArea {
+  position: relative;
+  border-radius: 12px;
+  transition: background 0.18s ease;
+}
+
+.watchPageTagsBlock {
+  position: relative;
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.025);
+  box-sizing: border-box;
+  transition: background 0.18s ease;
+}
+
+.watchPageDescriptionArea {
+  position: relative;
+  border-radius: 12px;
+  transition: background 0.18s ease;
+}
+
+.watchPageTagsBlock {
+  position: relative;
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.025);
+  box-sizing: border-box;
+  transition: background 0.18s ease;
+}
+
+.watchPageDescriptionEditBtn,
+.watchPageTagsEditBtn {
+  position: absolute;
+  top: 23px;
+  right: 8px;
+  opacity: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.04);
+  color: rgba(255,255,255,0.7);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  z-index: 2;
 }

@@ -358,6 +358,19 @@ export async function deleteComment(commentId) {
   return data;
 }
 
+export async function updateVideo(videoId, payload) {
+  const res = await fetch(`${API_BASE}/api/videos/${videoId}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify(payload),
+  });
+
+  const data = await res.json().catch(() => null);
+  if (!res.ok) throw new Error(data?.error || `updateVideo failed: ${res.status}`);
+  return data.video;
+}
+
 export async function deleteVideo(videoId) {
   const res = await fetch(`${API_BASE}/api/videos/${videoId}`, {
     method: "DELETE",

@@ -310,6 +310,12 @@
   -webkit-backdrop-filter: blur(10px);
 }
 
+.vNoRating {
+  font-size: 12px;
+  color: rgba(255,255,255,0.42);
+  font-weight: 500;
+}
+
 .thumb-wrapper {
   position: relative;
 }

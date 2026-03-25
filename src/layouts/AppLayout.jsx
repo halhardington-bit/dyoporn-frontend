@@ -56,12 +56,13 @@ export default function AppLayout({
           setMobileOpen={setSidebarOpen}
         />
 
-        <div className="appMain">
+        <main className="appMain">
           <div className="appContent">
             {user && user.emailVerified === false && (
               <div className="verifyBanner">
                 <div className="verifyBannerText">
-                  Verify your email to unlock uploads, comments, ratings, subscriptions, and history.
+                  Verify your email to unlock uploads, comments, ratings,
+                  subscriptions, and history.
                 </div>
 
                 <div className="verifyBannerActions">
@@ -79,8 +80,8 @@ export default function AppLayout({
               </div>
             )}
 
-            <div className="folderShell">
-              <nav className="folderTabs">
+            <section className="workspaceShell">
+              <nav className="folderTabs" aria-label="Workspace tabs">
                 <NavLink
                   to="/watch"
                   end
@@ -118,14 +119,21 @@ export default function AppLayout({
                 >
                   Generate
                 </NavLink>
+
+                <NavLink
+                  to="/plans"
+                  className={({ isActive }) => `folderTab ${isActive ? "active" : ""}`}
+                >
+                  Plans
+                </NavLink>
               </nav>
 
               <div className="folderBody">
                 <Outlet context={{ q, setQ, user }} />
               </div>
-            </div>
+            </section>
           </div>
-        </div>
+        </main>
       </div>
 
       {authOpen && (

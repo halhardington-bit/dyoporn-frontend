@@ -48,6 +48,7 @@ export default function VideoCard({
 
   const ratingAvg = formatAvg(video.ratingAvg);
   const ratingCount = Number(video.ratingCount || 0);
+  const hasRatings = ratingCount > 0;
 
   const ownerUsername =
     video.channelUsername || video.creatorUsername || video.creator_username || null;
@@ -310,10 +311,16 @@ export default function VideoCard({
           <h4 className="video-title">{video.title}</h4>
 
           <div className="vTitleRight">
-            <div className="vRating" aria-label={`Rating ${ratingAvg} (${ratingCount})`}>
-              <span className="vStar">★</span>
-              <span className="vAvg">{ratingAvg}</span>
-              <span className="vCount">({ratingCount})</span>
+            <div className="vRating">
+              {hasRatings ? (
+                <>
+                  <span className="vStar">★</span>
+                  <span className="vAvg">{ratingAvg}</span>
+                  <span className="vCount">({ratingCount})</span>
+                </>
+              ) : (
+                <span className="vNoRating">Not yet rated</span>
+              )}
             </div>
           </div>
         </div>

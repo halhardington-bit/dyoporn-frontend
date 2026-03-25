@@ -30,6 +30,18 @@ function buildRowsByTags(videos, { maxRows = 8, minCount = 2 } = {}) {
     }
   }
 
+  function setParam(next) {
+    const sp = new URLSearchParams(params);
+
+    for (const [k, v] of Object.entries(next)) {
+      const val = String(v ?? "").trim();
+      if (!val) sp.delete(k);
+      else sp.set(k, val);
+    }
+
+    setSearchParams(sp, { replace: true });
+  }
+
   const topTags = [...counts.entries()]
     .filter(([, c]) => c >= minCount)
     .sort((a, b) => b[1] - a[1])
@@ -57,15 +69,65 @@ function buildRowsByTags(videos, { maxRows = 8, minCount = 2 } = {}) {
   return rows;
 }
 
+function getVideoCreatedAtMs(video) {
+  const raw =
+    video.createdAt ||
+    video.created_at ||
+    video.publishedAt ||
+    video.published_at ||
+    null;
+
+  if (!raw) return null;
+
+  const ms = new Date(raw).getTime();
+  return Number.isFinite(ms) ? ms : null;
+}
+
+function applyTimeFilter(videos, timeFilter) {
+  if (!Array.isArray(videos)) return [];
+
+  const now = Date.now();
+
+  const cutoffByFilter = {
+    "24h": now - 24 * 60 * 60 * 1000,
+    week: now - 7 * 24 * 60 * 60 * 1000,
+    month: now - 30 * 24 * 60 * 60 * 1000,
+    year: now - 365 * 24 * 60 * 60 * 1000,
+  };
+
+  const cutoff = cutoffByFilter[timeFilter];
+  if (!cutoff) return videos;
+
+  return videos.filter((video) => {
+    const createdMs = getVideoCreatedAtMs(video);
+    if (!createdMs) return false;
+    return createdMs >= cutoff;
+  });
+}
+
 export default function Home({ user, onRequireLogin }) {
   const outlet = useOutletContext?.() || {};
   const setQ = outlet.setQ || (() => {});
 
   const [params] = useSearchParams();
 
+  const [, setSearchParams] = useSearchParams();
+
+  function setParam(next) {
+    const sp = new URLSearchParams(params);
+    for (const [k, v] of Object.entries(next)) {
+      const val = String(v ?? "").trim();
+      if (!val) sp.delete(k);
+      else sp.set(k, val);
+    }
+    setSearchParams(sp, { replace: true });
+  }
+
   const urlQ = (params.get("q") || "").trim();
   const filter = (params.get("filter") || "").trim().toLowerCase();
   const sort = (params.get("sort") || "").trim().toLowerCase();
+  const time = (params.get("time") || "all").trim().toLowerCase();
+
 
   const [videos, setVideos] = useState([]);
   const [homeRows, setHomeRows] = useState([]);
@@ -101,11 +163,20 @@ export default function Home({ user, onRequireLogin }) {
               sort: sort || "recent-history",
             });
           } else {
-            vids = await getVideos({ q: urlQ });
+            vids = await getVideos({
+              q: urlQ,
+              sort: sort || "newest",
+            });
           }
 
           if (!alive) return;
-          setVideos(Array.isArray(vids) ? vids : []);
+
+          const filteredVids = applyTimeFilter(
+            Array.isArray(vids) ? vids : [],
+            time
+          );
+
+          setVideos(filteredVids);
           setHomeRows([]);
           return;
         }
@@ -119,9 +190,16 @@ export default function Home({ user, onRequireLogin }) {
         }
 
         const vids = await getVideos({});
-        if (!alive) return;
-        setVideos(Array.isArray(vids) ? vids : []);
-        setHomeRows([]);
+          if (!alive) return;
+
+          const filteredVids = applyTimeFilter(
+            Array.isArray(vids) ? vids : [],
+            time
+          );
+
+          setVideos(filteredVids);
+          setHomeRows([]);
+
       } catch (e) {
         console.error("Home fetch failed:", e);
         if (!alive) return;
@@ -135,7 +213,7 @@ export default function Home({ user, onRequireLogin }) {
     return () => {
       alive = false;
     };
-  }, [urlQ, filter, sort, isRatedMode, isHistoryMode, isSearching, isLoggedIn]);
+  }, [urlQ, filter, sort, time, isRatedMode, isHistoryMode, isSearching, isLoggedIn]);
 
   const tagRows = useMemo(() => {
     if (isSearching || isLoggedIn) return [];
@@ -150,56 +228,118 @@ export default function Home({ user, onRequireLogin }) {
       : `Results for “${urlQ}”`;
 
     return (
-      <div className="page">
+      <div className="page page--home">
         <div className="resultsHeader">
-          {loading ? (
-            <span>
-              {isRatedMode
-                ? "Loading recently rated…"
-                : isHistoryMode
-                ? "Loading history…"
-                : "Searching…"}
-            </span>
-          ) : (
-            <span>
-              {headerLabel} ({videos.length})
-            </span>
-          )}
-        </div>
-
-        {!loading && videos.length === 0 ? (
-          <div className="emptyState">
-            <div className="emptyTitle">
-              {isRatedMode
-                ? "No rated videos yet"
-                : isHistoryMode
-                ? "No watch history yet"
-                : "No results"}
+          <div className="resultsHeaderBar">
+            <div className="resultsHeaderInner">
+              {loading ? (
+                <span>
+                  {isRatedMode
+                    ? "Loading recently rated…"
+                    : isHistoryMode
+                    ? "Loading history…"
+                    : "Searching…"}
+                </span>
+              ) : (
+                <span>
+                  {headerLabel} <span className="resultsCount">({videos.length})</span>
+                </span>
+              )}
             </div>
 
-            <div className="emptySub">
-              {isRatedMode ? (
-                "Videos you rate will appear here."
-              ) : isHistoryMode ? (
-                "Videos you watch will appear here."
-              ) : (
-                <>
-                  Would you like to{" "}
-                  {user ? (
-                    <Link to="/create" className="createLink">
-                      create it?
-                    </Link>
+            <div className="resultsControls">
+              <div className="resultsSort">
+                <span className="resultsSortLabel">Sort:</span>
+                <select
+                  className="resultsSortSelect"
+                  value={
+                    isRatedMode
+                      ? sort || "recent-rating"
+                      : isHistoryMode
+                      ? sort || "recent-history"
+                      : sort || "newest"
+                  }
+                  onChange={(e) => setParam({ sort: e.target.value })}
+                >
+                  {isRatedMode ? (
+                    <>
+                      <option value="recent-rating">Recently rated</option>
+                      <option value="highest">Highest rated</option>
+                      <option value="views">Most views</option>
+                      <option value="newest">Newest</option>
+                      <option value="oldest">Oldest</option>
+                    </>
+                  ) : isHistoryMode ? (
+                    <>
+                      <option value="recent-history">Recently watched</option>
+                      <option value="highest">Highest rated</option>
+                      <option value="views">Most views</option>
+                      <option value="newest">Newest</option>
+                      <option value="oldest">Oldest</option>
+                    </>
                   ) : (
-                    <button
-                      type="button"
-                      className="plainBtn"
-                      onClick={() => onRequireLogin?.("/create")}
-                    >
-                      create it?
-                    </button>
+                    <>
+                      <option value="newest">Newest</option>
+                      <option value="highest">Highest rated</option>
+                      <option value="views">Most views</option>
+                      <option value="oldest">Oldest</option>
+                    </>
                   )}
-                </>
-              )}
+                </select>
+              </div>
+
+              <div className="resultsSort">
+                <span className="resultsSortLabel">Time:</span>
+                <select
+                  className="resultsSortSelect"
+                  value={time || "all"}
+                  onChange={(e) => setParam({ time: e.target.value })}
+                >
+                  <option value="24h">Past 24 hours</option>
+                  <option value="week">Past week</option>
+                  <option value="month">Past month</option>
+                  <option value="year">Past year</option>
+                  <option value="all">All time</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+        {!loading && videos.length === 0 ? (
+          <div className="emptyState">
+            <div className="emptyStateInner">
+              <div className="emptyTitle">
+                {isRatedMode
+                  ? "No rated videos yet"
+                  : isHistoryMode
+                  ? "No watch history yet"
+                  : "No results"}
+              </div>
+
+              <div className="emptySub">
+                {isRatedMode ? (
+                  "Videos you rate will appear here."
+                ) : isHistoryMode ? (
+                  "Videos you watch will appear here."
+                ) : (
+                  <>
+                    Would you like to{" "}
+                    {user ? (
+                      <Link to="/create" className="createLink">
+                        create it?
+                      </Link>
+                    ) : (
+                      <button
+                        type="button"
+                        className="plainBtn"
+                        onClick={() => onRequireLogin?.("/create")}
+                      >
+                        create it?
+                      </button>
+                    )}
+                  </>
+                )}
+              </div>
             </div>
           </div>
         ) : (
@@ -221,9 +361,9 @@ export default function Home({ user, onRequireLogin }) {
   let cursor = 0;
 
   return (
-    <div className="page">
+    <div className="page page--home">
       {loading ? (
-        <div className="loading">Loading…</div>
+        <div className="loading loadingPanel">Loading…</div>
       ) : (
         <div className="feedInner">
           {isLoggedIn

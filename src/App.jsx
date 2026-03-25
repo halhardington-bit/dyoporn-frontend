@@ -5,6 +5,7 @@ import { me, logout } from "./api";
 import AppLayout from "./layouts/AppLayout.jsx";
 import Home from "./pages/Home.jsx";
 import Watch from "./pages/Watch.jsx";
+import Plans from "./pages/Plans.jsx";
 import Create from "./pages/Create.jsx";
 import Profile from "./pages/Profile.jsx";
 import EditProfile from "./pages/EditProfile.jsx";
@@ -124,6 +125,8 @@ export default function App() {
             <Route path="projects" element={<GenerateDashboard />} />
             <Route path="edit/:projectId" element={<GenerateEdit user={user} />} />
           </Route>
+
+          <Route path="/plans" element={<Plans user={user} onRequireLogin={openLogin} />} />
 
           <Route
             path="/me/profile"
