@@ -395,6 +395,147 @@
   color: rgba(255, 150, 150, 0.95);
 }
 
+.vManageMenuPortal {
+  z-index: 100000;
+}
+
+/* Hide by default */
+.vManageWrap {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 40;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 120ms ease;
+}
+
+.video-card:hover .vManageWrap,
+.vManageWrap.isOpen {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Show on hover */
+.video-card:hover .vManageWrap {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* ALSO show if menu is open (critical) */
+.vManageWrap:has(.vManageMenu) {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.video-card {
+  position: relative;
+  overflow: visible;
+  z-index: 0;
+  isolation: isolate;
+}
+
+.video-card:hover,
+.video-card:focus-within,
+.video-card.menuOpen {
+  z-index: 100;
+}
+
+.vManageWrap {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 40;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 120ms ease;
+}
+
+.video-card:hover .vManageWrap,
+.video-card:focus-within .vManageWrap,
+.vManageWrap.isOpen,
+.video-card.menuOpen .vManageWrap {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.vManageMenu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 9999;
+}
+
+.vManageMenuPortal {
+  z-index: 100000;
+}
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+  z-index: 100001;
+}
+
+.modalCard {
+  width: 100%;
+  max-width: 480px;
+  background: #111;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 14px;
+  padding: 16px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+}
+
+.modalTitle {
+  font-size: 18px;
+  font-weight: 800;
+  margin-bottom: 10px;
+}
+
+.modalBody {
+  font-size: 14px;
+  line-height: 1.4;
+  opacity: 0.95;
+}
+
+.modalError {
+  margin-top: 10px;
+  padding: 10px;
+  border-radius: 10px;
+  background: rgba(255,0,0,0.12);
+  border: 1px solid rgba(255,0,0,0.25);
+}
+
+.modalActions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 14px;
+}
+
+.modalBtn {
+  border: 1px solid rgba(255,255,255,0.18);
+  background: rgba(255,255,255,0.06);
+  color: white;
+  padding: 9px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.modalBtnDanger {
+  border: 1px solid rgba(255,0,0,0.35);
+  background: rgba(255,0,0,0.18);
+  color: white;
+  padding: 9px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
 @media (max-width: 700px) {
   .video-card {
     gap: 10px;

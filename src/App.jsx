@@ -18,7 +18,8 @@ import BetaSignup from "./pages/BetaSignup.jsx";
 import VerifyEmail from "./pages/VerifyEmail.jsx";
 import ForgotPassword from "./pages/ForgotPassword.jsx";
 import ResetPassword from "./pages/ResetPassword.jsx";
-
+import Moderation from "./pages/Moderation.jsx";
+import ModerationReports from "./pages/moderation/ModerationReports.jsx"
 
 const BETA_LOCK = false;
 
@@ -28,6 +29,8 @@ export default function App() {
 
   const [authOpen, setAuthOpen] = useState(false);
   const [authMode, setAuthMode] = useState("login");
+
+  console.log(user)
 
   useEffect(() => {
     (async () => {
@@ -127,6 +130,19 @@ export default function App() {
           </Route>
 
           <Route path="/plans" element={<Plans user={user} onRequireLogin={openLogin} />} />
+          <Route
+            path="/moderation"
+            element={
+              user?.isModerator ? <Moderation /> : <Navigate to="/watch" />
+            }
+          />
+
+          <Route
+            path="/moderation/reports"
+            element={
+              user?.isModerator ? <ModerationReports /> : <Navigate to="/watch" />
+            }
+          />
 
           <Route
             path="/me/profile"

@@ -1,0 +1,58 @@
+.page--moderation {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.moderationHeader h2 {
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.moderationHeader p {
+  opacity: 0.7;
+  font-size: 14px;
+}
+
+.moderationGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+.moderationCard {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 14px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.moderationCardTitle {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.moderationCardDesc {
+  font-size: 13px;
+  opacity: 0.7;
+}
+
+.moderationBtn {
+  margin-top: auto;
+  align-self: flex-start;
+
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.05);
+  color: white;
+
+  padding: 8px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.moderationBtn:hover {
+  background: rgba(255,255,255,0.1);
+}

@@ -23,6 +23,8 @@ export default function AppLayout({
   const [verifyMsg, setVerifyMsg] = useState("");
   const nav = useNavigate();
 
+  const isModerator = !!user?.isModerator;
+
   async function handleResendVerification() {
     try {
       setVerifyBusy(true);
@@ -90,20 +92,23 @@ export default function AppLayout({
                   Watch
                 </NavLink>
 
-                <NavLink
-                  to="/create"
-                  className={({ isActive }) =>
-                    `folderTab ${isActive ? "active" : ""} ${!user ? "lockedTab" : ""}`
-                  }
-                  onClick={(e) => {
-                    if (!user) {
-                      e.preventDefault();
-                      onOpenLogin("/create");
+
+                {isModerator && (
+                  <NavLink
+                    to="/create"
+                    className={({ isActive }) =>
+                      `folderTab ${isActive ? "active" : ""} ${!user ? "lockedTab" : ""}`
                     }
-                  }}
-                >
-                  Upload
-                </NavLink>
+                    onClick={(e) => {
+                      if (!user) {
+                        e.preventDefault();
+                        onOpenLogin("/create");
+                      }
+                    }}
+                  >
+                    Upload
+                  </NavLink>
+                )}
 
                 <NavLink
                   to="/generate"
@@ -126,6 +131,15 @@ export default function AppLayout({
                 >
                   Plans
                 </NavLink>
+
+                {isModerator && (
+                  <NavLink
+                    to="/moderation"
+                    className={({ isActive }) => `folderTab ${isActive ? "active" : ""}`}
+                  >
+                    Moderation
+                  </NavLink>
+                )}
               </nav>
 
               <div className="folderBody">

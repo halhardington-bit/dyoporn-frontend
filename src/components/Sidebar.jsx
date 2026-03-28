@@ -149,6 +149,10 @@ export default function Sidebar({ user, onOpenLogin, mobileOpen, setMobileOpen }
     setMobileOpen(false);
   }
 
+  function isWatchLaterActive() {
+  return currentPath === "/watch" && currentFilter === "watch-later";
+}
+
   return (
     <>
       <button
@@ -259,15 +263,10 @@ export default function Sidebar({ user, onOpenLogin, mobileOpen, setMobileOpen }
 
               <button
                 type="button"
-                className="sidebarItem"
-                onClick={() => {
-                  if (!user) {
-                    requireLogin("/watch");
-                    return;
-                  }
-                  console.log("Watch Later clicked");
-                  setMobileOpen(false);
-                }}
+                className={`sidebarItem ${isWatchLaterActive() ? "active" : ""}`}
+                onClick={() =>
+                  handleProtectedNavigate("/watch?filter=watch-later&sort=recent-watch-later")
+                }
               >
                 Watch Later
               </button>

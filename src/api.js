@@ -241,6 +241,96 @@ export function streamUrl(videoOrId) {
   return `${API_BASE}/videos/${id}/stream`;
 }
 
+export async function getWatchLater() {
+  const res = await fetch(`${API_BASE}/api/me/watch-later`, {
+    credentials: "include",
+  });
+
+  const data = await res.json().catch(() => null);
+  if (!res.ok) throw new Error(data?.error || "Failed to load Watch Later");
+  return Array.isArray(data) ? data : [];
+}
+
+export async function addToWatchLater(videoId) {
+  const res = await fetch(`${API_BASE}/api/me/watch-later/${videoId}`, {
+    method: "POST",
+    credentials: "include",
+  });
+
+  const data = await res.json().catch(() => null);
+  if (!res.ok) throw new Error(data?.error || "Failed to add to Watch Later");
+  return data;
+}
+
+export async function removeFromWatchLater(videoId) {
+  const res = await fetch(`${API_BASE}/api/me/watch-later/${videoId}`, {
+    method: "DELETE",
+    credentials: "include",
+  });
+
+  const data = await res.json().catch(() => null);
+  if (!res.ok) throw new Error(data?.error || "Failed to remove from Watch Later");
+  return data;
+}
+
+export async function getWatchLaterStatus(videoId) {
+  const res = await fetch(`${API_BASE}/api/me/watch-later/${videoId}`, {
+    credentials: "include",
+  });
+
+  const data = await res.json().catch(() => null);
+  if (!res.ok) throw new Error(data?.error || "Failed to load Watch Later status");
+  return data;
+}
+
+
+// REPORTS
+export async function reportVideo(videoId, { offense, comments } = {}) {
+  const res = await fetch(`${API_BASE}/api/videos/${videoId}/report`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify({ offense, comments }),
+  });
+
+  const data = await res.json().catch(() => null);
+  if (!res.ok) throw new Error(data?.error || "Failed to report video");
+  return data;
+}
+
+export async function getModerationReports({
+  archived = false,
+  q = "",
+  limit = 100,
+  offset = 0,
+} = {}) {
+  const params = new URLSearchParams();
+  params.set("archived", archived ? "1" : "0");
+  params.set("limit", String(limit));
+  params.set("offset", String(offset));
+  if (String(q || "").trim()) params.set("q", String(q).trim());
+
+  const res = await fetch(`${API_BASE}/api/mod/reports?${params.toString()}`, {
+    credentials: "include",
+  });
+
+  const data = await res.json().catch(() => null);
+  if (!res.ok) throw new Error(data?.error || "Failed to load moderation reports");
+  return Array.isArray(data) ? data : [];
+}
+
+export async function resolveModerationReport(reportId, action) {
+  const res = await fetch(`${API_BASE}/api/mod/reports/${reportId}/resolve`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify({ action }),
+  });
+
+  const data = await res.json().catch(() => null);
+  if (!res.ok) throw new Error(data?.error || "Failed to resolve report");
+  return data;
+}
 
 
 // RATINGS

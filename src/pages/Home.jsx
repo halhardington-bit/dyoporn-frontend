@@ -4,6 +4,9 @@ import { getVideos, getHomeRows } from "../api.js";
 import { VideoShelf } from "../ui/VideoShelf.jsx";
 import VideoCard from "../ui/VideoCard.jsx";
 
+
+
+
 function normTag(t) {
   return String(t || "").trim().toLowerCase();
 }
@@ -28,18 +31,6 @@ function buildRowsByTags(videos, { maxRows = 8, minCount = 2 } = {}) {
       if (!t) continue;
       counts.set(t, (counts.get(t) || 0) + 1);
     }
-  }
-
-  function setParam(next) {
-    const sp = new URLSearchParams(params);
-
-    for (const [k, v] of Object.entries(next)) {
-      const val = String(v ?? "").trim();
-      if (!val) sp.delete(k);
-      else sp.set(k, val);
-    }
-
-    setSearchParams(sp, { replace: true });
   }
 
   const topTags = [...counts.entries()]
@@ -109,9 +100,7 @@ export default function Home({ user, onRequireLogin }) {
   const outlet = useOutletContext?.() || {};
   const setQ = outlet.setQ || (() => {});
 
-  const [params] = useSearchParams();
-
-  const [, setSearchParams] = useSearchParams();
+  const [params, setSearchParams] = useSearchParams();
 
   function setParam(next) {
     const sp = new URLSearchParams(params);
@@ -127,7 +116,8 @@ export default function Home({ user, onRequireLogin }) {
   const filter = (params.get("filter") || "").trim().toLowerCase();
   const sort = (params.get("sort") || "").trim().toLowerCase();
   const time = (params.get("time") || "all").trim().toLowerCase();
-
+  const refreshKey = (params.get("_refresh") || "").trim();
+  
 
   const [videos, setVideos] = useState([]);
   const [homeRows, setHomeRows] = useState([]);
@@ -136,7 +126,9 @@ export default function Home({ user, onRequireLogin }) {
   const isLoggedIn = !!user?.id;
   const isRatedMode = filter === "rated";
   const isHistoryMode = filter === "history";
-  const isSearching = urlQ.length > 0 || isRatedMode || isHistoryMode;
+  const isWatchLaterMode = filter === "watch-later";
+  const isSearching =
+    urlQ.length > 0 || isRatedMode || isHistoryMode || isWatchLaterMode;
 
   useEffect(() => {
     setQ(urlQ);
@@ -161,6 +153,11 @@ export default function Home({ user, onRequireLogin }) {
             vids = await getVideos({
               filter: "history",
               sort: sort || "recent-history",
+            });
+          } else if (isWatchLaterMode) {
+            vids = await getVideos({
+              filter: "watch-later",
+              sort: sort || "recent-watch-later",
             });
           } else {
             vids = await getVideos({
@@ -190,16 +187,15 @@ export default function Home({ user, onRequireLogin }) {
         }
 
         const vids = await getVideos({});
-          if (!alive) return;
+        if (!alive) return;
 
-          const filteredVids = applyTimeFilter(
-            Array.isArray(vids) ? vids : [],
-            time
-          );
+        const filteredVids = applyTimeFilter(
+          Array.isArray(vids) ? vids : [],
+          time
+        );
 
-          setVideos(filteredVids);
-          setHomeRows([]);
-
+        setVideos(filteredVids);
+        setHomeRows([]);
       } catch (e) {
         console.error("Home fetch failed:", e);
         if (!alive) return;
@@ -213,7 +209,18 @@ export default function Home({ user, onRequireLogin }) {
     return () => {
       alive = false;
     };
-  }, [urlQ, filter, sort, time, isRatedMode, isHistoryMode, isSearching, isLoggedIn]);
+  }, [
+    urlQ,
+    filter,
+    sort,
+    time,
+    refreshKey,
+    isRatedMode,
+    isHistoryMode,
+    isWatchLaterMode,
+    isSearching,
+    isLoggedIn,
+  ]);
 
   const tagRows = useMemo(() => {
     if (isSearching || isLoggedIn) return [];
@@ -225,6 +232,8 @@ export default function Home({ user, onRequireLogin }) {
       ? "Recently Rated"
       : isHistoryMode
       ? "Watch History"
+      : isWatchLaterMode
+      ? "Watch Later"
       : `Results for “${urlQ}”`;
 
     return (
@@ -238,6 +247,8 @@ export default function Home({ user, onRequireLogin }) {
                     ? "Loading recently rated…"
                     : isHistoryMode
                     ? "Loading history…"
+                    : isWatchLaterMode
+                    ? "Loading Watch Later…"
                     : "Searching…"}
                 </span>
               ) : (
@@ -257,6 +268,8 @@ export default function Home({ user, onRequireLogin }) {
                       ? sort || "recent-rating"
                       : isHistoryMode
                       ? sort || "recent-history"
+                      : isWatchLaterMode
+                      ? sort || "recent-watch-later"
                       : sort || "newest"
                   }
                   onChange={(e) => setParam({ sort: e.target.value })}
@@ -272,6 +285,14 @@ export default function Home({ user, onRequireLogin }) {
                   ) : isHistoryMode ? (
                     <>
                       <option value="recent-history">Recently watched</option>
+                      <option value="highest">Highest rated</option>
+                      <option value="views">Most views</option>
+                      <option value="newest">Newest</option>
+                      <option value="oldest">Oldest</option>
+                    </>
+                  ) : isWatchLaterMode ? (
+                    <>
+                      <option value="recent-watch-later">Recently added</option>
                       <option value="highest">Highest rated</option>
                       <option value="views">Most views</option>
                       <option value="newest">Newest</option>
@@ -305,6 +326,7 @@ export default function Home({ user, onRequireLogin }) {
             </div>
           </div>
         </div>
+
         {!loading && videos.length === 0 ? (
           <div className="emptyState">
             <div className="emptyStateInner">
@@ -313,6 +335,8 @@ export default function Home({ user, onRequireLogin }) {
                   ? "No rated videos yet"
                   : isHistoryMode
                   ? "No watch history yet"
+                  : isWatchLaterMode
+                  ? "No Watch Later videos yet"
                   : "No results"}
               </div>
 
@@ -321,6 +345,8 @@ export default function Home({ user, onRequireLogin }) {
                   "Videos you rate will appear here."
                 ) : isHistoryMode ? (
                   "Videos you watch will appear here."
+                ) : isWatchLaterMode ? (
+                  "Videos you save for later will appear here."
                 ) : (
                   <>
                     Would you like to{" "}
@@ -350,6 +376,7 @@ export default function Home({ user, onRequireLogin }) {
                 video={video}
                 locked={!isLoggedIn && idx >= 2}
                 onRequireLogin={onRequireLogin}
+                user={user}
               />
             ))}
           </div>

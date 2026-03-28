@@ -1,7 +1,16 @@
 import "./VideoCard.css";
-import { useNavigate, NavLink } from "react-router-dom";
+import { useNavigate, NavLink, useSearchParams } from "react-router-dom";
 import { thumbUrl, streamUrl } from "../api.js";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
+import {
+  addToWatchLater,
+  removeFromWatchLater,
+  getWatchLaterStatus,
+  reportVideo,
+} from "../api.js";
+import crypto from "crypto";
+
 
 function formatViews(n) {
   if (n == null) return null;
@@ -22,6 +31,16 @@ function lc(s) {
   return String(s || "").toLowerCase().trim();
 }
 
+const REPORT_OPTIONS = [
+  "Spam or misleading",
+  "Harassment or bullying",
+  "Hateful or abusive content",
+  "Violence or dangerous acts",
+  "Sexual content",
+  "Copyright or stolen content",
+  "Other",
+];
+
 export default function VideoCard({
   video,
   locked = false,
@@ -31,6 +50,7 @@ export default function VideoCard({
   me = null,
 }) {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const src = thumbUrl(video) || null;
 
@@ -70,7 +90,27 @@ export default function VideoCard({
       ownerUserId != null &&
       Number(currentUser.id) === Number(ownerUserId));
 
-  const canManage = isOwner && typeof onRequestDelete === "function";
+  const canManage = true;
+  const canDelete = isOwner && typeof onRequestDelete === "function";
+
+  const [inWatchLater, setInWatchLater] = useState(false);
+  const [watchLaterBusy, setWatchLaterBusy] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
+  const [manageMenuOpen, setManageMenuOpen] = useState(false);
+  const [menuPos, setMenuPos] = useState({ top: 0, right: 0 });
+
+  const [reportOpen, setReportOpen] = useState(false);
+  const [reportReason, setReportReason] = useState("");
+  const [reportOther, setReportOther] = useState("");
+  const [reportComments, setReportComments] = useState("");
+  const [reportBusy, setReportBusy] = useState(false);
+  const [reportError, setReportError] = useState("");
+  const [reportSuccess, setReportSuccess] = useState(false);
+
+  const videoRef = useRef(null);
+  const hoverTimerRef = useRef(null);
+  const manageMenuRef = useRef(null);
+  const manageButtonRef = useRef(null);
 
   const progressSeconds = Number(video.progressSeconds || 0);
   const durationSeconds = Number(video.durationSeconds || 0);
@@ -84,6 +124,8 @@ export default function VideoCard({
     ? Math.max(0, Math.min(100, (progressSeconds / durationSeconds) * 100))
     : 0;
 
+  const previewEnabled = !locked && !!previewSrc;
+
   function handleClick() {
     if (locked) return onRequireLogin?.();
     navigate(`/watch/${video.id}`);
@@ -94,6 +136,99 @@ export default function VideoCard({
       e.preventDefault();
       handleClick();
     }
+  }
+
+  async function handleWatchLaterClick(e) {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!currentUser?.id) {
+      setManageMenuOpen(false);
+      onRequireLogin?.(`/watch/${video.id}`);
+      return;
+    }
+
+    try {
+      setWatchLaterBusy(true);
+
+      const isWatchLaterPage = searchParams.get("filter") === "watch-later";
+
+      if (inWatchLater) {
+        await removeFromWatchLater(video.id);
+        setInWatchLater(false);
+
+        if (isWatchLaterPage) {
+          const sp = new URLSearchParams(searchParams);
+          sp.set("_refresh", Date.now().toString());
+          setSearchParams(sp, { replace: true });
+        }
+      } else {
+        await addToWatchLater(video.id);
+        setInWatchLater(true);
+      }
+
+      setManageMenuOpen(false);
+    } catch (err) {
+      console.error("Watch Later toggle failed:", err);
+    } finally {
+      setWatchLaterBusy(false);
+    }
+  }
+
+  function handleReportClick(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    setManageMenuOpen(false);
+
+    if (!currentUser?.id) {
+      onRequireLogin?.(`/watch/${video.id}`);
+      return;
+    }
+
+    setReportError("");
+    setReportSuccess(false);
+    setReportReason("");
+    setReportOther("");
+    setReportComments("");
+    setReportOpen(true);
+  }
+
+  async function handleSubmitReport(e) {
+    e.preventDefault();
+
+    const offense =
+      reportReason === "Other" ? reportOther.trim() || "Other" : reportReason.trim();
+
+    if (!offense) {
+      setReportError("Please select a reason.");
+      return;
+    }
+
+    try {
+      setReportBusy(true);
+      setReportError("");
+
+      await reportVideo(video.id, {
+        offense,
+        comments: reportComments.trim(),
+      });
+
+      setReportSuccess(true);
+      setReportReason("");
+      setReportOther("");
+      setReportComments("");
+    } catch (err) {
+      setReportError(err?.message || "Failed to submit report");
+    } finally {
+      setReportBusy(false);
+    }
+  }
+
+  function closeReportModal() {
+    if (reportBusy) return;
+    setReportOpen(false);
+    setReportError("");
+    setReportSuccess(false);
   }
 
   function handleDeleteClick(e) {
@@ -109,14 +244,17 @@ export default function VideoCard({
     setManageMenuOpen(false);
   }
 
-  // -----------------------
-  // Hover preview behavior
-  // -----------------------
-  const videoRef = useRef(null);
-  const hoverTimerRef = useRef(null);
-  const [showPreview, setShowPreview] = useState(false);
+  function updateMenuPosition() {
+    const btn = manageButtonRef.current;
+    if (!btn) return;
 
-  const previewEnabled = !locked && !!previewSrc;
+    const rect = btn.getBoundingClientRect();
+
+    setMenuPos({
+      top: rect.bottom + 8,
+      right: window.innerWidth - rect.right,
+    });
+  }
 
   function startPreviewSoon() {
     if (!previewEnabled) return;
@@ -141,6 +279,28 @@ export default function VideoCard({
   }
 
   useEffect(() => {
+    let alive = true;
+
+    (async () => {
+      if (!currentUser?.id || !video?.id) {
+        if (alive) setInWatchLater(false);
+        return;
+      }
+
+      try {
+        const data = await getWatchLaterStatus(video.id);
+        if (alive) setInWatchLater(!!data?.saved);
+      } catch {
+        if (alive) setInWatchLater(false);
+      }
+    })();
+
+    return () => {
+      alive = false;
+    };
+  }, [currentUser?.id, video?.id]);
+
+  useEffect(() => {
     const el = videoRef.current;
     if (!el || !showPreview) return;
 
@@ -156,18 +316,29 @@ export default function VideoCard({
     play();
   }, [showPreview]);
 
+  useLayoutEffect(() => {
+    if (!manageMenuOpen) return;
+
+    updateMenuPosition();
+
+    function handleReposition() {
+      updateMenuPosition();
+    }
+
+    window.addEventListener("resize", handleReposition);
+    window.addEventListener("scroll", handleReposition, true);
+
+    return () => {
+      window.removeEventListener("resize", handleReposition);
+      window.removeEventListener("scroll", handleReposition, true);
+    };
+  }, [manageMenuOpen]);
+
   useEffect(() => {
     return () => {
       clearTimeout(hoverTimerRef.current);
     };
   }, []);
-
-  // -----------------------
-  // Owner manage menu
-  // -----------------------
-  const [manageMenuOpen, setManageMenuOpen] = useState(false);
-  const manageMenuRef = useRef(null);
-  const manageButtonRef = useRef(null);
 
   useEffect(() => {
     if (!manageMenuOpen) return;
@@ -181,57 +352,71 @@ export default function VideoCard({
       setManageMenuOpen(false);
     }
 
-    function handleKeyDown(e) {
+    function handleEscape(e) {
       if (e.key === "Escape") setManageMenuOpen(false);
     }
 
     document.addEventListener("mousedown", handlePointerDown);
     document.addEventListener("touchstart", handlePointerDown);
-    document.addEventListener("keydown", handleKeyDown);
+    document.addEventListener("keydown", handleEscape);
 
     return () => {
       document.removeEventListener("mousedown", handlePointerDown);
       document.removeEventListener("touchstart", handlePointerDown);
-      document.removeEventListener("keydown", handleKeyDown);
+      document.removeEventListener("keydown", handleEscape);
     };
   }, [manageMenuOpen]);
 
-  return (
-    <div
-      className={`video-card ${locked ? "locked" : ""}`}
-      onClick={handleClick}
-      onKeyDown={handleKeyDown}
-      role="button"
-      tabIndex={0}
-      onMouseEnter={startPreviewSoon}
-      onMouseLeave={stopPreview}
-      onFocus={startPreviewSoon}
-      onBlur={stopPreview}
-    >
-      {canManage && (
-        <div className="vManageWrap" onClick={(e) => e.stopPropagation()}>
+  useEffect(() => {
+    if (!reportOpen) return;
+
+    function handleEscape(e) {
+      if (e.key === "Escape") closeReportModal();
+    }
+
+    window.addEventListener("keydown", handleEscape);
+    return () => window.removeEventListener("keydown", handleEscape);
+  }, [reportOpen, reportBusy]);
+
+  const menuPortal = manageMenuOpen
+    ? createPortal(
+        <div
+          ref={manageMenuRef}
+          className="vManageMenu vManageMenuPortal"
+          role="menu"
+          aria-label="Video options"
+          style={{
+            position: "fixed",
+            top: `${menuPos.top}px`,
+            right: `${menuPos.right}px`,
+          }}
+          onClick={(e) => e.stopPropagation()}
+        >
           <button
-            ref={manageButtonRef}
             type="button"
-            className="vManageButton"
-            aria-label="Open video options"
-            aria-expanded={manageMenuOpen}
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              setManageMenuOpen((v) => !v);
-            }}
+            className="vManageItem"
+            role="menuitem"
+            onClick={handleWatchLaterClick}
+            disabled={watchLaterBusy}
           >
-            ⋯
+            {watchLaterBusy
+              ? "Working..."
+              : inWatchLater
+              ? "Remove from Watch Later"
+              : "Watch Later"}
           </button>
 
-          {manageMenuOpen ? (
-            <div
-              ref={manageMenuRef}
-              className="vManageMenu"
-              role="menu"
-              aria-label="Video options"
-            >
+          <button
+            type="button"
+            className="vManageItem"
+            role="menuitem"
+            onClick={handleReportClick}
+          >
+            Report Video
+          </button>
+
+          {isOwner && (
+            <>
               <button
                 type="button"
                 className="vManageItem"
@@ -249,99 +434,242 @@ export default function VideoCard({
               >
                 Change Visibility
               </button>
+            </>
+          )}
 
-              <button
-                type="button"
-                className="vManageItem danger"
-                role="menuitem"
-                onClick={handleDeleteClick}
-              >
-                Delete
-              </button>
-            </div>
-          ) : null}
-        </div>
-      )}
+          {canDelete && (
+            <button
+              type="button"
+              className="vManageItem danger"
+              role="menuitem"
+              onClick={handleDeleteClick}
+            >
+              Delete
+            </button>
+          )}
+        </div>,
+        document.body
+      )
+    : null;
 
-      <div className="thumb-wrapper">
-        {src ? (
-          <img
-            className={`thumbImg ${showPreview ? "isHidden" : ""}`}
-            src={src}
-            alt={video.title}
-            loading="lazy"
-          />
-        ) : null}
+  const reportModal = reportOpen
+    ? createPortal(
+        <div className="modalOverlay" onMouseDown={closeReportModal}>
+          <div className="modalCard" onMouseDown={(e) => e.stopPropagation()}>
+            <div className="modalTitle">Report video</div>
 
-        {previewEnabled ? (
-          <video
-            ref={videoRef}
-            className={`thumbPreview ${showPreview ? "isVisible" : ""}`}
-            src={previewSrc}
-            preload="metadata"
-            muted
-            playsInline
-            loop
-          />
-        ) : null}
+            {reportSuccess ? (
+              <>
+                <div className="modalBody">
+                  Thanks. Your report has been submitted.
+                </div>
 
-        {duration && <div className="durationBadge">{duration}</div>}
+                <div className="modalActions">
+                  <button
+                    type="button"
+                    className="modalBtn"
+                    onClick={closeReportModal}
+                  >
+                    Close
+                  </button>
+                </div>
+              </>
+            ) : (
+              <form onSubmit={handleSubmitReport}>
+                <div className="modalBody">
+                  <div style={{ marginBottom: 12, fontWeight: 700 }}>
+                    Why are you reporting this video?
+                  </div>
 
-        {showProgressBar && (
-          <div className="videoProgressBar" aria-hidden="true">
-            <div
-              className="videoProgressFill"
-              style={{ width: `${progressPct}%` }}
-            />
-          </div>
-        )}
+                  <div style={{ display: "grid", gap: 8 }}>
+                    {REPORT_OPTIONS.map((option) => (
+                      <label key={option} style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                        <input
+                          type="radio"
+                          name={`report-${video.id}`}
+                          value={option}
+                          checked={reportReason === option}
+                          onChange={(e) => setReportReason(e.target.value)}
+                          disabled={reportBusy}
+                        />
+                        <span>{option}</span>
+                      </label>
+                    ))}
+                  </div>
 
-        {locked && (
-          <div className="lockOverlay">
-            <div className="lockPill">
-              <span className="lockIcon">🔒</span>
-              <span>Log in to watch</span>
-            </div>
-          </div>
-        )}
-      </div>
+                  {reportReason === "Other" && (
+                    <div style={{ marginTop: 12 }}>
+                      <input
+                        type="text"
+                        className="verifyInput"
+                        placeholder="Other reason"
+                        value={reportOther}
+                        onChange={(e) => setReportOther(e.target.value)}
+                        disabled={reportBusy}
+                      />
+                    </div>
+                  )}
 
-      <div className="video-meta">
-        <div className="vTitleRow">
-          <h4 className="video-title">{video.title}</h4>
+                  <div style={{ marginTop: 12 }}>
+                    <textarea
+                      className="verifyInput"
+                      rows={4}
+                      placeholder="Additional comments (optional)"
+                      value={reportComments}
+                      onChange={(e) => setReportComments(e.target.value)}
+                      disabled={reportBusy}
+                    />
+                  </div>
 
-          <div className="vTitleRight">
-            <div className="vRating">
-              {hasRatings ? (
-                <>
-                  <span className="vStar">★</span>
-                  <span className="vAvg">{ratingAvg}</span>
-                  <span className="vCount">({ratingCount})</span>
-                </>
-              ) : (
-                <span className="vNoRating">Not yet rated</span>
-              )}
-            </div>
-          </div>
-        </div>
+                  {reportError ? <div className="modalError">{reportError}</div> : null}
+                </div>
 
-        {(ownerUsername || views) && (
-          <div className="video-sub">
-            {ownerUsername && (
-              <NavLink
-                to={`/u/${ownerUsername}`}
-                className="video-creator"
-                onClick={(e) => e.stopPropagation()}
-              >
-                {ownerDisplay}
-              </NavLink>
+                <div className="modalActions">
+                  <button
+                    type="button"
+                    className="modalBtn"
+                    onClick={closeReportModal}
+                    disabled={reportBusy}
+                  >
+                    Cancel
+                  </button>
+
+                  <button
+                    type="submit"
+                    className="modalBtnDanger"
+                    disabled={reportBusy}
+                  >
+                    {reportBusy ? "Submitting…" : "Submit report"}
+                  </button>
+                </div>
+              </form>
             )}
+          </div>
+        </div>,
+        document.body
+      )
+    : null;
 
-            {ownerUsername && views && <span className="dot">•</span>}
-            {views && <span className="video-views">{views}</span>}
+  return (
+    <>
+      <div
+        className={`video-card ${locked ? "locked" : ""} ${
+          manageMenuOpen ? "menuOpen" : ""
+        }`}
+        onClick={handleClick}
+        onKeyDown={handleKeyDown}
+        role="button"
+        tabIndex={0}
+        onMouseEnter={startPreviewSoon}
+        onMouseLeave={stopPreview}
+        onFocus={startPreviewSoon}
+        onBlur={stopPreview}
+      >
+        {canManage && (
+          <div
+            className={`vManageWrap ${manageMenuOpen ? "isOpen" : ""}`}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              ref={manageButtonRef}
+              type="button"
+              className="vManageButton"
+              aria-label="Open video options"
+              aria-expanded={manageMenuOpen}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setManageMenuOpen((v) => !v);
+              }}
+            >
+              ⋯
+            </button>
           </div>
         )}
+
+        <div className="thumb-wrapper">
+          {src ? (
+            <img
+              className={`thumbImg ${showPreview ? "isHidden" : ""}`}
+              src={src}
+              alt={video.title}
+              loading="lazy"
+            />
+          ) : null}
+
+          {previewEnabled ? (
+            <video
+              ref={videoRef}
+              className={`thumbPreview ${showPreview ? "isVisible" : ""}`}
+              src={previewSrc}
+              preload="metadata"
+              muted
+              playsInline
+              loop
+            />
+          ) : null}
+
+          {duration && <div className="durationBadge">{duration}</div>}
+
+          {showProgressBar && (
+            <div className="videoProgressBar" aria-hidden="true">
+              <div
+                className="videoProgressFill"
+                style={{ width: `${progressPct}%` }}
+              />
+            </div>
+          )}
+
+          {locked && (
+            <div className="lockOverlay">
+              <div className="lockPill">
+                <span className="lockIcon">🔒</span>
+                <span>Log in to watch</span>
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="video-meta">
+          <div className="vTitleRow">
+            <h4 className="video-title">{video.title}</h4>
+
+            <div className="vTitleRight">
+              <div className="vRating">
+                {hasRatings ? (
+                  <>
+                    <span className="vStar">★</span>
+                    <span className="vAvg">{ratingAvg}</span>
+                    <span className="vCount">({ratingCount})</span>
+                  </>
+                ) : (
+                  <span className="vNoRating">Not yet rated</span>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {(ownerUsername || views) && (
+            <div className="video-sub">
+              {ownerUsername && (
+                <NavLink
+                  to={`/u/${ownerUsername}`}
+                  className="video-creator"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {ownerDisplay}
+                </NavLink>
+              )}
+
+              {ownerUsername && views && <span className="dot">•</span>}
+              {views && <span className="video-views">{views}</span>}
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+
+      {menuPortal}
+      {reportModal}
+    </>
   );
 }
