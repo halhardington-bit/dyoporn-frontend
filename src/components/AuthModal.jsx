@@ -169,6 +169,33 @@ export default function AuthModal({
           </button>
         </div>
 
+          <div className="modal-socials">
+            <button
+              type="button"
+              className="btn btn-ghost"
+              onClick={() => {
+                const apiBase =
+                  window.location.hostname === "localhost"
+                    ? "http://localhost:3001"
+                    : "https://api.dyop.ai";
+
+                window.location.href = `${apiBase}/auth/google`;
+              }}
+            >
+              Continue with Google
+            </button>
+          </div>
+
+          <div
+            style={{
+              opacity: 0.5,
+              textAlign: "center",
+              margin: "10px 0",
+            }}
+          >
+            or
+          </div>
+
         <form className="modal-form" onSubmit={handleSubmit}>
           {!isLogin && (
             <label className="field">

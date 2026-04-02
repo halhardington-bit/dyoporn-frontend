@@ -179,6 +179,14 @@
   text-align: center;
 }
 
+.modal-socials {
+  margin: 10px 0 12px;
+}
+
+.modal-socials .btn {
+  width: 100%;
+}
+
 /* Reuse same language as header */
 .modal-footer .signup-hint {
   font-size: 12px;
