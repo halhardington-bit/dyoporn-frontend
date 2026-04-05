@@ -9,7 +9,6 @@ import {
   getWatchLaterStatus,
   reportVideo,
 } from "../api.js";
-import crypto from "crypto";
 
 
 function formatViews(n) {
