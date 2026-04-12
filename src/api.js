@@ -538,6 +538,23 @@ export async function getUserVideos(
   return data;
 }
 
+export async function updateMyTier(tier) {
+  const res = await fetch("/api/me/tier", {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify({ tier }),
+  });
+
+  const data = await res.json().catch(() => null);
+
+  if (!res.ok) {
+    throw new Error(data?.error || "Failed to update plan");
+  }
+
+  return data;
+}
+
 // AUTH
 export async function login({ email, password }) {
   const res = await fetch(`${API_BASE}/auth/login`, {

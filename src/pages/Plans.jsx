@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-
-const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
+import { whoami, updateMyTier } from "../api.js";
 
 const plans = [
   {
@@ -61,26 +60,18 @@ export default function Plans({ user, onRequireLogin }) {
     let alive = true;
 
     (async () => {
-      if (!user) {
+      if (!user?.id) {
         if (alive) setCurrentTier("Free");
         return;
       }
 
       try {
         setLoadingTier(true);
-
-        const res = await fetch(`${API_BASE}/auth/me`, {
-          credentials: "include",
-        });
-
-        const data = await res.json().catch(() => null);
-
-        if (!res.ok || !data) return;
+        const me = await whoami();
         if (!alive) return;
-
-        setCurrentTier(data.tier || "Free");
+        setCurrentTier(me?.tier || "Free");
       } catch {
-        // silent fallback to current prop/state
+        if (!alive) return;
       } finally {
         if (alive) setLoadingTier(false);
       }
@@ -89,7 +80,7 @@ export default function Plans({ user, onRequireLogin }) {
     return () => {
       alive = false;
     };
-  }, [user]);
+  }, [user?.id]);
 
   async function handleChoosePlan(tier) {
     if (!user) {
@@ -104,21 +95,10 @@ export default function Plans({ user, onRequireLogin }) {
       setError("");
       setSuccess("");
 
-      const res = await fetch(`${API_BASE}/api/me/tier`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ tier }),
-      });
+      const data = await updateMyTier(tier);
 
-      const data = await res.json().catch(() => null);
-
-      if (!res.ok) {
-        throw new Error(data?.error || "Failed to update plan");
-      }
-
-      setCurrentTier(tier);
-      setSuccess(``);
+      setCurrentTier(data?.tier || tier);
+      setSuccess("");
     } catch (err) {
       setError(err?.message || "Failed to update plan");
     } finally {

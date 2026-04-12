@@ -31,12 +31,15 @@ function lc(s) {
 }
 
 const REPORT_OPTIONS = [
-  "Spam or misleading",
-  "Harassment or bullying",
-  "Hateful or abusive content",
-  "Violence or dangerous acts",
-  "Sexual content",
-  "Copyright or stolen content",
+  "This video features a minor",
+  "This video features a real person",
+  "Copyright Infringement",
+  "Celebrity Impersonation",
+  "Unsafe Content",
+  "Misleading",
+  "Harrassment or Hate",
+  "Stolen Content",
+  "Spam",
   "Other",
 ];
 
