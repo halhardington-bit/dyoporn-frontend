@@ -539,12 +539,21 @@ export async function getUserVideos(
 }
 
 export async function updateMyTier(tier) {
-  const res = await fetch("/api/me/tier", {
+  const res = await fetch(`${API_BASE}/api/me/tier`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     credentials: "include",
     body: JSON.stringify({ tier }),
   });
+
+  const data = await res.json().catch(() => null);
+
+  if (!res.ok) {
+    throw new Error(data?.error || "Failed to update plan");
+  }
+
+  return data;
+}
 
   const data = await res.json().catch(() => null);
 
