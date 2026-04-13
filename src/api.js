@@ -555,15 +555,6 @@ export async function updateMyTier(tier) {
   return data;
 }
 
-  const data = await res.json().catch(() => null);
-
-  if (!res.ok) {
-    throw new Error(data?.error || "Failed to update plan");
-  }
-
-  return data;
-}
-
 // AUTH
 export async function login({ email, password }) {
   const res = await fetch(`${API_BASE}/auth/login`, {
