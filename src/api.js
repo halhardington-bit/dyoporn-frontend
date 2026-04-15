@@ -555,6 +555,32 @@ export async function updateMyTier(tier) {
   return data;
 }
 
+
+export async function registerBeta({
+  email,
+  username,
+  password,
+  dateOfBirth,
+  country,
+}) {
+  const res = await fetch(`${API_BASE}/auth/register-beta`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify({
+      email,
+      username,
+      password,
+      dateOfBirth,
+      country,
+    }),
+  });
+
+  const data = await res.json().catch(() => null);
+  if (!res.ok) throw new Error(data?.error || `Beta registration failed: ${res.status}`);
+  return data;
+}
+
 // AUTH
 export async function login({ email, password }) {
   const res = await fetch(`${API_BASE}/auth/login`, {

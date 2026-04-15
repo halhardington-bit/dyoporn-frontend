@@ -94,10 +94,11 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<BetaSignup />} />
+        <Route path="/" element={<Navigate to="/watch" replace />} />
         <Route path="/verify-email" element={<VerifyEmail />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/beta" element={<BetaSignup />} />
 
         <Route
           element={

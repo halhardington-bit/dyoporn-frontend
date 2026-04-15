@@ -1,44 +1,115 @@
 import { useState } from "react";
-import { betaSignup } from "../api";
+import { useNavigate } from "react-router-dom";
+import { registerBeta } from "../api";
+import logo from "../assets/logo-01-cropped.svg";
 import "./BetaSignup.css";
 
+function calculateAge(dateString) {
+  if (!dateString) return null;
+
+  const today = new Date();
+  const birthDate = new Date(dateString);
+
+  if (Number.isNaN(birthDate.getTime())) return null;
+
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const monthDiff = today.getMonth() - birthDate.getMonth();
+
+  if (
+    monthDiff < 0 ||
+    (monthDiff === 0 && today.getDate() < birthDate.getDate())
+  ) {
+    age--;
+  }
+
+  return age;
+}
+
+function getApiBase() {
+  return window.location.hostname === "localhost"
+    ? "http://localhost:3001"
+    : "https://api.dyop.ai";
+}
+
 export default function BetaSignup() {
+  const navigate = useNavigate();
+
   const [email, setEmail] = useState("");
-  const [watching, setWatching] = useState(false);
-  const [creating, setCreating] = useState(false);
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
+  const [dateOfBirth, setDateOfBirth] = useState("");
+  const [country, setCountry] = useState("");
+  const [error, setError] = useState("");
   const [status, setStatus] = useState("idle");
-  const [message, setMessage] = useState("");
 
   async function handleSubmit(e) {
     e.preventDefault();
+    setError("");
 
-    const cleanEmail = email.trim().toLowerCase();
+    if (!username.trim()) {
+      setError("Please choose a username.");
+      return;
+    }
 
-    if (!cleanEmail) {
-      setStatus("error");
-      setMessage("Please enter your email.");
+    if (!email.trim()) {
+      setError("Please enter your email.");
+      return;
+    }
+
+    if (!dateOfBirth) {
+      setError("Please enter your date of birth.");
+      return;
+    }
+
+    const age = calculateAge(dateOfBirth);
+
+    if (age == null) {
+      setError("Please enter a valid date of birth.");
+      return;
+    }
+
+    if (age < 18) {
+      setError("You must be at least 18 years old to create an account.");
+      return;
+    }
+
+    if (!password) {
+      setError("Please enter a password.");
+      return;
+    }
+
+    if (password !== confirm) {
+      setError("Passwords do not match.");
       return;
     }
 
     try {
       setStatus("loading");
-      setMessage("");
 
-      const res = await betaSignup({
-        email: cleanEmail,
-        watching,
-        creating,
+      const data = await registerBeta({
+        email: email.trim().toLowerCase(),
+        username: username.trim(),
+        password,
+        dateOfBirth,
+        country: country.trim() || null,
       });
 
-      setStatus("success");
-      setMessage(res?.message || "Thanks. You're on the list.");
-      setEmail("");
-      setWatching(false);
-      setCreating(false);
+      if (data?.user) {
+        navigate("/watch");
+        return;
+      }
+
+      navigate("/watch");
     } catch (err) {
-      setStatus("error");
-      setMessage(err.message || "Something went wrong.");
+      setError(err?.message || "Failed to create account.");
+      setStatus("idle");
     }
+  }
+
+  function handleGoogleBetaSignup() {
+    const apiBase = getApiBase();
+    window.location.href = `${apiBase}/auth/google/beta`;
   }
 
   return (
@@ -52,70 +123,94 @@ export default function BetaSignup() {
           <div className="betaTopline">
             <span className="betaKicker">BETA ACCESS</span>
             <span className="betaDot" />
-            <span className="betaSmall">SIGN UP FOR EARLY ENTRY</span>
+            <span className="betaSmall">CREATE YOUR ACCOUNT</span>
           </div>
 
           <div className="betaBrandRow">
             <div className="betaBrandBlock">
-              <div className="betaBrand">DYOPorn</div>
-              <div className="betaBrandShadow">DYOPorn</div>
+              <img src={logo} alt="DYOP" className="betaLogo" />
             </div>
           </div>
 
+          <div className="betaSocials">
+            <button
+              type="button"
+              className="betaButton betaButtonGoogle"
+              onClick={handleGoogleBetaSignup}
+              disabled={status === "loading"}
+            >
+              Continue with Google
+            </button>
+          </div>
+
+          <div className="betaDivider">
+            <span>or</span>
+          </div>
+
           <form className="betaForm" onSubmit={handleSubmit}>
-            
-            {/* Email input */}
+            <input
+              className="betaInput"
+              type="text"
+              placeholder="Username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              disabled={status === "loading"}
+            />
+
             <input
               className="betaInput"
               type="email"
-              placeholder="Enter your email"
+              placeholder="Email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               disabled={status === "loading"}
             />
 
-            {/* Optional section */}
-            <div className="betaOptional">
-              <div className="betaOptionalLabel">
-                Optional — What do you want to use DYOPorn for?
-              </div>
+            <input
+              className="betaInput"
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              disabled={status === "loading"}
+            />
 
-              <div className="betaChecks">
-                <label className={`betaCheck ${watching ? "isChecked" : ""}`}>
-                  <input
-                    type="checkbox"
-                    checked={watching}
-                    onChange={(e) => setWatching(e.target.checked)}
-                  />
-                  <span>Watching videos</span>
-                </label>
+            <input
+              className="betaInput"
+              type="password"
+              placeholder="Confirm password"
+              value={confirm}
+              onChange={(e) => setConfirm(e.target.value)}
+              disabled={status === "loading"}
+            />
 
-                <label className={`betaCheck ${creating ? "isChecked" : ""}`}>
-                  <input
-                    type="checkbox"
-                    checked={creating}
-                    onChange={(e) => setCreating(e.target.checked)}
-                  />
-                  <span>Creating videos</span>
-                </label>
-              </div>
-            </div>
+            <input
+              className="betaInput"
+              type="date"
+              value={dateOfBirth}
+              onChange={(e) => setDateOfBirth(e.target.value)}
+              max={new Date().toISOString().split("T")[0]}
+              disabled={status === "loading"}
+            />
 
-            {/* CTA */}
+            <input
+              className="betaInput"
+              type="text"
+              placeholder="Country (optional)"
+              value={country}
+              onChange={(e) => setCountry(e.target.value)}
+              disabled={status === "loading"}
+            />
+
+            {error ? <div className="betaMessage error">{error}</div> : null}
+
             <button
               className="betaButton betaButtonPrimary"
               type="submit"
               disabled={status === "loading"}
             >
-              {status === "loading" ? "Joining..." : "Join Beta"}
+              {status === "loading" ? "Creating account..." : "Continue"}
             </button>
-
-            {message && (
-              <div className={`betaMessage ${status === "success" ? "success" : "error"}`}>
-                {message}
-              </div>
-            )}
-
           </form>
         </section>
       </main>

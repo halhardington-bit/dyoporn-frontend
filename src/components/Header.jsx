@@ -2,6 +2,7 @@ import "./Header.css";
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { getMyProfile, whoami } from "../api.js";
+import logo from "../assets/logo-01-exact-bounds.svg";
 
 export default function Header({
   user,
@@ -144,7 +145,7 @@ export default function Header({
           </button>
 
           <NavLink to="/watch" className="logo">
-            DYOPorn
+            <img src={logo} alt="DYOP" className="logoImg" />
           </NavLink>
         </div>
 
