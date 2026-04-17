@@ -109,7 +109,7 @@ export default function BetaSignup() {
 
   function handleGoogleBetaSignup() {
     const apiBase = getApiBase();
-    window.location.href = `${apiBase}/auth/google/beta`;
+    window.location.href = `${apiBase}/auth/google?beta=1`;
   }
 
   return (

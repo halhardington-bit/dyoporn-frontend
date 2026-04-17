@@ -7,8 +7,8 @@ const styleList = [
   "Hyperreal",
   "Anime 3D",
   "Anime 2D",
-  "Disney",
-  "Ghibli",
+  "Cartoon 2D",
+  "Cartoon 3D",
   "North American 2D",
 ];
 
