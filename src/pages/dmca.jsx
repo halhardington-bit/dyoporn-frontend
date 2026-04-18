@@ -1,4 +1,4 @@
-import "./Dmca.css";
+import "./dmca.css";
 
 export default function Dmca() {
   return (
