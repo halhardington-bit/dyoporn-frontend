@@ -1,0 +1,256 @@
+.page--legal {
+  padding: 28px 20px 56px;
+}
+
+.dmcaPage {
+  width: 100%;
+  max-width: 1120px;
+  margin: 0 auto;
+}
+
+.dmcaHero {
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 22px;
+  padding: 34px 34px 28px;
+  border-radius: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background:
+    radial-gradient(circle at top right, rgba(212, 175, 55, 0.09), transparent 28%),
+    radial-gradient(circle at left center, rgba(255, 255, 255, 0.06), transparent 24%),
+    linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01)),
+    rgba(10, 10, 10, 0.94);
+}
+
+.dmcaHeroBadge {
+  display: inline-flex;
+  align-items: center;
+  margin-bottom: 12px;
+  padding: 7px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.04);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: rgba(255,255,255,0.62);
+}
+
+.dmcaHeroTitle {
+  margin: 0 0 12px;
+  font-size: 42px;
+  line-height: 0.98;
+  color: #ffffff;
+}
+
+.dmcaHeroText {
+  max-width: 760px;
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.65;
+  color: rgba(255,255,255,0.72);
+}
+
+.dmcaHeroCard {
+  margin-top: 22px;
+  display: inline-flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 16px 18px;
+  border-radius: 18px;
+  border: 1px solid rgba(212, 175, 55, 0.16);
+  background: rgba(255,255,255,0.03);
+}
+
+.dmcaHeroCardLabel {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: rgba(255,255,255,0.52);
+  text-transform: uppercase;
+}
+
+.dmcaHeroCardEmail {
+  font-size: 22px;
+  font-weight: 700;
+  color: #f4d377;
+  line-height: 1.1;
+}
+
+.dmcaHeroCardSub {
+  font-size: 13px;
+  color: rgba(255,255,255,0.62);
+}
+
+.dmcaGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+.dmcaPanel {
+  padding: 24px;
+  border-radius: 22px;
+  border: 1px solid rgba(255,255,255,0.07);
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)),
+    rgba(9, 9, 9, 0.94);
+}
+
+.dmcaPanelPrimary {
+  background:
+    radial-gradient(circle at top left, rgba(255,255,255,0.04), transparent 28%),
+    linear-gradient(180deg, rgba(255,255,255,0.025), rgba(255,255,255,0.01)),
+    rgba(9, 9, 9, 0.94);
+}
+
+.dmcaPanelWarning {
+  border-color: rgba(212, 175, 55, 0.14);
+}
+
+.dmcaPanelHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.dmcaStep {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.04);
+  color: rgba(255,255,255,0.68);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.dmcaPanel h2 {
+  margin: 0;
+  font-size: 21px;
+  color: #ffffff;
+  line-height: 1.2;
+}
+
+.dmcaPanel p {
+  margin: 0;
+  color: rgba(255,255,255,0.72);
+  line-height: 1.65;
+  font-size: 14px;
+}
+
+.dmcaChecklist {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 12px;
+}
+
+.dmcaChecklist li {
+  position: relative;
+  padding-left: 18px;
+  color: rgba(255,255,255,0.74);
+  line-height: 1.6;
+  font-size: 14px;
+}
+
+.dmcaChecklist li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.62em;
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(212, 175, 55, 0.78);
+}
+
+.dmcaCallout {
+  margin-top: 16px;
+  padding: 15px 16px;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.07);
+  background: rgba(255,255,255,0.03);
+}
+
+.dmcaCalloutRow + .dmcaCalloutRow {
+  margin-top: 10px;
+}
+
+.dmcaCalloutLabel {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.5);
+}
+
+.dmcaCalloutValue {
+  display: block;
+  color: rgba(255,255,255,0.88);
+  font-size: 14px;
+}
+
+.dmcaQuote {
+  padding: 16px 18px;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.03);
+}
+
+.dmcaQuote p + p {
+  margin-top: 12px;
+}
+
+@media (max-width: 900px) {
+  .dmcaGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .dmcaHero {
+    padding: 28px 24px 24px;
+  }
+
+  .dmcaHeroTitle {
+    font-size: 34px;
+  }
+}
+
+@media (max-width: 640px) {
+  .page--legal {
+    padding: 20px 14px 40px;
+  }
+
+  .dmcaHero {
+    padding: 22px 18px 18px;
+    border-radius: 22px;
+  }
+
+  .dmcaHeroTitle {
+    font-size: 28px;
+  }
+
+  .dmcaHeroText {
+    font-size: 14px;
+  }
+
+  .dmcaHeroCardEmail {
+    font-size: 18px;
+  }
+
+  .dmcaPanel {
+    padding: 18px;
+    border-radius: 18px;
+  }
+
+  .dmcaPanel h2 {
+    font-size: 18px;
+  }
+}

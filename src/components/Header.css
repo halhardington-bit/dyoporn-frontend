@@ -7,16 +7,12 @@
   color: #eaf2ff;
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 10px;
-
   padding: 8px 16px;
   font-size: 10px;
   font-weight: 500;
-
   cursor: pointer;
-
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-
   transition:
     background 0.2s ease,
     border-color 0.2s ease,
@@ -31,7 +27,6 @@
     rgba(255, 255, 255, 0.05)
   );
   border-color: rgba(255, 255, 255, 0.22);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
   transform: translateY(-1px);
   box-shadow:
     0 0 0 1px rgba(120, 180, 255, 0.25),
@@ -49,15 +44,11 @@
     0 6px 18px rgba(0, 0, 0, 0.45);
 }
 
-
 .header {
   width: 100%;
-  border-bottom: 1px solid rgba(255,255,255,0.08);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-
-
-/* ⭐ Centered layout container */
 .header-inner {
   max-width: 1400px;
   margin: 0 auto;
@@ -65,7 +56,7 @@
   display: grid;
   grid-template-columns: auto 1fr auto;
   align-items: center;
-
+  column-gap: 16px;
 }
 
 .header-left {
@@ -84,35 +75,36 @@
   display: none;
 }
 
-/* LEFT */
-
 .logo {
-  font-size: 20px;
-  font-weight: 700;
-  color: white;
+  display: inline-flex;
+  align-items: center;
   text-decoration: none;
-
 }
 
+.logoImg {
+  height: 40px;
+  width: auto;
+  display: block;
+  opacity: 0.92;
+  transition: opacity 120ms ease, transform 120ms ease;
+}
 
-
-
-/* CENTER */
+.logo:hover .logoImg {
+  opacity: 1;
+  transform: translateY(-1px);
+}
 
 .header-center {
   display: flex;
   justify-content: center;
-
+  min-width: 0;
 }
-
 
 .searchForm {
   width: 100%;
   max-width: 520px;
   padding: 0 40px;
-
 }
-
 
 .search {
   width: 100%;
@@ -121,88 +113,26 @@
   border: none;
   outline: none;
   font-size: 14px;
-  background: rgba(255,255,255,0.06);
+  background: rgba(255, 255, 255, 0.06);
   color: white;
-
 }
 
-
-/* RIGHT */
+.search::placeholder {
+  color: rgba(255, 255, 255, 0.52);
+}
 
 .header-right {
   display: flex;
   align-items: center;
-  gap: 16px;
-
+  justify-content: flex-end;
+  gap: 10px;
 }
 
-
-
-.user-info {
+.headerMenuGroup {
+  position: relative;
   display: flex;
   align-items: center;
-  gap: 16px;
-}
-
-.username {
-  font-weight: 600;
-  text-decoration: none;
-  color: white;
-  font-size: 12px;
-}
-
-
-
-.tokens {
-  opacity: 1;
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.82);
-}
-
-.auth-actions {
-  display: flex;
-  align-items: center;
-  gap: 7px; /* ← increase this for more spacing */
-}
-
-
-.rating {
-  opacity: 1;
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.82);
-}
-
-
-
-.signup-link {
-  background: none;
-  border: none;
-  color: #4da3ff;
-  cursor: pointer;
-  font-size: 12px;
-  margin-left: 12px;
-}
-
-/* Kill any unexpected focus ring / border styles on the rating (prod-only issue) */
-.header .user-info .rating {
-  border: 0 !important;
-  outline: 0 !important;
-  box-shadow: none !important;
-  background: transparent !important;
-}
-
-/* If it’s coming from a global :focus-visible rule */
-.header .user-info .rating:focus,
-.header .user-info .rating:focus-visible {
-  border: 0 !important;
-  outline: 0 !important;
-  box-shadow: none !important;
-}
-
-/* In case something is styling all spans or adding an inset ring */
-.header .user-info .rating * {
-  outline: 0 !important;
-  box-shadow: none !important;
+  gap: 10px;
 }
 
 .user-info {
@@ -221,126 +151,98 @@
   gap: 12px;
 }
 
+.username {
+  font-weight: 600;
+  text-decoration: none;
+  color: white;
+  font-size: 12px;
+}
+
+.tokens {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.rating {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.header .user-info .rating,
+.header .user-info .rating:focus,
+.header .user-info .rating:focus-visible,
+.header .user-info .rating * {
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+.auth-actions,
+.auth-actions-desktop {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.signup-link {
+  background: none;
+  border: none;
+  color: #4da3ff;
+  cursor: pointer;
+  font-size: 12px;
+  margin-left: 0;
+}
+
+.signup-link:hover {
+  color: #76b8ff;
+}
+
 .userMenuButton {
-  display: none;
+  display: inline-flex;
   width: 36px;
   height: 36px;
   border-radius: 10px;
-  border: 1px solid rgba(255,255,255,0.10);
-  background: rgba(255,255,255,0.04);
-  color: var(--text);
-  cursor: pointer;
-  font-size: 16px;
-  font-weight: 700;
   align-items: center;
   justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+  font-weight: 700;
+  flex-shrink: 0;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    transform 0.15s ease;
 }
 
 .userMenuButton:hover {
-  background: rgba(255,255,255,0.08);
-  border-color: rgba(255,255,255,0.16);
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
+}
+
+.userMenuButton:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(120, 180, 255, 0.28);
 }
 
 .userMenuPanel {
   position: absolute;
   top: calc(100% + 10px);
-  right: -6px;
+  right: 0;
   min-width: 190px;
   padding: 10px;
   border-radius: 16px;
-  border: 1px solid rgba(255,255,255,0.12);
-  background: rgba(10,10,10,0.97);
-  box-shadow: 0 22px 50px rgba(0,0,0,0.52);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(10, 10, 10, 0.97);
+  box-shadow: 0 22px 50px rgba(0, 0, 0, 0.52);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
-  z-index: 100;
-}
-
-.userMenuItem {
-  display: block;
-  width: 100%;
-  padding: 10px 12px;
-  border-radius: 10px;
-  color: var(--text);
-  font-size: 13px;
-  text-align: left;
-  background: transparent;
-  border: 0;
-}
-
-.userMenuLogout {
-  cursor: pointer;
-}
-
-.userMenuLogout:hover,
-.userMenuItem:hover {
-  background: rgba(255,255,255,0.06);
-}
-
-.guest-menu {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-/* desktop guest buttons stay visible */
-.auth-actions {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-}
-
-/* shared mobile menu button */
-.userMenuButton {
-  display: none;
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  border: 1px solid rgba(255,255,255,0.10);
-  background: rgba(255,255,255,0.04);
-  color: var(--text);
-  cursor: pointer;
-  font-size: 16px;
-  font-weight: 700;
-  align-items: center;
-  justify-content: center;
-}
-
-.userMenuButton:hover {
-  background: rgba(255,255,255,0.08);
-  border-color: rgba(255,255,255,0.16);
-}
-
-.userMenuPanel {
-  position: absolute;
-  top: calc(100% + 10px);
-  right: -6px;
-  min-width: 190px;
-  padding: 10px;
-  border-radius: 16px;
-  border: 1px solid rgba(255,255,255,0.12);
-  background: rgba(10,10,10,0.97);
-  box-shadow: 0 22px 50px rgba(0,0,0,0.52);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  z-index: 100;
-}
-
-.userMenuItem {
-  display: block;
-  width: 100%;
-  padding: 10px 12px;
-  border-radius: 10px;
-  color: var(--text);
-  font-size: 13px;
-  text-align: left;
-  background: transparent;
-  border: 0;
-}
-
-.userMenuItem:hover,
-.userMenuLogout:hover {
-  background: rgba(255,255,255,0.06);
+  z-index: 9999;
 }
 
 .userMenuHeading {
@@ -355,10 +257,38 @@
 }
 
 .userMenuHeading:hover {
-  background: rgba(255,255,255,0.05);
+  background: rgba(255, 255, 255, 0.05);
 }
 
+.userMenuItem,
+.userMenuLogout,
+.userMenuDesktopOnly {
+  display: block;
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  color: var(--text, white);
+  font-size: 13px;
+  text-align: left;
+  text-decoration: none;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+}
 
+.userMenuItem:hover,
+.userMenuLogout:hover,
+.userMenuDesktopOnly:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.userMenuDesktopOnly {
+  display: none;
+}
+
+.dmca-link:hover {
+  color: rgba(255, 255, 255, 0.8);
+}
 
 @media (max-width: 900px) {
   .sidebarMobileToggle.topbarSidebarToggle {
@@ -370,7 +300,6 @@
     right: auto !important;
     transform: none !important;
     z-index: auto !important;
-
     width: 36px;
     height: 36px;
     padding: 0;
@@ -378,10 +307,9 @@
     justify-content: center;
     flex-direction: column;
     gap: 4px;
-
-    border: 1px solid rgba(255,255,255,0.12);
+    border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: 10px;
-    background: rgba(255,255,255,0.04);
+    background: rgba(255, 255, 255, 0.04);
     cursor: pointer;
     flex-shrink: 0;
     box-shadow: none !important;
@@ -390,7 +318,7 @@
   .sidebarMobileToggleLine {
     width: 16px;
     height: 2px;
-    background: rgba(255,255,255,0.9);
+    background: rgba(255, 255, 255, 0.9);
     border-radius: 999px;
     display: block;
   }
@@ -409,9 +337,14 @@
     padding: 0 8px;
   }
 
+  .auth-actions-desktop {
+    display: none;
+  }
 
+  .userMenuDesktopOnly {
+    display: block;
+  }
 }
-
 
 @media (max-width: 700px) {
   .userDesktopMeta {
@@ -446,59 +379,10 @@
     padding: 0 4px;
   }
 
-  .logo {
-    font-size: 18px;
+  .logoImg {
+    height: 34px;
   }
 }
-
-.logoImg {
-  height: 40px;
-  width: auto;
-  display: block;
-  opacity: 0.92;
-  transition: opacity 120ms ease, transform 120ms ease;
-}
-
-.logo:hover .logoImg {
-  opacity: 1;
-  transform: translateY(-1px);
-}
-
-@media (max-width: 700px) {
-  .userDesktopMeta {
-    display: none;
-  }
-
-  .userMenuButton {
-    display: inline-flex;
-  }
-
-  .user {
-    gap: 8px;
-  }
-
-  .username {
-    max-width: 110px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .userMenuHeading {
-  display: block;
-  padding: 8px 10px 10px;
-  text-decoration: none;
-  color: white;
-  font-size: 12px;
-  font-weight: 700;
-  line-height: 1.2;
-  border-radius: 10px;
-}
-
-.userMenuHeading:hover {
-  background: rgba(255,255,255,0.05);
-}
-
 
 @media (max-width: 520px) {
   .header-inner {
@@ -515,17 +399,14 @@
     font-size: 13px;
   }
 
-  .sidebarMobileToggle.topbarSidebarToggle {
-    width: 34px;
-    height: 34px;
-  }
-
+  .sidebarMobileToggle.topbarSidebarToggle,
   .userMenuButton {
     width: 34px;
     height: 34px;
   }
-}
 
-  
+  .userMenuPanel {
+    right: 0;
+    min-width: 170px;
+  }
 }
-

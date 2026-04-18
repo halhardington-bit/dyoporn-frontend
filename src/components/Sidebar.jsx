@@ -9,7 +9,6 @@ const styleList = [
   "Anime 2D",
   "Cartoon 2D",
   "Cartoon 3D",
-  "North American 2D",
 ];
 
 const genreList = [
@@ -21,7 +20,7 @@ const genreList = [
   "Horror",
 ];
 
-export default function Sidebar({ user, onOpenLogin, mobileOpen, setMobileOpen }) {
+export default function Sidebar({ user, onOpenLogin, mobileOpen, setMobileOpen, collapsed = false, setCollapsed, }) {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -172,7 +171,9 @@ export default function Sidebar({ user, onOpenLogin, mobileOpen, setMobileOpen }
         onClick={() => setMobileOpen(false)}
       />
 
-      <aside className={`sidebar ${mobileOpen ? "isMobileOpen" : ""}`}>
+      <aside
+        className={`sidebar ${mobileOpen ? "isMobileOpen" : ""} ${collapsed ? "isCollapsed" : ""}`}
+      >
         <div className="sidebarInner">
           <div className="sidebarMobileHeader">
             <div className="sidebarMobileTitle">Browse</div>

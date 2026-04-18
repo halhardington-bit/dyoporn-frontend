@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { NavLink, Outlet, useNavigate, useLocation } from "react-router-dom";
 import Header from "../components/Header.jsx";
 import AuthModal from "../components/AuthModal.jsx";
 import Sidebar from "../components/Sidebar.jsx";
@@ -21,9 +21,19 @@ export default function AppLayout({
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [verifyBusy, setVerifyBusy] = useState(false);
   const [verifyMsg, setVerifyMsg] = useState("");
+
   const nav = useNavigate();
+  const location = useLocation();
 
   const isModerator = !!user?.isModerator;
+  const isAccountRoute = location.pathname.startsWith("/account");
+  const hideSidebar = isAccountRoute;
+
+  useEffect(() => {
+    if (hideSidebar) {
+      setSidebarOpen(false);
+    }
+  }, [hideSidebar]);
 
   async function handleResendVerification() {
     try {
@@ -45,21 +55,27 @@ export default function AppLayout({
         onOpenLogin={onOpenLogin}
         onOpenRegister={onOpenRegister}
         onLogout={onLogout}
-        onToggleSidebar={() => setSidebarOpen((v) => !v)}
+        onToggleSidebar={() => {
+          if (!hideSidebar) {
+            setSidebarOpen((v) => !v);
+          }
+        }}
         q={q}
         setQ={setQ}
       />
 
-      <div className="appShell">
-        <Sidebar
-          user={user}
-          onOpenLogin={onOpenLogin}
-          mobileOpen={sidebarOpen}
-          setMobileOpen={setSidebarOpen}
-        />
+      <div className={`appShell ${isAccountRoute ? "appShell--account" : ""}`}>
+        {!hideSidebar && (
+          <Sidebar
+            user={user}
+            onOpenLogin={onOpenLogin}
+            mobileOpen={sidebarOpen}
+            setMobileOpen={setSidebarOpen}
+          />
+        )}
 
-        <main className="appMain">
-          <div className="appContent">
+        <main className={`appMain ${isAccountRoute ? "appMain--account" : ""}`}>
+          <div className={`appContent ${isAccountRoute ? "appContent--account" : ""}`}>
             {user && user.emailVerified === false && (
               <div className="verifyBanner">
                 <div className="verifyBannerText">
@@ -82,70 +98,73 @@ export default function AppLayout({
               </div>
             )}
 
-            <section className="workspaceShell">
-              <nav className="folderTabs" aria-label="Workspace tabs">
-                <NavLink
-                  to="/watch"
-                  end
-                  className={({ isActive }) => `folderTab ${isActive ? "active" : ""}`}
-                >
-                  Watch
-                </NavLink>
-
-
-                {isModerator && (
+            {isAccountRoute ? (
+              <Outlet context={{ q, setQ, user }} />
+            ) : (
+              <section className="workspaceShell">
+                <nav className="folderTabs" aria-label="Workspace tabs">
                   <NavLink
-                    to="/create"
+                    to="/watch"
+                    end
+                    className={({ isActive }) => `folderTab ${isActive ? "active" : ""}`}
+                  >
+                    Watch
+                  </NavLink>
+
+                  {isModerator && (
+                    <NavLink
+                      to="/create"
+                      className={({ isActive }) =>
+                        `folderTab ${isActive ? "active" : ""} ${!user ? "lockedTab" : ""}`
+                      }
+                      onClick={(e) => {
+                        if (!user) {
+                          e.preventDefault();
+                          onOpenLogin("/create");
+                        }
+                      }}
+                    >
+                      Upload
+                    </NavLink>
+                  )}
+
+                  <NavLink
+                    to="/generate"
                     className={({ isActive }) =>
                       `folderTab ${isActive ? "active" : ""} ${!user ? "lockedTab" : ""}`
                     }
                     onClick={(e) => {
                       if (!user) {
                         e.preventDefault();
-                        onOpenLogin("/create");
+                        onOpenLogin("/generate");
                       }
                     }}
                   >
-                    Upload
+                    Generate
                   </NavLink>
-                )}
 
-                <NavLink
-                  to="/generate"
-                  className={({ isActive }) =>
-                    `folderTab ${isActive ? "active" : ""} ${!user ? "lockedTab" : ""}`
-                  }
-                  onClick={(e) => {
-                    if (!user) {
-                      e.preventDefault();
-                      onOpenLogin("/generate");
-                    }
-                  }}
-                >
-                  Generate
-                </NavLink>
-
-                <NavLink
-                  to="/plans"
-                  className={({ isActive }) => `folderTab ${isActive ? "active" : ""}`}
-                >
-                  Plans
-                </NavLink>
-
-                {isModerator && (
                   <NavLink
-                    to="/moderation"
+                    to="/plans"
                     className={({ isActive }) => `folderTab ${isActive ? "active" : ""}`}
                   >
-                    Moderation
+                    Plans
                   </NavLink>
-                )}
-              </nav>
 
-              <div className="folderBody">
-                <Outlet context={{ q, setQ, user }} />
-              </div>
-            </section>
+                  {isModerator && (
+                    <NavLink
+                      to="/moderation"
+                      className={({ isActive }) => `folderTab ${isActive ? "active" : ""}`}
+                    >
+                      Moderation
+                    </NavLink>
+                  )}
+                </nav>
+
+                <div className="folderBody">
+                  <Outlet context={{ q, setQ, user }} />
+                </div>
+              </section>
+            )}
           </div>
         </main>
       </div>
@@ -163,7 +182,9 @@ export default function AppLayout({
             }
           }}
           onSwitchMode={(m) =>
-            m === "login" ? onOpenLogin(postAuthPath) : onOpenRegister(postAuthPath)
+            m === "login"
+              ? onOpenLogin(postAuthPath)
+              : onOpenRegister(postAuthPath)
           }
         />
       )}

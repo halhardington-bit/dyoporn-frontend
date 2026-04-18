@@ -1583,3 +1583,180 @@ select {
     width: 100%;
   }
 }
+
+.watchBetaBanner {
+  margin: 0 0 24px;
+}
+
+.watchBetaBannerInner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+
+  padding: 16px 20px; /* ↓ from 24px */
+  border-radius: 18px;
+
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.025),
+      rgba(255, 255, 255, 0.01)
+    ),
+    rgba(10, 10, 10, 0.9);
+}
+
+.watchBetaBannerCopy {
+  min-width: 0;
+}
+
+.watchBetaBannerEyebrow {
+  margin-bottom: 4px; /* tighter */
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.watchBetaBannerTitle {
+  margin: 0 0 4px;
+  font-size: 20px; /* ↓ from 28px */
+  line-height: 1.1;
+  color: #fff;
+}
+
+.watchBetaBannerText {
+  margin: 0;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.watchBetaBannerActions {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+.watchBetaBannerButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 148px;
+  height: 48px;
+  padding: 0 20px;
+
+  border-radius: 14px;
+  border: 1px solid rgba(212, 175, 55, 0.32);
+  background: rgba(14, 14, 14, 0.96);
+
+  color: #d8b65a;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+
+  transition:
+    border-color 0.18s ease,
+    background 0.18s ease,
+    color 0.18s ease,
+    transform 0.18s ease;
+}
+
+.watchBetaBannerButton:hover {
+  background: rgba(18, 18, 18, 0.98);
+  border-color: rgba(212, 175, 55, 0.52);
+  color: #ebcb75;
+  transform: translateY(-1px);
+}
+
+.watchBetaBannerButton:active {
+  transform: translateY(0);
+}
+
+@media (max-width: 900px) {
+  .watchBetaBannerInner {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 20px;
+  }
+
+  .watchBetaBannerTitle {
+    font-size: 24px;
+  }
+
+  .watchBetaBannerActions {
+    width: 100%;
+  }
+
+  .watchBetaBannerButton {
+    width: 100%;
+  }
+}
+
+@media (max-width: 600px) {
+  .watchBetaBanner {
+    margin-bottom: 18px;
+  }
+
+  .watchBetaBannerInner {
+    gap: 18px;
+    padding: 18px;
+    border-radius: 18px;
+  }
+
+  .watchBetaBannerTitle {
+    font-size: 22px;
+  }
+
+  .watchBetaBannerText {
+    font-size: 13px;
+  }
+}
+
+.appMain--account {
+  width: 100%;
+  min-width: 0;
+}
+
+.appContent--account {
+  width: 100%;
+  max-width: none;
+  padding-top: 20px;
+}
+
+.appShell {
+  display: flex;
+  min-width: 0;
+}
+
+.appMain {
+  flex: 1 1 auto;
+  min-width: 0;
+  width: 100%;
+}
+
+.appContent {
+  width: 100%;
+  min-width: 0;
+}
+
+/* Account route overrides */
+.appShell--account {
+  display: block;
+  width: 100%;
+}
+
+.appMain--account {
+  width: 100%;
+  min-width: 0;
+  max-width: none;
+  padding: 0 24px;
+}
+
+.appContent--account {
+  width: 100%;
+  min-width: 0;
+  max-width: none;
+  padding: 24px 0 40px;
+}
+

@@ -1,0 +1,195 @@
+.ageGateBackdrop {
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
+  background: #050505;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.ageGateNoise {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.035;
+  background-image:
+    radial-gradient(circle at 20% 20%, rgba(255,255,255,0.18) 0, transparent 22%),
+    radial-gradient(circle at 80% 30%, rgba(255,255,255,0.12) 0, transparent 18%),
+    radial-gradient(circle at 50% 80%, rgba(255,255,255,0.08) 0, transparent 20%);
+}
+
+.ageGateGlow {
+  position: absolute;
+  border-radius: 999px;
+  filter: blur(110px);
+  pointer-events: none;
+  opacity: 0.3;
+}
+
+.ageGateGlowA {
+  width: 340px;
+  height: 340px;
+  left: -80px;
+  top: -60px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.ageGateGlowB {
+  width: 300px;
+  height: 300px;
+  right: -60px;
+  bottom: -60px;
+  background: rgba(212, 175, 55, 0.08);
+}
+
+.ageGateWrap {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 560px;
+}
+
+.ageGateCard {
+  border-radius: 24px;
+  padding: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.03),
+      rgba(255, 255, 255, 0.01)
+    ),
+    rgba(10, 10, 10, 0.94);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.ageGateTopline {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.ageGateEyebrow,
+.ageGateSmall {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.ageGateDot {
+  width: 4px;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.32);
+}
+
+.ageGateTitle {
+  margin: 0 0 10px;
+  font-size: 34px;
+  line-height: 1.05;
+  color: #fff;
+}
+
+.ageGateText {
+  margin: 0 0 22px;
+  font-size: 14px;
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.ageGateForm {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.ageGateField {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ageGateLabel {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.68);
+}
+
+.ageGateInput {
+  height: 52px;
+  padding: 0 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(18, 18, 18, 0.9);
+  color: #fff;
+  font-size: 14px;
+}
+
+.ageGateInput:focus {
+  outline: none;
+  border-color: rgba(212, 175, 55, 0.32);
+}
+
+.ageGateCheck {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 13px;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.ageGateCheck input {
+  margin-top: 2px;
+}
+
+.ageGateError {
+  color: salmon;
+  font-size: 13px;
+}
+
+.ageGateButton {
+  height: 48px;
+  border-radius: 14px;
+  border: 1px solid rgba(212, 175, 55, 0.32);
+  background: rgba(14, 14, 14, 0.96);
+  color: #d8b65a;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    border-color 0.18s ease,
+    background 0.18s ease,
+    color 0.18s ease,
+    transform 0.18s ease;
+}
+
+.ageGateButton:hover {
+  background: rgba(18, 18, 18, 0.98);
+  border-color: rgba(212, 175, 55, 0.5);
+  color: #ebcb75;
+  transform: translateY(-1px);
+}
+
+.ageGateButton:active {
+  transform: translateY(0);
+}
+
+@media (max-width: 600px) {
+  .ageGateCard {
+    padding: 22px;
+    border-radius: 20px;
+  }
+
+  .ageGateTitle {
+    font-size: 28px;
+  }
+
+  .ageGateText {
+    font-size: 13px;
+  }
+}

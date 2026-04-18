@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getMyProfile, updateMyProfile } from "../api.js";
-import "./Profile.css";
+import "./EditProfile.css";
 
-export default function EditProfile({ user, onRequireLogin }) {
+export default function EditProfile({ user, onRequireLogin, onUserUpdated, refreshMe }) {
   const nav = useNavigate();
 
   const [form, setForm] = useState(null);
@@ -15,8 +15,8 @@ export default function EditProfile({ user, onRequireLogin }) {
     let alive = true;
 
     (async () => {
-      // If user hasn’t restored yet (refresh), wait for user prop to resolve
       if (!user) {
+        if (!alive) return;
         setLoading(false);
         setForm(null);
         setErr("You must be logged in to edit your profile.");
@@ -26,12 +26,13 @@ export default function EditProfile({ user, onRequireLogin }) {
       try {
         setLoading(true);
         setErr("");
+
         const me = await getMyProfile();
         if (!alive) return;
         setForm(me);
       } catch (e) {
         if (!alive) return;
-        setErr(e?.message || "Failed to load profile");
+        setErr(e?.message || "Failed to load profile.");
       } finally {
         if (!alive) return;
         setLoading(false);
@@ -43,9 +44,19 @@ export default function EditProfile({ user, onRequireLogin }) {
     };
   }, [user]);
 
-  function setField(k, v) {
-    setForm((p) => ({ ...p, [k]: v }));
+  function setField(key, value) {
+    setForm((prev) => ({ ...prev, [key]: value }));
   }
+
+  const avatarPreview = useMemo(() => {
+    if (form?.avatarUrl) return form.avatarUrl;
+    const fallback = form?.displayName || user?.username || "?";
+    return fallback;
+  }, [form?.avatarUrl, form?.displayName, user?.username]);
+
+  const bannerStyle = form?.bannerUrl
+    ? { backgroundImage: `url(${form.bannerUrl})` }
+    : undefined;
 
   async function save() {
     setErr("");
@@ -55,40 +66,68 @@ export default function EditProfile({ user, onRequireLogin }) {
 
       const updated = await updateMyProfile(form);
 
-      // Hard refresh after successful save
-      window.location.href = `/u/${updated?.profile?.username || user.username}`;
+      if (typeof onUserUpdated === "function" && updated?.profile) {
+        onUserUpdated((prev) => ({
+          ...(prev || user || {}),
+          ...updated.profile,
+        }));
+      }
 
+      if (typeof refreshMe === "function") {
+        try {
+          await refreshMe();
+        } catch {}
+      }
+
+      window.location.href = `/u/${updated?.profile?.username || user.username}`;
     } catch (e) {
-      setErr(e?.message || "Failed to save");
+      setErr(e?.message || "Failed to save profile.");
     } finally {
       setBusy(false);
     }
   }
 
-
-  if (loading) return <div className="shell">Loading…</div>;
+  if (loading) {
+    return (
+      <div className="shell">
+        <div className="editProfilePage">
+          <div className="editProfilePanel">
+            <div className="editProfileState">Loading…</div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (!user) {
     return (
       <div className="shell">
-        <div className="profileCard">
-          <div className="profileSectionTitle">Edit profile</div>
+        <div className="editProfilePage">
+          <div className="editProfilePanel editProfilePanelNarrow">
+            <div className="editProfileEyebrow">PROFILE</div>
+            <h1 className="editProfileTitle">Manage Profile</h1>
 
-          <div style={{ marginTop: 10, opacity: 0.9 }}>
-            {err || "You must be logged in to edit your profile."}
-          </div>
+            <div className="editProfileState">
+              {err || "You must be logged in to edit your profile."}
+            </div>
 
-          <div className="formActions" style={{ marginTop: 14 }}>
-            <button
-              className="commentMiniBtn primary"
-              type="button"
-              onClick={() => onRequireLogin?.("/me/profile")}
-            >
-              Log in
-            </button>
-            <button className="commentMiniBtn" type="button" onClick={() => nav("/watch")}>
-              Back
-            </button>
+            <div className="editProfileActions">
+              <button
+                className="editProfileBtn editProfileBtnPrimary"
+                type="button"
+                onClick={() => onRequireLogin?.("/me/profile")}
+              >
+                Log in
+              </button>
+
+              <button
+                className="editProfileBtn"
+                type="button"
+                onClick={() => nav("/watch")}
+              >
+                Back
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -98,10 +137,13 @@ export default function EditProfile({ user, onRequireLogin }) {
   if (!form) {
     return (
       <div className="shell">
-        <div className="profileCard">
-          <div className="profileSectionTitle">Edit profile</div>
-          <div style={{ marginTop: 10, opacity: 0.9 }}>
-            {err || "Could not load profile."}
+        <div className="editProfilePage">
+          <div className="editProfilePanel editProfilePanelNarrow">
+            <div className="editProfileEyebrow">PROFILE</div>
+            <h1 className="editProfileTitle">Edit profile</h1>
+            <div className="editProfileState">
+              {err || "Could not load profile."}
+            </div>
           </div>
         </div>
       </div>
@@ -110,70 +152,92 @@ export default function EditProfile({ user, onRequireLogin }) {
 
   return (
     <div className="shell">
-      <div className="profileCard">
-        <div className="profileSectionTitle">Edit profile</div>
+      <div className="editProfilePage">
+        <section className="editProfileHero">
+          <div className="editProfileHeroBanner" style={bannerStyle}>
+            {!form?.bannerUrl ? <div className="editProfileHeroBannerFallback" /> : null}
+          </div>
 
-        <div className="profileForm">
-          <label className="field">
-            <span>Display name</span>
-            <input
-              value={form.displayName || ""}
-              onChange={(e) => setField("displayName", e.target.value)}
-            />
-          </label>
+          <div className="editProfileHeroInner">
+            <div className="editProfileAvatarWrap">
+              {form?.avatarUrl ? (
+                <div
+                  className="editProfileAvatar"
+                  style={{ backgroundImage: `url(${form.avatarUrl})` }}
+                />
+              ) : (
+                <div className="editProfileAvatar editProfileAvatarFallback">
+                  {String(avatarPreview).charAt(0).toUpperCase()}
+                </div>
+              )}
+            </div>
 
-          <label className="field">
-            <span>Bio</span>
-            <textarea
-              rows={4}
-              value={form.bio || ""}
-              onChange={(e) => setField("bio", e.target.value)}
-            />
-          </label>
+            <div className="editProfileHeroText">
+              <div className="editProfileEyebrow">PROFILE</div>
+              <h1 className="editProfileTitle">Manage Profile</h1>
+              <p className="editProfileLead">
+                Update how your channel appears across the site. Keep it clean,
+                readable, and on-brand.
+              </p>
+            </div>
+          </div>
+        </section>
 
-          <label className="field">
-            <span>Avatar URL</span>
-            <input
-              value={form.avatarUrl || ""}
-              onChange={(e) => setField("avatarUrl", e.target.value)}
-            />
-          </label>
+        <section className="editProfilePanel">
+          <div className="editProfilePanelHeader">
+            <div>
+              <div className="editProfileSectionEyebrow">DETAILS</div>
+              <h2 className="editProfileSectionTitle">Public profile</h2>
+            </div>
+          </div>
 
-          <label className="field">
-            <span>Banner URL</span>
-            <input
-              value={form.bannerUrl || ""}
-              onChange={(e) => setField("bannerUrl", e.target.value)}
-            />
-          </label>
+          <div className="editProfileFormGrid">
+            <label className="editProfileField">
+              <span className="editProfileLabel">Display name</span>
+              <input
+                className="editProfileInput"
+                value={form.displayName || ""}
+                onChange={(e) => setField("displayName", e.target.value)}
+                placeholder="How your name appears publicly"
+                maxLength={80}
+              />
+            </label>
 
-          <label className="field">
-            <span>Location</span>
-            <input
-              value={form.location || ""}
-              onChange={(e) => setField("location", e.target.value)}
-            />
-          </label>
+            <label className="editProfileField editProfileFieldFull">
+              <span className="editProfileLabel">Bio</span>
+              <textarea
+                className="editProfileTextarea"
+                rows={5}
+                value={form.bio || ""}
+                onChange={(e) => setField("bio", e.target.value)}
+                placeholder="Tell people a little about yourself or your channel"
+                maxLength={500}
+              />
+            </label>
+          </div>
 
-          <label className="field">
-            <span>Website</span>
-            <input
-              value={form.website || ""}
-              onChange={(e) => setField("website", e.target.value)}
-            />
-          </label>
+          {err ? <div className="editProfileError">{err}</div> : null}
 
-          {err && <div className="commentError">{err}</div>}
-
-          <div className="formActions">
-            <button className="commentMiniBtn" type="button" onClick={() => nav(-1)} disabled={busy}>
+          <div className="editProfileActions">
+            <button
+              className="editProfileBtn"
+              type="button"
+              onClick={() => nav(-1)}
+              disabled={busy}
+            >
               Cancel
             </button>
-            <button className="commentMiniBtn primary" type="button" onClick={save} disabled={busy}>
-              {busy ? "Saving…" : "Save"}
+
+            <button
+              className="editProfileBtn editProfileBtnPrimary"
+              type="button"
+              onClick={save}
+              disabled={busy}
+            >
+              {busy ? "Saving…" : "Save changes"}
             </button>
           </div>
-        </div>
+        </section>
       </div>
     </div>
   );

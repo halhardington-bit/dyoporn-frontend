@@ -35,6 +35,7 @@ function tokenize(q) {
     "was",
     "were",
   ]);
+
   return norm(q)
     .split(/\s+/)
     .filter((t) => t.length >= 2 && !STOP.has(t));
@@ -68,6 +69,12 @@ function toTime(iso) {
   return Number.isFinite(t) ? t : 0;
 }
 
+function formatInt(n) {
+  const num = Number(n);
+  if (!Number.isFinite(num)) return "0";
+  return num.toLocaleString("en-AU");
+}
+
 export default function Profile({ user, onRequireLogin }) {
   const { username } = useParams();
   const [params, setSearchParams] = useSearchParams();
@@ -84,15 +91,12 @@ export default function Profile({ user, onRequireLogin }) {
   const [uploadsBusy, setUploadsBusy] = useState(false);
   const [uploadsErr, setUploadsErr] = useState("");
 
-  // Session truth
   const [sessionUser, setSessionUser] = useState(null);
 
-  // Delete modal
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [deleteBusy, setDeleteBusy] = useState(false);
   const [deleteErr, setDeleteErr] = useState("");
 
-  // Subscription state
   const [subscribed, setSubscribed] = useState(false);
   const [subscriberCount, setSubscriberCount] = useState(0);
   const [subBusy, setSubBusy] = useState(false);
@@ -305,92 +309,123 @@ export default function Profile({ user, onRequireLogin }) {
   if (!profile) return <div className="shell">Loading…</div>;
 
   const meta = isMe && me ? me : profile;
-
   const displayRating = Number(meta?.rating ?? 0);
   const displayReviewCount = Number(meta?.reviewCount ?? meta?.review_count ?? 0);
+  const displayName = profile.displayName || profile.username;
+  const avatarLetter = displayName?.[0]?.toUpperCase() || "?";
 
   return (
     <div className="shell">
-      <div className="profileCard">
-        <div className="profileTop">
-          <div className="avatarWrap">
-            <div
-              className="avatar"
-              style={
-                profile.avatarUrl
-                  ? { backgroundImage: `url(${profile.avatarUrl})` }
-                  : undefined
-              }
-            >
-              {!profile.avatarUrl ? profile.displayName?.[0]?.toUpperCase() : null}
-            </div>
-          </div>
+      <div className="profilePage">
+        <section className="profileHero">
+          <div className="profileHeroGlow profileHeroGlowA" />
+          <div className="profileHeroGlow profileHeroGlowB" />
 
-          <div className="profileInfo">
-            <div className="profileNameRow">
-              <div className="displayName">
-                {profile.displayName}
-                {isMe ? (
-                  <span style={{ opacity: 0.55, marginLeft: 8 }}>(you)</span>
-                ) : null}
+          <div className="profileHeroInner">
+            <div className="profileAvatarWrap">
+              <div
+                className="profileAvatar"
+                style={
+                  profile.avatarUrl
+                    ? { backgroundImage: `url(${profile.avatarUrl})` }
+                    : undefined
+                }
+              >
+                {!profile.avatarUrl ? avatarLetter : null}
               </div>
-
-              {isMe && (
-                <NavLink className="editBtn" to="/me/profile">
-                  Edit profile
-                </NavLink>
-              )}
             </div>
 
-            <div className="handle">@{profile.username}</div>
+            <div className="profileHeroBody">
+              <div className="profileHeroTopRow">
+                <div className="profileIdentity">
+                  <h1 className="profileDisplayName">
+                    {displayName}
+                    {isMe ? <span className="profileYouBadge">you</span> : null}
+                  </h1>
 
-            <div className="profileMeta">
-              <span>⭐ {displayRating.toFixed(2)}</span>
-              <span className="dot">•</span>
-              <span>{displayReviewCount} reviews</span>
-            </div>
+                  <div className="profileHandle">@{profile.username}</div>
+                </div>
 
-            <div className="profileSubRow">
-              <div className="profileSubMeta">
-                <div className="profileSubscriberCount">
-                  {subscriberCount} {subscriberCount === 1 ? "subscriber" : "subscribers"}
+                <div className="profileHeroActions">
+                  {isMe ? (
+                    <NavLink className="profileEditBtn" to="/me/profile">
+                      Manage
+                    </NavLink>
+                  ) : isLoggedIn ? (
+                    <button
+                      className={`profileSubscribeBtn ${subscribed ? "subscribed" : ""}`}
+                      onClick={handleToggleSubscription}
+                      disabled={subBusy}
+                      type="button"
+                    >
+                      {subBusy ? "Working..." : subscribed ? "Subscribed" : "Subscribe"}
+                    </button>
+                  ) : (
+                    <button
+                      className="profileSubscribeBtn"
+                      type="button"
+                      onClick={() => onRequireLogin?.(`/u/${profile.username}`)}
+                    >
+                      Subscribe
+                    </button>
+                  )}
                 </div>
               </div>
 
-              {!isMe &&
-                (isLoggedIn ? (
-                  <button
-                    className={`profileSubscribeBtn ${subscribed ? "subscribed" : ""}`}
-                    onClick={handleToggleSubscription}
-                    disabled={subBusy}
-                    type="button"
-                  >
-                    {subBusy ? "Working..." : subscribed ? "Subscribed" : "Subscribe"}
-                  </button>
-                ) : (
-                  <button
-                    className="profileSubscribeBtn"
-                    type="button"
-                    onClick={() => onRequireLogin?.(`/profile/${profile.username}`)}
-                  >
-                    Subscribe
-                  </button>
-                ))}
+              <div className="profileStatsRow">
+                <div className="profileStatPill">
+                  <span className="profileStatLabel">Rating</span>
+                  <span className="profileStatValue">⭐ {displayRating.toFixed(2)}</span>
+                </div>
+
+                <div className="profileStatPill">
+                  <span className="profileStatLabel">Reviews</span>
+                  <span className="profileStatValue">{formatInt(displayReviewCount)}</span>
+                </div>
+
+                <div className="profileStatPill">
+                  <span className="profileStatLabel">Subscribers</span>
+                  <span className="profileStatValue">
+                    {formatInt(subscriberCount)}
+                  </span>
+                </div>
+              </div>
+
+              {subErr ? <div className="profileSubError">{subErr}</div> : null}
+
+              {profile.bio ? (
+                <div className="profileBio">{profile.bio}</div>
+              ) : (
+                <div className="profileBio profileBioMuted">
+                  No bio yet.
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+
+        <section className="profilePanel">
+          <div className="profilePanelTop">
+            <div>
+              <div className="profileSectionEyebrow">CONTENT</div>
+              <h2 className="profileSectionTitle">Uploads</h2>
             </div>
 
-            {subErr ? <div className="profileSubError">{subErr}</div> : null}
-
-            {profile.bio ? <div className="bio">{profile.bio}</div> : null}
+            {!isLoggedIn ? (
+              <div className="profileBrowseNote">
+                Browsing mode — log in to watch videos.
+              </div>
+            ) : null}
           </div>
-        </div>
-
-        <div className="profileSection">
-          <div className="profileSectionTitle">Uploads</div>
 
           <div className="profileControlsRow">
-            <div className="profileSort">
-              <span className="profileSortLabel">Sort:</span>
+            <div className="profileSortBlock">
+              <label className="profileControlLabel" htmlFor="profile-sort">
+                Sort
+              </label>
+
               <select
+                id="profile-sort"
                 className="profileSortSelect"
                 value={sort}
                 onChange={(e) => setParam({ sort: e.target.value })}
@@ -403,9 +438,14 @@ export default function Profile({ user, onRequireLogin }) {
             </div>
 
             <form className="profileSearchForm" onSubmit={handleSearchSubmit}>
+              <label className="profileControlLabel srOnly" htmlFor="profile-search">
+                Search uploads
+              </label>
+
               <input
+                id="profile-search"
                 className="profileSearchInput"
-                placeholder={`Search ${profile.username}'s videos`}
+                placeholder={`Search ${profile.username}'s uploads`}
                 value={localQ}
                 onChange={(e) => setLocalQ(e.target.value)}
               />
@@ -426,18 +466,12 @@ export default function Profile({ user, onRequireLogin }) {
             </form>
           </div>
 
-          {!isLoggedIn && (
-            <div style={{ padding: "6px 2px 10px", opacity: 0.8, fontSize: 13 }}>
-              Browsing mode — log in to watch videos.
-            </div>
-          )}
-
           {uploadsBusy ? (
-            <div style={{ padding: 14, opacity: 0.85 }}>Loading uploads…</div>
+            <div className="profileStateMsg">Loading uploads…</div>
           ) : uploadsErr ? (
-            <div style={{ padding: 14, opacity: 0.9 }}>{uploadsErr}</div>
+            <div className="profileStateMsg profileStateError">{uploadsErr}</div>
           ) : uploads.length === 0 ? (
-            <div style={{ padding: 14, opacity: 0.85 }}>
+            <div className="profileStateMsg">
               {urlQ ? "No matching uploads." : "No uploads yet."}
             </div>
           ) : (
@@ -459,27 +493,27 @@ export default function Profile({ user, onRequireLogin }) {
               })}
             </div>
           )}
-        </div>
+        </section>
       </div>
 
-      {deleteTarget && (
-        <div className="modalOverlay" onMouseDown={closeDeleteModal}>
-          <div className="modalCard" onMouseDown={(e) => e.stopPropagation()}>
-            <div className="modalTitle">Delete video?</div>
+      {deleteTarget ? (
+        <div className="profileModalOverlay" onMouseDown={closeDeleteModal}>
+          <div className="profileModalCard" onMouseDown={(e) => e.stopPropagation()}>
+            <div className="profileModalTitle">Delete video?</div>
 
-            <div className="modalBody">
-              <div style={{ marginBottom: 8, opacity: 0.9 }}>
-                This can’t be undone.
-              </div>
-              <div style={{ fontWeight: 700 }}>{deleteTarget.title}</div>
+            <div className="profileModalBody">
+              <div className="profileModalSub">This can’t be undone.</div>
+              <div className="profileModalVideoTitle">{deleteTarget.title}</div>
 
-              {deleteErr && <div className="modalError">{deleteErr}</div>}
+              {deleteErr ? (
+                <div className="profileModalError">{deleteErr}</div>
+              ) : null}
             </div>
 
-            <div className="modalActions">
+            <div className="profileModalActions">
               <button
                 type="button"
-                className="modalBtn"
+                className="profileModalBtn"
                 onClick={closeDeleteModal}
                 disabled={deleteBusy}
               >
@@ -488,7 +522,7 @@ export default function Profile({ user, onRequireLogin }) {
 
               <button
                 type="button"
-                className="modalBtnDanger"
+                className="profileModalBtnDanger"
                 onClick={confirmDelete}
                 disabled={deleteBusy}
               >
@@ -497,7 +531,7 @@ export default function Profile({ user, onRequireLogin }) {
             </div>
           </div>
         </div>
-      )}
+      ) : null}
     </div>
   );
 }

@@ -1,296 +1,338 @@
-.profileCard {
-  width: 100%;
-  max-width: none;
-  margin: 0;
-  border: 1px solid rgba(255,255,255,0.10);
-  background: rgba(255,255,255,0.03);
-  border-radius: 18px;
-  overflow: visible;
-  box-sizing: border-box;
+.profilePage {
+  display: grid;
+  gap: 18px;
 }
 
-.profileBanner {
-  height: 140px;
-  background: rgba(255,255,255,0.06);
-  background-size: cover;
-  background-position: center;
+.profileHero {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 26px;
+  background:
+    radial-gradient(circle at top right, rgba(212, 175, 55, 0.08), transparent 26%),
+    radial-gradient(circle at left center, rgba(255, 255, 255, 0.06), transparent 22%),
+    linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01)),
+    rgba(10, 10, 10, 0.94);
 }
 
-.profileTop {
+.profileHeroGlow {
+  position: absolute;
+  border-radius: 999px;
+  filter: blur(90px);
+  pointer-events: none;
+  opacity: 0.22;
+}
+
+.profileHeroGlowA {
+  width: 220px;
+  height: 220px;
+  top: -60px;
+  left: -40px;
+  background: rgba(255, 255, 255, 0.09);
+}
+
+.profileHeroGlowB {
+  width: 240px;
+  height: 240px;
+  bottom: -90px;
+  right: -40px;
+  background: rgba(212, 175, 55, 0.08);
+}
+
+.profileHeroInner {
+  position: relative;
+  z-index: 1;
   display: flex;
   align-items: flex-start;
-  gap: 18px;
-  padding: 18px 20px 16px;
-  box-sizing: border-box;
+  gap: 20px;
+  padding: 26px;
 }
 
-.avatarWrap {
-  width: 92px;
-  flex: 0 0 92px;
+.profileAvatarWrap {
+  flex: 0 0 104px;
+  width: 104px;
 }
 
-.avatar {
-  width: 92px;
-  height: 92px;
+.profileAvatar {
+  width: 104px;
+  height: 104px;
   border-radius: 999px;
-  border: 2px solid rgba(0,0,0,0.35);
-  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.07);
   background-size: cover;
   background-position: center;
   display: grid;
   place-items: center;
+  font-size: 32px;
   font-weight: 800;
-  font-size: 28px;
-  color: rgba(232,236,241,0.95);
+  color: rgba(255,255,255,0.95);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
 }
 
-.profileInfo {
-  min-width: 0;
+.profileHeroBody {
   flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-.profileNameRow {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.displayName {
-  font-size: 28px;
-  line-height: 1.15;
-  font-weight: 800;
-  color: rgba(232,236,241,0.95);
   min-width: 0;
 }
 
-.handle {
-  font-size: 14px;
-  color: rgba(232,236,241,0.65);
-  margin-top: 4px;
-}
-
-.profileMeta {
-  margin-top: 10px;
-  font-size: 14px;
-  color: rgba(232,236,241,0.75);
+.profileHeroTopRow {
   display: flex;
-  gap: 8px;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.profileIdentity {
+  min-width: 0;
+}
+
+.profileDisplayName {
+  margin: 0;
+  display: flex;
   align-items: center;
+  gap: 10px;
   flex-wrap: wrap;
+  font-size: 34px;
+  line-height: 1.02;
+  color: #fff;
 }
 
-.dot {
-  opacity: 0.55;
+.profileYouBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 24px;
+  padding: 0 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.04);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(255,255,255,0.7);
 }
 
-.bio {
-  margin-top: 10px;
-  color: rgba(232,236,241,0.85);
+.profileHandle {
+  margin-top: 8px;
   font-size: 14px;
-  line-height: 1.5;
+  color: rgba(255,255,255,0.58);
+}
+
+.profileHeroActions {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+.profileEditBtn,
+.profileSubscribeBtn {
+  appearance: none;
+  border-radius: 999px;
+  padding: 11px 16px;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    transform 0.16s ease,
+    border-color 0.16s ease,
+    background 0.16s ease,
+    color 0.16s ease,
+    opacity 0.16s ease;
+}
+
+.profileEditBtn {
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.04);
+  color: rgba(255,255,255,0.9);
+}
+
+.profileEditBtn:hover {
+  background: rgba(255,255,255,0.06);
+  transform: translateY(-1px);
+}
+
+.profileSubscribeBtn {
+  border: 1px solid rgba(212, 175, 55, 0.28);
+  background: rgba(14, 14, 14, 0.96);
+  color: #d8b65a;
+}
+
+.profileSubscribeBtn:hover {
+  background: rgba(18, 18, 18, 0.98);
+  border-color: rgba(212, 175, 55, 0.48);
+  color: #ebcb75;
+  transform: translateY(-1px);
+}
+
+.profileSubscribeBtn:disabled {
+  opacity: 0.72;
+  cursor: default;
+  transform: none;
+}
+
+.profileSubscribeBtn.subscribed {
+  border-color: rgba(255,255,255,0.14);
+  color: rgba(255,255,255,0.82);
+}
+
+.profileStatsRow {
+  margin-top: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.profileStatPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 38px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.03);
+}
+
+.profileStatLabel {
+  font-size: 12px;
+  color: rgba(255,255,255,0.56);
+}
+
+.profileStatValue {
+  font-size: 13px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.88);
+}
+
+.profileBio {
+  margin-top: 16px;
+  max-width: 880px;
+  font-size: 14px;
+  line-height: 1.65;
+  color: rgba(255,255,255,0.78);
   white-space: pre-wrap;
   word-break: break-word;
 }
 
-.links {
-  margin-top: 10px;
+.profileBioMuted {
+  color: rgba(255,255,255,0.48);
+}
+
+.profileSubError {
+  margin-top: 12px;
+  font-size: 13px;
+  color: #ff8d8d;
+}
+
+.profilePanel {
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 24px;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)),
+    rgba(10, 10, 10, 0.92);
+  padding: 22px;
+}
+
+.profilePanelTop {
   display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 16px;
 }
 
-.pill {
-  display: inline-flex;
-  padding: 6px 10px;
-  border-radius: 999px;
-  border: 1px solid rgba(255,255,255,0.12);
-  background: rgba(255,255,255,0.04);
-  color: rgba(232,236,241,0.80);
-  font-size: 12px;
-  text-decoration: none;
-}
-
-.editBtn {
-  text-decoration: none;
-  font-size: 12px;
+.profileSectionEyebrow {
+  margin-bottom: 6px;
+  font-size: 11px;
   font-weight: 700;
-  padding: 7px 12px;
-  border-radius: 999px;
-  border: 1px solid rgba(80,160,255,0.35);
-  background: rgba(80,160,255,0.16);
-  color: rgba(210,232,255,0.95);
-  white-space: nowrap;
-}
-
-.profileSection {
-  padding: 0 20px 20px;
-  box-sizing: border-box;
-  overflow: visible;
+  letter-spacing: 0.14em;
+  color: rgba(255,255,255,0.5);
 }
 
 .profileSectionTitle {
-  padding: 16px 0 12px;
-  border-top: 1px solid rgba(255,255,255,0.08);
-  color: rgba(232,236,241,0.85);
-  font-weight: 700;
-  font-size: 15px;
+  margin: 0;
+  font-size: 24px;
+  color: #fff;
+  line-height: 1.1;
 }
 
-.profileForm {
-  padding: 14px 0;
-  display: grid;
-  gap: 12px;
-}
-
-.field {
-  display: grid;
-  gap: 6px;
-  color: rgba(232,236,241,0.75);
-  font-size: 12px;
-}
-
-.field input,
-.field textarea {
-  border: 1px solid rgba(255,255,255,0.10);
-  background: rgba(255,255,255,0.04);
-  color: rgba(232,236,241,0.92);
-  border-radius: 12px;
-  padding: 10px 12px;
-  font-size: 14px;
-}
-
-.formActions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  margin-top: 4px;
-}
-
-.profileHeader {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 16px 20px;
-}
-
-.profileAvatar {
-  width: 72px;
-  height: 72px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.08);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 32px;
-  font-weight: bold;
-}
-
-.profileStats {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  color: rgba(255,255,255,0.7);
+.profileBrowseNote {
   font-size: 13px;
-}
-
-.profileStats .dot {
-  opacity: 0.4;
-}
-
-.profileActions {
-  margin-left: auto;
-  display: flex;
-  align-items: center;
-}
-
-.profileSectionTitleRow {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+  color: rgba(255,255,255,0.62);
 }
 
 .profileControlsRow {
-  margin-top: 12px;
   display: flex;
-  align-items: center;
+  align-items: end;
   gap: 12px;
+  margin-bottom: 12px;
 }
 
-.profileSort {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+.profileSortBlock {
   flex: 0 0 auto;
-  white-space: nowrap;
+  min-width: 150px;
 }
 
-.profileSortLabel {
-  opacity: 0.8;
-  font-size: 14px;
+.profileControlLabel {
+  display: block;
+  margin-bottom: 7px;
+  font-size: 12px;
+  color: rgba(255,255,255,0.58);
 }
 
 .profileSortSelect {
   appearance: none;
   -webkit-appearance: none;
-  min-width: 150px;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  width: 100%;
+  min-width: 0;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
   color: #fff;
-  padding: 10px 32px 10px 12px;
-  border-radius: 12px;
+  padding: 12px 34px 12px 12px;
+  border-radius: 14px;
   font-size: 14px;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: border-color 0.15s ease, background 0.15s ease;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='white' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
-  background-position: right 10px center;
+  background-position: right 11px center;
   background-size: 10px;
 }
 
 .profileSortSelect:hover {
-  background-color: rgba(255, 255, 255, 0.12);
+  background-color: rgba(255,255,255,0.08);
 }
 
-.profileSortSelect:focus {
+.profileSortSelect:focus,
+.profileSearchInput:focus {
   outline: none;
-  border-color: rgba(255, 255, 255, 0.35);
+  border-color: rgba(255,255,255,0.28);
 }
 
 .profileSortSelect option {
   background: #0f1114;
-  color: white;
-  padding: 8px;
+  color: #fff;
 }
 
 .profileSearchForm {
   flex: 1;
   position: relative;
-  margin-top: 0;
 }
 
 .profileSearchInput {
   width: 100%;
-  padding: 12px 40px 12px 12px;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.16);
+  padding: 12px 42px 12px 14px;
   border-radius: 14px;
-  color: white;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.06);
+  color: #fff;
   font-size: 14px;
   box-sizing: border-box;
 }
 
 .profileSearchInput::placeholder {
-  color: rgba(255, 255, 255, 0.55);
-}
-
-.profileSearchInput:focus {
-  outline: none;
-  border-color: rgba(255, 255, 255, 0.35);
+  color: rgba(255,255,255,0.48);
 }
 
 .profileSearchClear {
@@ -302,193 +344,152 @@
   height: 28px;
   border-radius: 10px;
   border: 0;
-  background: rgba(255, 255, 255, 0.12);
-  color: rgba(255, 255, 255, 0.9);
+  background: rgba(255,255,255,0.12);
+  color: rgba(255,255,255,0.88);
   cursor: pointer;
 }
 
 .profileSearchClear:hover {
-  background: rgba(255, 255, 255, 0.18);
+  background: rgba(255,255,255,0.18);
 }
 
 .profileUploadsGrid {
-  padding: 14px 0 0;
+  padding-top: 8px;
   display: grid;
-  overflow: visible;
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   gap: 14px;
 }
 
-.modalOverlay {
+.profileStateMsg {
+  padding: 16px 2px 4px;
+  font-size: 14px;
+  color: rgba(255,255,255,0.72);
+}
+
+.profileStateError {
+  color: #ff8d8d;
+}
+
+.profileModalOverlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.55);
+  background: rgba(0,0,0,0.62);
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 18px;
   z-index: 9999;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
 }
 
-.modalCard {
+.profileModalCard {
   width: 100%;
   max-width: 480px;
-  background: #111;
+  padding: 18px;
+  border-radius: 18px;
   border: 1px solid rgba(255,255,255,0.12);
-  border-radius: 14px;
-  padding: 16px;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01)),
+    rgba(12, 12, 12, 0.98);
   box-shadow: 0 20px 60px rgba(0,0,0,0.6);
 }
 
-.modalTitle {
-  font-size: 18px;
+.profileModalTitle {
+  font-size: 20px;
   font-weight: 800;
+  color: #fff;
   margin-bottom: 10px;
 }
 
-.modalBody {
+.profileModalBody {
   font-size: 14px;
-  line-height: 1.4;
-  opacity: 0.95;
+  line-height: 1.5;
+  color: rgba(255,255,255,0.8);
 }
 
-.modalError {
-  margin-top: 10px;
-  padding: 10px;
-  border-radius: 10px;
+.profileModalSub {
+  margin-bottom: 8px;
+  color: rgba(255,255,255,0.62);
+}
+
+.profileModalVideoTitle {
+  font-weight: 700;
+  color: #fff;
+}
+
+.profileModalError {
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-radius: 12px;
   background: rgba(255,0,0,0.12);
-  border: 1px solid rgba(255,0,0,0.25);
+  border: 1px solid rgba(255,0,0,0.24);
+  color: #ffb3b3;
 }
 
-.modalActions {
+.profileModalActions {
   display: flex;
   gap: 10px;
   justify-content: flex-end;
-  margin-top: 14px;
+  margin-top: 16px;
 }
 
-.modalBtn {
+.profileModalBtn,
+.profileModalBtnDanger {
+  appearance: none;
+  border-radius: 12px;
+  padding: 10px 14px;
+  cursor: pointer;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.profileModalBtn {
   border: 1px solid rgba(255,255,255,0.18);
   background: rgba(255,255,255,0.06);
-  color: white;
-  padding: 9px 12px;
-  border-radius: 10px;
-  cursor: pointer;
+  color: #fff;
 }
 
-.modalBtn:disabled {
-  opacity: 0.55;
-  cursor: default;
+.profileModalBtnDanger {
+  border: 1px solid rgba(255,0,0,0.34);
+  background: rgba(255,0,0,0.16);
+  color: #fff;
 }
 
-.modalBtnDanger {
-  border: 1px solid rgba(255,0,0,0.35);
-  background: rgba(255,0,0,0.18);
-  color: white;
-  padding: 9px 12px;
-  border-radius: 10px;
-  cursor: pointer;
-}
-
-.modalBtnDanger:disabled {
-  opacity: 0.55;
-  cursor: default;
-}
-
-.profileControlsRow {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-}
-
-/* SORT: shrink it */
-
-.profileSortSelect {
-  width: auto;
-  min-width: 125px;
-  max-width: 140px;
-}
-
-/* SEARCH: let it dominate */
-.profileSearchForm {
-  flex: 1;
-  display: flex;
-  position: relative;
-}
-
-.profileSearchInput {
-  width: 100%;
-}
-
-.profileSubRow {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-top: 10px;
-}
-
-.profileSubMeta {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.profileSubscriberCount {
-  font-size: 0.95rem;
-  opacity: 0.85;
-}
-
-.profileSubscribeBtn {
-  border: 0;
-  border-radius: 999px;
-  padding: 10px 16px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: transform 0.12s ease, opacity 0.12s ease;
-}
-
-.profileSubscribeBtn:hover {
+.profileModalBtn:hover,
+.profileModalBtnDanger:hover {
   transform: translateY(-1px);
 }
 
-.profileSubscribeBtn:disabled {
-  opacity: 0.7;
+.profileModalBtn:disabled,
+.profileModalBtnDanger:disabled {
+  opacity: 0.6;
   cursor: default;
   transform: none;
 }
 
-.profileSubscribeBtn.subscribed {
-  opacity: 0.85;
+.srOnly {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
 }
-
-.profileSubError {
-  margin-top: 8px;
-  color: #ff7b7b;
-  font-size: 0.9rem;
-}
-
-
-/* =========================
-   Tablet
-   ========================= */
 
 @media (max-width: 900px) {
-  .profileCard {
-    border-radius: 16px;
+  .profileHeroInner {
+    padding: 22px;
   }
 
-  .profileTop {
-    padding: 16px;
-    gap: 14px;
+  .profileDisplayName {
+    font-size: 28px;
   }
 
-  .profileSection {
-    padding: 0 16px 16px;
-  }
-
-  .displayName {
-    font-size: 24px;
+  .profilePanel {
+    padding: 18px;
   }
 
   .profileUploadsGrid {
@@ -496,90 +497,78 @@
   }
 }
 
-/* =========================
-   Mobile
-   ========================= */
-
 @media (max-width: 720px) {
-  .profileBanner {
-    height: 96px;
+  .profileHero {
+    border-radius: 22px;
   }
 
-  .profileTop {
+  .profileHeroInner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 18px;
+  }
+
+  .profileAvatarWrap {
+    width: 88px;
+    flex: 0 0 88px;
+  }
+
+  .profileAvatar {
+    width: 88px;
+    height: 88px;
+    font-size: 26px;
+  }
+
+  .profileHeroTopRow {
     flex-direction: column;
     align-items: flex-start;
     gap: 12px;
-    padding: 14px;
   }
 
-  .avatarWrap {
-    width: 84px;
-    flex: 0 0 84px;
+  .profileDisplayName {
+    font-size: 22px;
   }
 
-  .avatar {
-    width: 84px;
-    height: 84px;
-    font-size: 24px;
+  .profileStatsRow {
+    gap: 8px;
   }
 
-  .profileInfo {
-    width: 100%;
+  .profileStatPill {
+    min-height: 34px;
+    padding: 0 12px;
   }
 
-  .profileNameRow {
+  .profilePanel {
+    border-radius: 20px;
+    padding: 16px;
+  }
+
+  .profilePanelTop {
+    flex-direction: column;
     align-items: flex-start;
-    gap: 10px;
-  }
-
-  .displayName {
-    font-size: 18px;
-    line-height: 1.2;
-  }
-
-  .handle {
-    font-size: 13px;
-  }
-
-  .profileMeta {
-    margin-top: 8px;
-    font-size: 13px;
-  }
-
-  .bio {
-    font-size: 13px;
-    line-height: 1.45;
-  }
-
-  .editBtn {
-    margin-left: 0;
-  }
-
-  .profileSection {
-    padding: 0 14px 14px;
-  }
-
-  .profileSectionTitle {
-    padding: 14px 0 10px;
-    font-size: 14px;
+    gap: 8px;
   }
 
   .profileControlsRow {
     flex-direction: row;
-    align-items: center;
+    align-items: end;
     gap: 8px;
   }
 
-  .profileSort {
-    flex: 0 0 38%;
-  }
-
-  .profileSortSelect {
-    width: 100%;
+  .profileSortBlock {
+    flex: 0 0 40%;
+    min-width: 0;
   }
 
   .profileSearchForm {
     flex: 1;
+    min-width: 0;
+  }
+
+  .profileUploadsGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
   }
 
   .profileUploadsGrid .vTitle {
@@ -594,82 +583,66 @@
   .profileUploadsGrid .vThumbWrap {
     border-radius: 10px;
   }
-
-  .profileUploadsGrid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 10px;
-  }
 }
 
 @media (max-width: 520px) {
-  .profileCard {
-    border-radius: 14px;
+  .profileHeroInner {
+    padding: 14px;
   }
 
-  .profileBanner {
-    height: 84px;
-  }
-
-  .profileTop {
-    padding: 12px;
-  }
-
-  .avatarWrap {
+  .profileAvatarWrap {
     width: 78px;
     flex: 0 0 78px;
   }
 
-  .avatar {
+  .profileAvatar {
     width: 78px;
     height: 78px;
     font-size: 22px;
   }
 
-  .displayName {
-    font-size: 16px;
+  .profileDisplayName {
+    font-size: 18px;
   }
 
-  .handle {
+  .profileHandle {
     font-size: 12px;
   }
 
-  .profileMeta {
-    font-size: 12px;
-    gap: 6px;
+  .profileBio {
+    font-size: 13px;
+    line-height: 1.5;
   }
 
-  .profileSection {
-    padding: 0 12px 12px;
+  .profilePanel {
+    padding: 12px;
   }
 
-  .profileSearchInput{
+  .profileSectionTitle {
+    font-size: 20px;
+  }
+
+  .profileSortSelect,
+  .profileSearchInput {
     font-size: 13px;
     padding-top: 11px;
     padding-bottom: 11px;
-  }
-
-
-  .profileSortSelect {
-    font-size: 13px;
-    padding-top: 11px;
-    padding-bottom: 11px;
-    width: 1px;
   }
 
   .profileUploadsGrid {
     gap: 10px;
   }
 
-  .modalCard {
+  .profileModalCard {
     padding: 14px;
   }
 
-  .modalActions {
+  .profileModalActions {
     flex-direction: column-reverse;
   }
 
-  .modalBtn,
-  .modalBtnDanger {
+  .profileModalBtn,
+  .profileModalBtnDanger {
     width: 100%;
   }
 }

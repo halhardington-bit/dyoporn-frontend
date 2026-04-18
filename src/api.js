@@ -515,6 +515,42 @@ export async function recordView(id) {
   return data;
 }
 
+export async function logoutAllDevices() {
+  const res = await fetch(`${API_BASE}/auth/logout-all`, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  const data = await res.json().catch(() => ({}));
+
+  if (!res.ok) {
+    throw new Error(data?.error || "Failed to log out of all devices");
+  }
+
+  return data;
+}
+
+export async function sendChangePasswordEmail() {
+  const res = await fetch(`${API_BASE}/auth/send-change-password-email`, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  const data = await res.json().catch(() => ({}));
+
+  if (!res.ok) {
+    throw new Error(data?.error || "Failed to send password reset email");
+  }
+
+  return data;
+}
+
 export async function getUserVideos(
   username,
   { sort, scope, type } = {} // NEW: scope + type

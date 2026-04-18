@@ -18,10 +18,10 @@ export default function Header({
 
   const [meProfile, setMeProfile] = useState(null);
   const [sessionUser, setSessionUser] = useState(null);
-  const [mobileUserMenuOpen, setMobileUserMenuOpen] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
 
-  const mobileMenuRef = useRef(null);
-  const mobileMenuButtonRef = useRef(null);
+  const menuRef = useRef(null);
+  const menuButtonRef = useRef(null);
 
   useEffect(() => {
     let alive = true;
@@ -56,24 +56,24 @@ export default function Header({
   }, [user?.id]);
 
   useEffect(() => {
-    setMobileUserMenuOpen(false);
+    setUserMenuOpen(false);
   }, [location.pathname, location.search, user?.id]);
 
   useEffect(() => {
     function handlePointerDown(e) {
-      if (!mobileUserMenuOpen) return;
+      if (!userMenuOpen) return;
 
-      const panelEl = mobileMenuRef.current;
-      const buttonEl = mobileMenuButtonRef.current;
+      const panelEl = menuRef.current;
+      const buttonEl = menuButtonRef.current;
       const target = e.target;
 
       if (panelEl?.contains(target) || buttonEl?.contains(target)) return;
-      setMobileUserMenuOpen(false);
+      setUserMenuOpen(false);
     }
 
     function handleKeyDown(e) {
       if (e.key === "Escape") {
-        setMobileUserMenuOpen(false);
+        setUserMenuOpen(false);
       }
     }
 
@@ -86,7 +86,7 @@ export default function Header({
       document.removeEventListener("touchstart", handlePointerDown);
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [mobileUserMenuOpen]);
+  }, [userMenuOpen]);
 
   function submitSearch(e) {
     e.preventDefault();
@@ -110,22 +110,22 @@ export default function Header({
     return (meProfile?.displayName || user.displayName || user.username || "").trim();
   }, [user, meProfile]);
 
-  function closeMobileMenu() {
-    setMobileUserMenuOpen(false);
+  function closeMenu() {
+    setUserMenuOpen(false);
   }
 
-  function handleMobileLogout() {
-    closeMobileMenu();
+  function handleMenuLogout() {
+    closeMenu();
     onLogout?.();
   }
 
-  function handleMobileLogin() {
-    closeMobileMenu();
+  function handleMenuLogin() {
+    closeMenu();
     onOpenLogin?.();
   }
 
-  function handleMobileRegister() {
-    closeMobileMenu();
+  function handleMenuRegister() {
+    closeMenu();
     onOpenRegister?.();
   }
 
@@ -162,8 +162,8 @@ export default function Header({
 
         <div className="header-right">
           {!user ? (
-            <div className="guest-menu">
-              <div className="auth-actions">
+            <div className="headerMenuGroup">
+              <div className="auth-actions auth-actions-desktop">
                 <button className="login-btn" onClick={onOpenLogin}>
                   Log in
                 </button>
@@ -173,37 +173,45 @@ export default function Header({
               </div>
 
               <button
-                ref={mobileMenuButtonRef}
+                ref={menuButtonRef}
                 type="button"
                 className="userMenuButton"
-                aria-label="Open sign in menu"
-                aria-expanded={mobileUserMenuOpen}
-                onClick={() => setMobileUserMenuOpen((v) => !v)}
+                aria-label="Open site menu"
+                aria-expanded={userMenuOpen}
+                onClick={() => setUserMenuOpen((v) => !v)}
               >
                 ⋯
               </button>
 
-              {mobileUserMenuOpen ? (
+              {userMenuOpen ? (
                 <div
-                  ref={mobileMenuRef}
+                  ref={menuRef}
                   className="userMenuPanel"
                   role="menu"
                   aria-label="Guest menu"
                 >
+                  <NavLink
+                    className="userMenuItem"
+                    to="/dmca"
+                    onClick={closeMenu}
+                  >
+                    DMCA
+                  </NavLink>
+
                   <button
                     type="button"
-                    className="userMenuItem"
+                    className="userMenuItem userMenuDesktopOnly"
                     role="menuitem"
-                    onClick={handleMobileLogin}
+                    onClick={handleMenuLogin}
                   >
                     Log in
                   </button>
 
                   <button
                     type="button"
-                    className="userMenuItem"
+                    className="userMenuItem userMenuDesktopOnly"
                     role="menuitem"
-                    onClick={handleMobileRegister}
+                    onClick={handleMenuRegister}
                   >
                     Sign up
                   </button>
@@ -211,7 +219,7 @@ export default function Header({
               ) : null}
             </div>
           ) : (
-            <div className="user-info">
+            <div className="headerMenuGroup">
               <div className="userDesktopMeta">
                 <NavLink className="username" to={`/u/${user.username}`}>
                   {headerName}
@@ -221,26 +229,22 @@ export default function Header({
                 <span className="rating">
                   ⭐ {ratingVal == null ? "—" : Number(ratingVal).toFixed(2)} ({reviewCountVal})
                 </span>
-
-                <button className="signup-link" onClick={onLogout}>
-                  Log out
-                </button>
               </div>
 
               <button
-                ref={mobileMenuButtonRef}
+                ref={menuButtonRef}
                 type="button"
                 className="userMenuButton"
                 aria-label="Open account menu"
-                aria-expanded={mobileUserMenuOpen}
-                onClick={() => setMobileUserMenuOpen((v) => !v)}
+                aria-expanded={userMenuOpen}
+                onClick={() => setUserMenuOpen((v) => !v)}
               >
                 ⋯
               </button>
 
-              {mobileUserMenuOpen ? (
+              {userMenuOpen ? (
                 <div
-                  ref={mobileMenuRef}
+                  ref={menuRef}
                   className="userMenuPanel"
                   role="menu"
                   aria-label="Account menu"
@@ -248,24 +252,32 @@ export default function Header({
                   <NavLink
                     className="userMenuHeading"
                     to={`/u/${user.username}`}
-                    onClick={closeMobileMenu}
+                    onClick={closeMenu}
                   >
-                    {headerName}
+                    View Profile
                   </NavLink>
 
-                  <div className="userMenuItem" role="presentation">
-                    🪙 {tokensVal}
-                  </div>
+                  <NavLink
+                    className="userMenuItem"
+                    to="/account"
+                    onClick={closeMenu}
+                  >
+                    Account Settings
+                  </NavLink>
 
-                  <div className="userMenuItem" role="presentation">
-                    ⭐ {ratingVal == null ? "—" : Number(ratingVal).toFixed(2)} ({reviewCountVal})
-                  </div>
+                  <NavLink
+                    className="userMenuItem"
+                    to="/dmca"
+                    onClick={closeMenu}
+                  >
+                    DMCA
+                  </NavLink>
 
                   <button
                     type="button"
                     className="userMenuItem userMenuLogout"
                     role="menuitem"
-                    onClick={handleMobileLogout}
+                    onClick={handleMenuLogout}
                   >
                     Log out
                   </button>

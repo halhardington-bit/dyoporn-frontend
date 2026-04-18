@@ -1,0 +1,608 @@
+.accountSettingsPage {
+  width: 100%;
+  max-width: 1380px;
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+  gap: 32px;
+  align-items: start;
+  padding: 28px 0 40px;
+}
+
+.accountSettingsSidebar {
+  position: sticky;
+  top: 24px;
+  align-self: start;
+  min-width: 0;
+}
+
+.accountSettingsSidebarInner {
+  padding: 22px 18px 18px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 18px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.008)),
+    rgba(12, 12, 13, 0.78);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.accountSettingsEyebrow,
+.accountSettingsSectionEyebrow,
+.accountSettingsKicker {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(212, 175, 55, 0.58);
+}
+
+.accountSettingsEyebrow {
+  margin-bottom: 12px;
+}
+
+.accountSettingsTitle {
+  margin: 0 0 22px;
+  font-family: "Inter", sans-serif;
+  font-size: 31px;
+  line-height: 1;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.accountSettingsSidebarNav {
+  display: grid;
+  gap: 8px;
+}
+
+.accountSettingsSidebarItem {
+  position: relative;
+  display: block;
+  padding: 10px 12px;
+  margin: 0 -6px;
+  border-radius: 12px;
+  color: rgba(255, 255, 255, 0.6);
+  text-decoration: none;
+  font-size: 15px;
+  line-height: 1.35;
+  transition:
+    color 0.16s ease,
+    background 0.16s ease,
+    transform 0.16s ease;
+}
+
+.accountSettingsSidebarItem:hover {
+  color: rgba(255, 255, 255, 0.86);
+  background: rgba(255, 255, 255, 0.03);
+  transform: translateX(2px);
+}
+
+.accountSettingsSidebarItem.isActive {
+  color: rgba(255, 255, 255, 0.95);
+  background: rgba(255, 255, 255, 0.045);
+  font-weight: 500;
+}
+
+.accountSettingsSidebarItem.isActive::before {
+  content: "";
+  position: absolute;
+  left: -6px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 16px;
+  border-radius: 999px;
+  background: rgba(212, 175, 55, 0.9);
+}
+
+.accountSettingsMain {
+  min-width: 0;
+  width: 100%;
+}
+
+.accountSettingsMainInner {
+  width: 100%;
+  min-width: 0;
+  max-width: 1080px;
+  padding: 26px 28px 30px;
+  border: 1px solid rgba(255, 255, 255, 0.045);
+  border-radius: 22px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.018), rgba(255, 255, 255, 0.006)),
+    rgba(10, 10, 11, 0.72);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.accountSettingsContent {
+  display: grid;
+  gap: 38px;
+  width: 100%;
+  min-width: 0;
+}
+
+.accountSettingsIntro {
+  max-width: 760px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.045);
+}
+
+.accountSettingsKicker {
+  margin-bottom: 12px;
+}
+
+.accountSettingsHeading {
+  margin: 0 0 12px;
+  font-family: "Inter", sans-serif;
+  font-size: 44px;
+  line-height: 1.02;
+  font-weight: 500;
+  letter-spacing: -0.025em;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.accountSettingsSubtext {
+  margin: 0;
+  max-width: 760px;
+  font-size: 17px;
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.62);
+}
+
+.accountSettingsSection {
+  min-width: 0;
+}
+
+.accountSettingsSectionHeader {
+  margin-bottom: 16px;
+}
+
+.accountSettingsSectionEyebrow {
+  margin-bottom: 8px;
+}
+
+.accountSettingsSectionTitle {
+  margin: 0;
+  font-family: "Inter", sans-serif;
+  font-size: 26px;
+  line-height: 1.08;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: rgba(255, 255, 255, 0.86);
+}
+
+.accountSettingsDetailsList,
+.accountSettingsActionList {
+  width: 100%;
+  min-width: 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.accountSettingsDetailRow {
+  display: grid;
+  grid-template-columns: 190px minmax(320px, 1fr);
+  gap: 24px;
+  align-items: center;
+  padding: 18px 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  min-width: 0;
+  border-radius: 12px;
+  transition: background 0.16s ease;
+}
+
+.accountSettingsDetailRow:hover {
+  background: rgba(255, 255, 255, 0.018);
+}
+
+.accountSettingsDetailLabel {
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.44);
+}
+
+.accountSettingsDetailValue {
+  min-width: 0;
+  font-size: 16px;
+  line-height: 1.5;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.84);
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+.accountSettingsActionRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 18px;
+  align-items: center;
+  padding: 18px 14px;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  min-width: 0;
+  border-radius: 12px;
+  transition:
+    background 0.16s ease,
+    transform 0.16s ease;
+}
+
+.accountSettingsActionRow:hover {
+  background: rgba(255, 255, 255, 0.02);
+  transform: translateX(2px);
+}
+
+.accountSettingsActionTitle {
+  margin-bottom: 6px;
+  font-size: 16px;
+  line-height: 1.2;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.86);
+}
+
+.accountSettingsActionText {
+  font-size: 14px;
+  line-height: 1.65;
+  color: rgba(255, 255, 255, 0.56);
+}
+
+.accountSettingsActionArrow {
+  font-size: 17px;
+  color: rgba(255, 255, 255, 0.34);
+  transition:
+    color 0.16s ease,
+    transform 0.16s ease;
+}
+
+.accountSettingsActionRow:hover .accountSettingsActionArrow {
+  color: rgba(255, 255, 255, 0.72);
+  transform: translateX(2px);
+}
+
+.accountSettingsActionRow.danger .accountSettingsActionTitle {
+  color: rgba(255, 142, 142, 0.92);
+}
+
+@media (max-width: 1100px) {
+  .accountSettingsPage {
+    grid-template-columns: 220px minmax(0, 1fr);
+    gap: 24px;
+  }
+
+  .accountSettingsMainInner {
+    max-width: 100%;
+    padding: 22px 22px 26px;
+  }
+
+  .accountSettingsHeading {
+    font-size: 38px;
+  }
+}
+
+@media (max-width: 960px) {
+  .accountSettingsPage {
+    grid-template-columns: 1fr;
+    gap: 22px;
+  }
+
+  .accountSettingsSidebar {
+    position: static;
+  }
+
+  .accountSettingsSidebarInner {
+    padding: 16px;
+  }
+
+  .accountSettingsSidebarNav {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px 14px;
+  }
+
+  .accountSettingsSidebarItem {
+    margin: 0;
+    padding: 10px 12px;
+  }
+
+  .accountSettingsSidebarItem.isActive::before {
+    display: none;
+  }
+
+  .accountSettingsMainInner {
+    padding: 20px;
+  }
+}
+
+@media (max-width: 680px) {
+  .accountSettingsPage {
+    padding-top: 14px;
+    gap: 18px;
+  }
+
+  .accountSettingsSidebarNav {
+    grid-template-columns: 1fr;
+  }
+
+  .accountSettingsHeading {
+    font-size: 32px;
+  }
+
+  .accountSettingsSectionTitle {
+    font-size: 22px;
+  }
+
+  .accountSettingsDetailRow {
+    grid-template-columns: 1fr;
+    gap: 6px;
+    padding: 15px 10px;
+  }
+
+  .accountSettingsActionRow {
+    padding: 15px 10px;
+  }
+}
+
+.accountSettingsActionButton {
+  width: 100%;
+  background: transparent;
+  border-left: 0;
+  border-right: 0;
+  border-top: 0;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+}
+
+.accountSettingsStatusPill {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  border: 1px solid transparent;
+}
+
+.accountSettingsStatusPill.isVerified {
+  color: rgba(166, 230, 182, 0.95);
+  background: rgba(58, 116, 73, 0.18);
+  border-color: rgba(88, 160, 108, 0.22);
+}
+
+.accountSettingsStatusPill.isUnverified {
+  color: rgba(255, 206, 125, 0.95);
+  background: rgba(120, 86, 26, 0.18);
+  border-color: rgba(170, 126, 48, 0.22);
+}
+
+.accountSettingsInlineSuccess,
+.accountSettingsInlineError {
+  margin-top: 14px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.accountSettingsInlineSuccess {
+  color: rgba(166, 230, 182, 0.92);
+}
+
+.accountSettingsInlineError {
+  color: rgba(255, 138, 138, 0.92);
+}
+
+.accountSettingsActionButton:disabled {
+  opacity: 0.7;
+  cursor: default;
+}
+
+/* -------------------------------- */
+/* 💳 Billing card */
+/* -------------------------------- */
+
+.billingCard {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 22px 24px;
+  border-radius: 16px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.05);
+}
+
+.billingPlanName {
+  font-size: 22px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.9);
+}
+
+.billingPlanDesc {
+  font-size: 14px;
+  color: rgba(255,255,255,0.55);
+  margin-top: 6px;
+}
+
+.billingPrimaryBtn {
+  padding: 10px 16px;
+  border-radius: 999px;
+  border: none;
+  background: #d4af37;
+  color: #000;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* -------------------------------- */
+/* 🧾 Plans grid */
+/* -------------------------------- */
+
+.billingPlansGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+
+.billingPlanCard {
+  padding: 20px;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.05);
+  background: rgba(255,255,255,0.015);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.billingPlanCard.featured {
+  border-color: rgba(212,175,55,0.4);
+  background: rgba(212,175,55,0.05);
+}
+
+.planName {
+  font-size: 18px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.9);
+}
+
+.planPrice {
+  font-size: 20px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.75);
+}
+
+.planFeatures {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  color: rgba(255,255,255,0.6);
+  font-size: 14px;
+}
+
+.billingPlanCard button {
+  margin-top: auto;
+  padding: 10px;
+  border-radius: 10px;
+  border: none;
+  background: rgba(255,255,255,0.08);
+  color: rgba(255,255,255,0.85);
+  cursor: pointer;
+}
+
+.billingPlanCard button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .billingPlansGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* -------------------------------- */
+/* 🚨 Cancel subscription */
+/* -------------------------------- */
+
+.billingDangerCard {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 22px 24px;
+  border-radius: 16px;
+
+  background: rgba(255, 120, 120, 0.04);
+  border: 1px solid rgba(255, 120, 120, 0.18);
+}
+
+.billingDangerTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: rgba(255, 150, 150, 0.95);
+  margin-bottom: 6px;
+}
+
+.billingDangerText {
+  font-size: 14px;
+  color: rgba(255, 200, 200, 0.6);
+  max-width: 480px;
+}
+
+.billingDangerBtn {
+  padding: 10px 16px;
+  border-radius: 10px;
+  border: none;
+
+  background: rgba(255, 120, 120, 0.15);
+  color: rgba(255, 180, 180, 0.95);
+
+  font-weight: 600;
+  cursor: pointer;
+
+  transition: background 0.15s ease;
+}
+
+.billingDangerBtn:hover {
+  background: rgba(255, 120, 120, 0.25);
+}
+
+.billingDangerBtn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.billingManageCard {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  padding: 22px 24px;
+  border-radius: 16px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.05);
+}
+
+.billingManageTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.86);
+  margin-bottom: 6px;
+}
+
+.billingManageText {
+  font-size: 14px;
+  line-height: 1.65;
+  color: rgba(255,255,255,0.58);
+  max-width: 560px;
+}
+
+.billingDangerBtn,
+.billingRenewBtn {
+  padding: 10px 16px;
+  border-radius: 10px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, opacity 0.15s ease;
+}
+
+.billingDangerBtn {
+  background: rgba(255, 120, 120, 0.16);
+  color: rgba(255, 190, 190, 0.95);
+}
+
+.billingDangerBtn:hover {
+  background: rgba(255, 120, 120, 0.24);
+}
+
+.billingRenewBtn {
+  background: rgba(212, 175, 55, 0.16);
+  color: rgba(245, 222, 154, 0.96);
+}
+
+.billingRenewBtn:hover {
+  background: rgba(212, 175, 55, 0.24);
+}
+
+.billingDangerBtn:disabled,
+.billingRenewBtn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}

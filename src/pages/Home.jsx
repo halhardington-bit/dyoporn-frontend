@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
-import { useOutletContext, useSearchParams, Link } from "react-router-dom";
+import { useOutletContext, useSearchParams, Link, NavLink } from "react-router-dom";
 import { getVideos, getHomeRows } from "../api.js";
 import { VideoShelf } from "../ui/VideoShelf.jsx";
 import VideoCard from "../ui/VideoCard.jsx";
+
 
 
 
@@ -94,6 +95,32 @@ function applyTimeFilter(videos, timeFilter) {
     if (!createdMs) return false;
     return createdMs >= cutoff;
   });
+}
+
+const SHOW_BETA_BANNER = true;
+
+function HomeBetaBanner() {
+  return (
+    <section className="watchBetaBanner" aria-label="Beta signup banner">
+      <div className="watchBetaBannerInner">
+        <div className="watchBetaBannerCopy">
+          <div className="watchBetaBannerEyebrow">EARLY ACCESS</div>
+          <h2 className="watchBetaBannerTitle">
+            Want Premium access? Join the beta.
+          </h2>
+          <p className="watchBetaBannerText">
+            Create a beta account to access Premium while early access is open.
+          </p>
+        </div>
+
+        <div className="watchBetaBannerActions">
+          <NavLink to="/beta" className="watchBetaBannerButton">
+            Join Beta
+          </NavLink>
+        </div>
+      </div>
+    </section>
+  );
 }
 
 export default function Home({ user, onRequireLogin }) {
@@ -389,6 +416,9 @@ export default function Home({ user, onRequireLogin }) {
 
   return (
     <div className="page page--home">
+
+      {SHOW_BETA_BANNER && !isLoggedIn ? <HomeBetaBanner /> : null}
+
       {loading ? (
         <div className="loading loadingPanel">Loading…</div>
       ) : (
