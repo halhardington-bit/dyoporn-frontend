@@ -1,0 +1,190 @@
+.page--moderationUserDetail {
+  padding: 28px;
+}
+
+.moderationUserDetailHeader {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  align-items: flex-start;
+  margin-bottom: 22px;
+}
+
+.moderationUserDetailEyebrow {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  opacity: 0.7;
+  margin-bottom: 6px;
+}
+
+.moderationUserDetailTitle {
+  margin: 0;
+  font-size: 34px;
+  line-height: 1.1;
+}
+
+.moderationUserDetailSub {
+  margin: 8px 0 0;
+  opacity: 0.8;
+  max-width: 760px;
+}
+
+.moderationUserDetailBackBtn,
+.moderationUserDetailSaveBtn {
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.06);
+  color: inherit;
+  border-radius: 12px;
+  padding: 10px 14px;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.moderationUserDetailGrid {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 18px;
+}
+
+.moderationUserDetailCard {
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.03);
+  border-radius: 20px;
+  padding: 18px;
+}
+
+.moderationUserDetailCardTitle {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 14px;
+}
+
+.moderationUserDetailFacts {
+  display: grid;
+  gap: 10px;
+}
+
+.moderationUserDetailFacts span {
+  opacity: 0.7;
+  margin-right: 6px;
+}
+
+.moderationUserDetailStatusRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.moderationUserDetailBadge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.moderationUserDetailBadge.yes {
+  background: rgba(91, 162, 255, 0.18);
+}
+
+.moderationUserDetailBadge.no {
+  background: rgba(255,255,255,0.08);
+}
+
+.moderationUserDetailBadge.shadow {
+  background: rgba(255, 185, 76, 0.18);
+}
+
+.moderationUserDetailBadge.banned {
+  background: rgba(255, 88, 88, 0.18);
+}
+
+.moderationUserDetailForm {
+  display: grid;
+  gap: 14px;
+}
+
+.moderationUserDetailField {
+  display: grid;
+  gap: 8px;
+}
+
+.moderationUserDetailField span {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.moderationUserDetailField input,
+.moderationUserDetailField select {
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(0,0,0,0.24);
+  color: inherit;
+  border-radius: 12px;
+  padding: 12px 14px;
+}
+
+.moderationUserDetailCheck {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 14px;
+  padding: 14px;
+  background: rgba(255,255,255,0.02);
+}
+
+.moderationUserDetailCheck input {
+  margin-top: 3px;
+}
+
+.moderationUserDetailCheck span {
+  display: grid;
+  gap: 4px;
+  font-weight: 600;
+}
+
+.moderationUserDetailCheck small {
+  font-weight: 400;
+  opacity: 0.72;
+  line-height: 1.4;
+}
+
+.dangerCheck {
+  border-color: rgba(255, 88, 88, 0.24);
+  background: rgba(255, 88, 88, 0.06);
+}
+
+.moderationUserDetailNotice {
+  border-radius: 14px;
+  padding: 12px 14px;
+  font-size: 14px;
+}
+
+.moderationUserDetailNotice.danger {
+  background: rgba(255, 88, 88, 0.08);
+  border: 1px solid rgba(255, 88, 88, 0.22);
+}
+
+.moderationUserDetailSuccess {
+  color: #92ffb4;
+}
+
+.moderationUserDetailActions {
+  margin-top: 6px;
+}
+
+.moderationUserDetailEmpty {
+  padding: 28px;
+  opacity: 0.8;
+}
+
+@media (max-width: 980px) {
+  .moderationUserDetailGrid,
+  .moderationUserDetailHeader {
+    grid-template-columns: 1fr;
+    flex-direction: column;
+  }
+}

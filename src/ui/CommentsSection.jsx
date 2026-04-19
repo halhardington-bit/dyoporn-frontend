@@ -67,6 +67,7 @@ export default function CommentsSection({
   const [openReplies, setOpenReplies] = useState(() => new Set());
 
   const isLoggedIn = !!user?.id;
+  const myUserId = user?.id != null ? Number(user.id) : null;
   const myUsername = user?.username ? String(user.username).toLowerCase() : null;
 
   const canPost = useMemo(() => commentBody.trim().length > 0, [commentBody]);
@@ -85,6 +86,27 @@ export default function CommentsSection({
     return !!myUsername && !!normalizedOwner && myUsername === normalizedOwner;
   };
 
+  function canSeeComment(item) {
+    if (!item) return false;
+    if (!item.isShadowHidden) return true;
+
+    const itemUserId =
+      item.userId != null && Number.isFinite(Number(item.userId))
+        ? Number(item.userId)
+        : null;
+
+    return myUserId != null && itemUserId === myUserId;
+  }
+
+  function normalizeComments(items = []) {
+    return (Array.isArray(items) ? items : [])
+      .filter(canSeeComment)
+      .map((c) => ({
+        ...c,
+        replies: (Array.isArray(c.replies) ? c.replies : []).filter(canSeeComment),
+      }));
+  }
+
   useEffect(() => {
     let cancelled = false;
 
@@ -92,7 +114,9 @@ export default function CommentsSection({
       try {
         setCommentsBusy(true);
         const c = await getComments(videoId);
-        if (!cancelled) setComments(c?.items ?? []);
+        if (!cancelled) {
+          setComments(normalizeComments(c?.items ?? []));
+        }
       } catch (e) {
         console.error(e);
       } finally {
@@ -116,7 +140,7 @@ export default function CommentsSection({
     return () => {
       cancelled = true;
     };
-  }, [videoId]);
+  }, [videoId, myUserId]);
 
   async function handlePostComment(e) {
     e.preventDefault();
@@ -132,10 +156,10 @@ export default function CommentsSection({
       const resp = await postComment(videoId, body);
       const newComment = resp?.comment;
 
-      if (newComment) {
+      if (newComment && canSeeComment(newComment)) {
         setComments((prev) => [newComment, ...prev]);
-        setCommentBody("");
       }
+      setCommentBody("");
     } catch (e) {
       console.error(e);
       setCommentError(e?.message || "Failed to post comment");
@@ -206,7 +230,7 @@ export default function CommentsSection({
       console.error(e);
       try {
         const c = await getComments(videoId);
-        setComments(c?.items ?? []);
+        setComments(normalizeComments(c?.items ?? []));
       } catch {}
     }
   }
@@ -349,7 +373,7 @@ export default function CommentsSection({
       const resp = await postComment(videoId, body, parentCommentId);
       const newReply = resp?.comment;
 
-      if (newReply) {
+      if (newReply && canSeeComment(newReply)) {
         setComments((prev) =>
           prev.map((c) =>
             c.id === parentCommentId
@@ -357,9 +381,10 @@ export default function CommentsSection({
               : c
           )
         );
-        setReplyBody("");
-        setReplyingTo(null);
       }
+
+      setReplyBody("");
+      setReplyingTo(null);
     } catch (e) {
       console.error(e);
     } finally {
@@ -473,6 +498,13 @@ export default function CommentsSection({
                       <>
                         <span className="dot">•</span>
                         <span className="watchPageCommentEdited">edited</span>
+                      </>
+                    ) : null}
+
+                    {c.isShadowHidden ? (
+                      <>
+                        <span className="dot">•</span>
+                        <span className="watchPageCommentEdited">hidden</span>
                       </>
                     ) : null}
                   </div>
@@ -650,6 +682,15 @@ export default function CommentsSection({
                                     <span className="dot">•</span>
                                     <span className="watchPageCommentEdited">
                                       edited
+                                    </span>
+                                  </>
+                                ) : null}
+
+                                {r.isShadowHidden ? (
+                                  <>
+                                    <span className="dot">•</span>
+                                    <span className="watchPageCommentEdited">
+                                      hidden
                                     </span>
                                   </>
                                 ) : null}

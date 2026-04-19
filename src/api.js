@@ -592,6 +592,45 @@ export async function updateMyTier(tier) {
 }
 
 
+export async function getModerationUsers({ q = "", filterBy = "all", limit = 50, offset = 0 } = {}) {
+  const params = new URLSearchParams();
+  if (q) params.set("q", q);
+  if (filterBy) params.set("filterBy", filterBy);
+  params.set("limit", String(limit));
+  params.set("offset", String(offset));
+
+  const res = await fetch(`${API_BASE}/api/mod/users?${params.toString()}`, {
+    credentials: "include",
+  });
+
+  const data = await res.json().catch(() => null);
+  if (!res.ok) throw new Error(data?.error || "Failed to fetch moderation users");
+  return data;
+}
+
+export async function getModerationUserById(userId) {
+  const res = await fetch(`${API_BASE}/api/mod/users/${userId}`, {
+    credentials: "include",
+  });
+
+  const data = await res.json().catch(() => null);
+  if (!res.ok) throw new Error(data?.error || "Failed to fetch moderation user");
+  return data;
+}
+
+export async function updateModerationUser(userId, payload) {
+  const res = await fetch(`${API_BASE}/api/mod/users/${userId}`, {
+    method: "PATCH",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+
+  const data = await res.json().catch(() => null);
+  if (!res.ok) throw new Error(data?.error || "Failed to update moderation user");
+  return data;
+}
+
 export async function registerBeta({
   email,
   username,

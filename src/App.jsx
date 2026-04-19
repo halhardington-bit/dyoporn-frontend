@@ -18,8 +18,13 @@ import BetaSignup from "./pages/BetaSignup.jsx";
 import VerifyEmail from "./pages/VerifyEmail.jsx";
 import ForgotPassword from "./pages/ForgotPassword.jsx";
 import ResetPassword from "./pages/ResetPassword.jsx";
+
 import Moderation from "./pages/Moderation.jsx";
 import ModerationReports from "./pages/moderation/ModerationReports.jsx";
+import ModerationUsers from "./pages/moderation/ModerationUsers.jsx";
+import ModerationUserDetail from "./pages/moderation/ModerationUserDetail.jsx";
+
+
 import AgeGate from "./pages/AgeGate.jsx";
 import Dmca from "./pages/dmca.jsx";
 
@@ -202,6 +207,20 @@ export default function App() {
             path="/moderation"
             element={
               user?.isModerator ? <Moderation /> : <Navigate to="/watch" replace />
+            }
+          />
+
+          <Route
+            path="/moderation/users"
+            element={
+              user?.isModerator ? <ModerationUsers /> : <Navigate to="/watch" replace />
+            }
+          />
+
+          <Route
+            path="/moderation/users/:id"
+            element={
+              user?.isModerator ? <ModerationUserDetail /> : <Navigate to="/watch" replace />
             }
           />
 

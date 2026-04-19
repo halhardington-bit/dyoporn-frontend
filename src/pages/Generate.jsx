@@ -1,4 +1,7 @@
+import React, { useState } from "react";
 import "./Generate.css";
+
+const API_BASE = (import.meta.env.VITE_API_BASE || "https://api.dyop.ai").replace(/\/$/, "");
 
 const FAQS = [
   {
@@ -24,6 +27,37 @@ const FAQS = [
 ];
 
 export default function Generate() {
+  const [loading, setLoading] = useState(false);
+
+  async function handleDownload() {
+    if (loading) return;
+
+    setLoading(true);
+    try {
+      const res = await fetch(`${API_BASE}/system/latest-version.json`)
+
+      const data = await res.json().catch(() => null);
+
+      if (!res.ok) {
+        throw new Error(data?.error || "Failed to fetch version info");
+      }
+
+      const url = data?.engine_patch_url;
+
+      if (!url) {
+        alert("Download not available yet.");
+        return;
+      }
+
+      window.open(url, "_blank", "noopener,noreferrer");
+    } catch (err) {
+      console.error("Download failed:", err);
+      alert("Failed to fetch download.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
     <div className="page">
       <div className="downloadPage">
@@ -40,9 +74,10 @@ export default function Generate() {
               <button
                 type="button"
                 className="downloadButton"
-                onClick={() => {}}
+                onClick={handleDownload}
+                disabled={loading}
               >
-                Download App
+                {loading ? "Preparing..." : "Download App"}
               </button>
 
               <div className="downloadMeta">

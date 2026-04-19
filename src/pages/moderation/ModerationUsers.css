@@ -1,0 +1,195 @@
+.page--moderationUsers {
+  padding: 28px;
+}
+
+.moderationUsersHeader {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  align-items: flex-start;
+  margin-bottom: 22px;
+}
+
+.moderationUsersEyebrow {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  opacity: 0.7;
+  margin-bottom: 6px;
+}
+
+.moderationUsersTitle {
+  margin: 0;
+  font-size: 34px;
+  line-height: 1.1;
+}
+
+.moderationUsersSub {
+  margin: 8px 0 0;
+  opacity: 0.8;
+  max-width: 760px;
+}
+
+.moderationUsersBackBtn,
+.moderationUsersSearchBtn,
+.moderationUsersPageBtn {
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.06);
+  color: inherit;
+  border-radius: 12px;
+  padding: 10px 14px;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.moderationUsersPanel {
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.03);
+  border-radius: 20px;
+  padding: 18px;
+}
+
+.moderationUsersPanelTop,
+.moderationUsersToolbar,
+.moderationUsersPagination {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+}
+
+.moderationUsersPanelTop {
+  margin-bottom: 16px;
+}
+
+.moderationUsersPanelTitle {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.moderationUsersPageInfo,
+.moderationUsersPageCount,
+.moderationUsersMeta {
+  opacity: 0.7;
+  font-size: 13px;
+}
+
+.moderationUsersToolbar {
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.moderationUsersSearch {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.moderationUsersFilterSelect,
+.moderationUsersSearchInput {
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(0,0,0,0.24);
+  color: inherit;
+  border-radius: 12px;
+  padding: 12px 14px;
+}
+
+.moderationUsersFilterSelect {
+  min-width: 160px;
+}
+
+.moderationUsersSearchInput {
+  flex: 1;
+  min-width: 240px;
+}
+
+.moderationUsersError,
+.moderationUserDetailError {
+  color: #ff8f8f;
+  margin-bottom: 14px;
+}
+
+.moderationUsersEmpty {
+  padding: 24px 6px;
+  opacity: 0.8;
+}
+
+.moderationUsersTableWrap {
+  overflow-x: auto;
+}
+
+.moderationUsersTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.moderationUsersTable th,
+.moderationUsersTable td {
+  text-align: left;
+  vertical-align: top;
+  padding: 14px 12px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+}
+
+.moderationUsersTable th {
+  font-size: 13px;
+  opacity: 0.7;
+  font-weight: 600;
+}
+
+.moderationUsersLink {
+  color: inherit;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.moderationUsersLink:hover {
+  text-decoration: underline;
+}
+
+.moderationUsersBadge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.moderationUsersBadge.isModerator {
+  background: rgba(91, 162, 255, 0.18);
+}
+
+.moderationUsersBadge.notModerator,
+.moderationUsersBadge.normal {
+  background: rgba(255,255,255,0.08);
+}
+
+.moderationUsersBadge.shadow {
+  background: rgba(255, 185, 76, 0.18);
+}
+
+.moderationUsersBadge.banned {
+  background: rgba(255, 88, 88, 0.18);
+}
+
+.moderationUsersStatusStack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.moderationUsersPagination {
+  margin-top: 16px;
+}
+
+@media (max-width: 900px) {
+  .moderationUsersHeader,
+  .moderationUsersPanelTop,
+  .moderationUsersPagination {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
