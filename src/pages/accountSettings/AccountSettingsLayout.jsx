@@ -45,14 +45,7 @@ export default function AccountSettingsLayout({ user }) {
               Plan & Billing
             </NavLink>
 
-            <NavLink
-              to="/account/subscriptions"
-              className={({ isActive }) =>
-                `accountSettingsSidebarItem ${isActive ? "isActive" : ""}`
-              }
-            >
-              Subscriptions
-            </NavLink>
+            
 
             <NavLink
               to="/account/danger"

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { registerBeta } from "../api";
-import logo from "../assets/logo-01-cropped.svg";
+import logo from "../assets/logo-01-exact-bounds.svg";
 import "./BetaSignup.css";
 
 function calculateAge(dateString) {

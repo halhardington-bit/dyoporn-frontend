@@ -285,6 +285,26 @@
   color: #d8d8d8;
 }
 
+/* Make date input feel native + slimmer */
+.betaInput[type="date"] {
+  height: 48px;              /* smaller than 58px */
+  padding: 0 14px;
+  font-size: 0.95rem;
+}
+
+/* Mobile-specific tightening */
+@media (max-width: 760px) {
+  .betaInput[type="date"] {
+    height: 44px;
+    font-size: 0.9rem;
+  }
+}
+
+.betaInput[type="date"] {
+  appearance: none;
+  -webkit-appearance: none;
+}
+
 @media (max-width: 760px) {
   .betaWrap {
     padding: 20px;
