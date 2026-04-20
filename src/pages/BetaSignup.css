@@ -153,11 +153,21 @@
 }
 
 .betaFieldLabel {
-  display: block;
-  margin: 2px 0 -6px;
   font-size: 0.92rem;
   line-height: 1.4;
   color: rgba(255, 255, 255, 0.5);
+}
+
+.betaDobGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.betaDobRow {
+  display: grid;
+  grid-template-columns: 0.8fr 1.25fr 1fr;
+  gap: 12px;
 }
 
 .betaInput {
@@ -193,20 +203,21 @@
   box-shadow: none;
 }
 
-.betaInputDate {
-  height: 58px;
-  color: rgba(255, 255, 255, 0.72);
-  color-scheme: dark;
+.betaSelect {
+  appearance: none;
+  -webkit-appearance: none;
+  color: rgba(255, 255, 255, 0.82);
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.045) 0%,
+      rgba(255, 255, 255, 0.03) 100%
+    );
 }
 
-.betaInputDate::-webkit-date-and-time-value {
-  text-align: left;
-}
-
-.betaInputDate::-webkit-calendar-picker-indicator {
-  opacity: 0.72;
-  cursor: pointer;
-  filter: invert(1);
+.betaSelect option {
+  color: #ffffff;
+  background: #111111;
 }
 
 .betaButton {
@@ -318,6 +329,7 @@
   color: #d8d8d8;
 }
 
+
 @media (max-width: 760px) {
   .betaWrap {
     padding: 20px;
@@ -326,6 +338,10 @@
   .betaShell {
     padding: 34px 24px 24px;
     border-radius: 26px;
+  }
+
+  .betaDobRow {
+    grid-template-columns: 1fr;
   }
 
   .betaButton {
@@ -337,7 +353,10 @@
     align-self: stretch;
   }
 
-  .betaInputDate {
-    height: 58px;
+  @media (max-width: 760px) {
+  .betaDobRow {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
   }
+}
 }

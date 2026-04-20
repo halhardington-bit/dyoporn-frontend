@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { registerBeta } from "../api";
 import logo from "../assets/logo-01-exact-bounds.svg";
@@ -31,6 +31,36 @@ function getApiBase() {
     : "https://api.dyop.ai";
 }
 
+function buildDateOfBirth(year, month, day) {
+  if (!year || !month || !day) return "";
+
+  const yyyy = String(year).padStart(4, "0");
+  const mm = String(month).padStart(2, "0");
+  const dd = String(day).padStart(2, "0");
+
+  return `${yyyy}-${mm}-${dd}`;
+}
+
+function getDaysInMonth(year, month) {
+  if (!year || !month) return 31;
+  return new Date(Number(year), Number(month), 0).getDate();
+}
+
+const MONTHS = [
+  { value: "1", label: "January" },
+  { value: "2", label: "February" },
+  { value: "3", label: "March" },
+  { value: "4", label: "April" },
+  { value: "5", label: "May" },
+  { value: "6", label: "June" },
+  { value: "7", label: "July" },
+  { value: "8", label: "August" },
+  { value: "9", label: "September" },
+  { value: "10", label: "October" },
+  { value: "11", label: "November" },
+  { value: "12", label: "December" },
+];
+
 export default function BetaSignup() {
   const navigate = useNavigate();
 
@@ -38,10 +68,23 @@ export default function BetaSignup() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
-  const [dateOfBirth, setDateOfBirth] = useState("");
+  const [birthDay, setBirthDay] = useState("");
+  const [birthMonth, setBirthMonth] = useState("");
+  const [birthYear, setBirthYear] = useState("");
   const [country, setCountry] = useState("");
   const [error, setError] = useState("");
   const [status, setStatus] = useState("idle");
+
+  const currentYear = new Date().getFullYear();
+
+  const yearOptions = useMemo(() => {
+    return Array.from({ length: 100 }, (_, i) => String(currentYear - 18 - i));
+  }, [currentYear]);
+
+  const dayOptions = useMemo(() => {
+    const count = getDaysInMonth(birthYear || 2000, birthMonth || 1);
+    return Array.from({ length: count }, (_, i) => String(i + 1));
+  }, [birthYear, birthMonth]);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -57,12 +100,14 @@ export default function BetaSignup() {
       return;
     }
 
-    if (!dateOfBirth) {
+    const builtDob = buildDateOfBirth(birthYear, birthMonth, birthDay);
+
+    if (!builtDob) {
       setError("Please enter your date of birth.");
       return;
     }
 
-    const age = calculateAge(dateOfBirth);
+    const age = calculateAge(builtDob);
 
     if (age == null) {
       setError("Please enter a valid date of birth.");
@@ -91,7 +136,7 @@ export default function BetaSignup() {
         email: email.trim().toLowerCase(),
         username: username.trim(),
         password,
-        dateOfBirth,
+        dateOfBirth: builtDob,
         country: country.trim() || null,
       });
 
@@ -184,17 +229,53 @@ export default function BetaSignup() {
               disabled={status === "loading"}
             />
 
-            
-            <input
-              id="beta-dob"
-              className="betaInput betaInputDate"
-              type="date"
-              value={dateOfBirth}
-              onChange={(e) => setDateOfBirth(e.target.value)}
-              max={new Date().toISOString().split("T")[0]}
-              disabled={status === "loading"}
-              autoComplete="bday"
-            />
+            <div className="betaDobGroup">
+              
+
+              <div className="betaDobRow">
+                <select
+                  className="betaInput betaSelect"
+                  value={birthDay}
+                  onChange={(e) => setBirthDay(e.target.value)}
+                  disabled={status === "loading"}
+                >
+                  <option value="">Day</option>
+                  {dayOptions.map((day) => (
+                    <option key={day} value={day}>
+                      {day}
+                    </option>
+                  ))}
+                </select>
+
+                <select
+                  className="betaInput betaSelect"
+                  value={birthMonth}
+                  onChange={(e) => setBirthMonth(e.target.value)}
+                  disabled={status === "loading"}
+                >
+                  <option value="">Month</option>
+                  {MONTHS.map((month) => (
+                    <option key={month.value} value={month.value}>
+                      {month.label}
+                    </option>
+                  ))}
+                </select>
+
+                <select
+                  className="betaInput betaSelect"
+                  value={birthYear}
+                  onChange={(e) => setBirthYear(e.target.value)}
+                  disabled={status === "loading"}
+                >
+                  <option value="">Year</option>
+                  {yearOptions.map((year) => (
+                    <option key={year} value={year}>
+                      {year}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
 
             <input
               className="betaInput"
