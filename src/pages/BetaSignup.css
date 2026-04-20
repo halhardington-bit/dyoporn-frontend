@@ -185,26 +185,21 @@
   box-shadow: none;
 }
 
-/* =========================
-   DATE INPUT FIX
-   ========================= */
-
 .betaInputDate {
-  height: 48px;
-  padding: 0 14px;
-  font-size: 0.95rem;
-  appearance: none;
-  -webkit-appearance: none;
-  background: rgba(255, 255, 255, 0.025);
+  height: 58px;
+  color-scheme: dark;
 }
 
 .betaInputDate::-webkit-date-and-time-value {
   text-align: left;
 }
 
-.betaInputDate::-webkit-calendar-picker-indicator {
-  opacity: 0.9;
-  cursor: pointer;
+.betaInputDate[type="text"] {
+  color: #ffffff;
+}
+
+.betaInputDate[type="text"]::placeholder {
+  color: rgba(255, 255, 255, 0.38);
 }
 
 .betaButton {
@@ -336,8 +331,6 @@
   }
 
   .betaInputDate {
-    height: 44px;
-    padding: 0 12px;
-    font-size: 0.9rem;
+    height: 58px;
   }
 }

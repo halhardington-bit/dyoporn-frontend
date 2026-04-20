@@ -42,6 +42,7 @@ export default function BetaSignup() {
   const [country, setCountry] = useState("");
   const [error, setError] = useState("");
   const [status, setStatus] = useState("idle");
+  const [dobInputType, setDobInputType] = useState("text");
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -110,6 +111,16 @@ export default function BetaSignup() {
   function handleGoogleBetaSignup() {
     const apiBase = getApiBase();
     window.location.href = `${apiBase}/auth/google?beta=1`;
+  }
+
+  function handleDobFocus() {
+    setDobInputType("date");
+  }
+
+  function handleDobBlur() {
+    if (!dateOfBirth) {
+      setDobInputType("text");
+    }
   }
 
   return (
@@ -186,11 +197,15 @@ export default function BetaSignup() {
 
             <input
               className="betaInput betaInputDate"
-              type="date"
+              type={dobInputType}
+              placeholder="Date of Birth"
               value={dateOfBirth}
+              onFocus={handleDobFocus}
+              onBlur={handleDobBlur}
               onChange={(e) => setDateOfBirth(e.target.value)}
               max={new Date().toISOString().split("T")[0]}
               disabled={status === "loading"}
+              autoComplete="bday"
               aria-label="Date of birth"
             />
 
