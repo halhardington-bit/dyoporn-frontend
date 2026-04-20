@@ -638,7 +638,7 @@ export async function registerBeta({
   dateOfBirth,
   country,
 }) {
-  const res = await fetch(`${API_BASE}/auth/register-beta`, {
+  const res = await fetch(`${API_BASE}/auth/register?beta=1`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     credentials: "include",
