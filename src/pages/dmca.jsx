@@ -2,7 +2,7 @@ import "./dmca.css";
 
 export default function Dmca() {
   return (
-    <div className="page page--legal">
+    <div className="dmcaStandalonePage">
       <div className="dmcaPage">
         <div className="dmcaHero">
           <div className="dmcaHeroBadge">LEGAL / COPYRIGHT</div>

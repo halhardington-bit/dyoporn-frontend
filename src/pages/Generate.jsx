@@ -1,41 +1,123 @@
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import "./Generate.css";
+
+import castingShot from "../assets/screenshots/casting.png";
+import storyShot from "../assets/screenshots/story.png";
+import actionShot from "../assets/screenshots/action.png";
+import musicShot from "../assets/screenshots/music.png";
+import editShot from "../assets/screenshots/edit.png";
 
 const API_BASE = (import.meta.env.VITE_API_BASE || "https://api.dyop.ai").replace(/\/$/, "");
 
 const FAQS = [
   {
-    q: "What is the app for?",
-    a: "The app is designed to provide a smoother creation and viewing experience, with a more streamlined workflow than the browser version.",
+    q: "What is the desktop app for?",
+    a: "It provides a cleaner, more focused way to create, manage, and browse without relying entirely on the browser.",
   },
   {
-    q: "Is the app available right now?",
-    a: "The download page is being prepared now. The button is currently a placeholder while the frontend is being finalized.",
+    q: "Is the app available now?",
+    a: "If a build is currently published, the download button will open it. If not, you'll be notified.",
   },
   {
-    q: "What kind of content is allowed?",
-    a: "Only synthetic, AI-generated adult content that complies with platform rules is permitted. Any prohibited, abusive, exploitative, or unlawful content is forbidden.",
+    q: "What content is allowed?",
+    a: "Only platform-compliant synthetic content is allowed. Prohibited, exploitative, or unlawful material is not permitted.",
   },
   {
-    q: "How does DMCA work on this platform?",
-    a: "We respond to valid DMCA and copyright-related complaints. If you believe content infringes your rights, you can contact the platform through the designated takedown process.",
+    q: "How are rights complaints handled?",
+    a: "Valid copyright and rights complaints may result in content removal or account action where appropriate.",
+  },
+];
+
+const SCREENSHOTS = [
+  {
+    title: "Casting",
+    description: "Build and manage performers, roles, and creative direction in one place.",
+    image: castingShot,
   },
   {
-    q: "Are real people shown on this platform?",
-    a: "Content on this platform is presented as AI-generated and synthetic. Uploading or distributing prohibited impersonation, non-consensual material, or unlawful content is not allowed.",
+    title: "Story",
+    description: "Shape scenes, structure ideas, and keep the narrative workflow moving.",
+    image: storyShot,
+  },
+  {
+    title: "Action",
+    description: "Block out momentum, pacing, and visual intensity with a clearer overview.",
+    image: actionShot,
+  },
+  {
+    title: "Music",
+    description: "Guide tone and atmosphere with tools built around audio-driven mood.",
+    image: musicShot,
+  },
+  {
+    title: "Edit",
+    description: "Refine the final cut with a cleaner space for sequencing and polish.",
+    image: editShot,
   },
 ];
 
 export default function Generate() {
   const [loading, setLoading] = useState(false);
+  const [version, setVersion] = useState(null);
+  const [activeShot, setActiveShot] = useState(0);
+  const [modalOpen, setModalOpen] = useState(false);
+
+  const currentShot = useMemo(() => SCREENSHOTS[activeShot], [activeShot]);
+
+  useEffect(() => {
+    async function fetchVersion() {
+      try {
+        const res = await fetch(`${API_BASE}/system/latest-version.json`);
+        const data = await res.json().catch(() => null);
+
+        if (res.ok && data?.latest_version) {
+          setVersion(data.latest_version);
+        } else if (res.ok && data?.latest) {
+          setVersion(data.latest);
+        } else {
+          setVersion("Unavailable");
+        }
+      } catch {
+        setVersion("Unavailable");
+      }
+    }
+
+    fetchVersion();
+  }, []);
+
+  useEffect(() => {
+    function onKeyDown(event) {
+      if (event.key === "Escape") {
+        setModalOpen(false);
+      }
+    }
+
+    if (modalOpen) {
+      document.body.style.overflow = "hidden";
+      window.addEventListener("keydown", onKeyDown);
+    }
+
+    return () => {
+      document.body.style.overflow = "";
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [modalOpen]);
+
+  function goPrevShot() {
+    setActiveShot((prev) => (prev === 0 ? SCREENSHOTS.length - 1 : prev - 1));
+  }
+
+  function goNextShot() {
+    setActiveShot((prev) => (prev === SCREENSHOTS.length - 1 ? 0 : prev + 1));
+  }
 
   async function handleDownload() {
     if (loading) return;
 
     setLoading(true);
-    try {
-      const res = await fetch(`${API_BASE}/system/latest-version.json`)
 
+    try {
+      const res = await fetch(`${API_BASE}/system/latest-version.json`);
       const data = await res.json().catch(() => null);
 
       if (!res.ok) {
@@ -62,95 +144,145 @@ export default function Generate() {
     <div className="page">
       <div className="downloadPage">
         <section className="downloadHero">
-          <div className="downloadHeroCopy">
-            <div className="downloadEyebrow">Desktop App</div>
-            <h1 className="downloadTitle">Download the app</h1>
-            <p className="downloadSubtitle">
-              Create, manage, and access your platform experience in a cleaner,
-              faster desktop environment.
-            </p>
+          <h1 className="downloadTitle">Download The App</h1>
+          <p className="downloadSubtitle">
+            A desktop experience for creating your fantasy
+          </p>
 
-            <div className="downloadActions">
+          <div className="downloadActions">
+            <button
+              type="button"
+              className="downloadButton"
+              onClick={handleDownload}
+              disabled={loading}
+            >
+              {loading ? "Preparing..." : "Download"}
+            </button>
+
+            <div className="downloadMeta">
+              {version ? `Version: ${version}` : "Checking version..."}
+            </div>
+          </div>
+        </section>
+
+        <section className="downloadSection">
+          <div className="sectionHeading">
+            
+          </div>
+
+          <div className="screenshotCarousel">
+            <div className="screenshotViewport">
               <button
                 type="button"
-                className="downloadButton"
-                onClick={handleDownload}
-                disabled={loading}
+                className="screenshotNav screenshotNav--left"
+                onClick={goPrevShot}
+                aria-label="Previous screenshot"
               >
-                {loading ? "Preparing..." : "Download App"}
+                ‹
               </button>
 
-              <div className="downloadMeta">
-                Windows support planned first. Additional platforms may follow.
-              </div>
+              <button
+                type="button"
+                className="screenshotFrame"
+                onClick={() => setModalOpen(true)}
+                aria-label={`Open ${currentShot.title} screenshot`}
+              >
+                <img
+                  className="screenshotImage"
+                  src={currentShot.image}
+                  alt={`${currentShot.title} screenshot`}
+                />
+              </button>
+
+              <button
+                type="button"
+                className="screenshotNav screenshotNav--right"
+                onClick={goNextShot}
+                aria-label="Next screenshot"
+              >
+                ›
+              </button>
             </div>
-          </div>
 
-          <div className="downloadHeroCard">
-            <div className="downloadPreview">
-              <div className="downloadPreviewTop">
-                <span className="previewDot" />
-                <span className="previewDot" />
-                <span className="previewDot" />
-              </div>
+            <div className="screenshotCaption">
+              <h3>{currentShot.title}</h3>
+              <p>{currentShot.description}</p>
+            </div>
 
-              <div className="downloadPreviewBody">
-                <div className="previewSidebar">
-                  <div className="previewSidebarItem active">Library</div>
-                  <div className="previewSidebarItem">Generate</div>
-                  <div className="previewSidebarItem">Projects</div>
-                  <div className="previewSidebarItem">Profile</div>
-                </div>
-
-                <div className="previewMain">
-                  <div className="previewMainHeader">App Experience TEMP TEMP TEMP</div>
-                  <div className="previewGrid">
-                    <div className="previewPanel large" />
-                    <div className="previewPanel" />
-                    <div className="previewPanel" />
-                    <div className="previewPanel wide" />
-                  </div>
-                </div>
-              </div>
+            <div className="screenshotDots" aria-label="Screenshot navigation">
+              {SCREENSHOTS.map((shot, index) => (
+                <button
+                  key={shot.title}
+                  type="button"
+                  className={`screenshotDot ${index === activeShot ? "is-active" : ""}`}
+                  aria-label={`Go to ${shot.title}`}
+                  aria-pressed={index === activeShot}
+                  onClick={() => setActiveShot(index)}
+                />
+              ))}
             </div>
           </div>
         </section>
 
-        <section className="downloadInfoGrid">
-          <div className="infoCard">
-            <h2>Why use the app?</h2>
-            <p>
-              The desktop version is intended to offer a more focused experience
-              for browsing, creating, and managing your content with fewer browser
-              limitations.
-            </p>
-          </div>
-
-          <div className="infoCard">
-            <h2>DMCA & rights complaints</h2>
-            <p>
-              We take copyright and intellectual property complaints seriously.
-              Valid DMCA notices and similar takedown requests may result in
-              content removal, restricted access, or account action where
-              appropriate.
-            </p>
-          </div>
-
-          <div className="infoCard">
-            <h2>Platform notice</h2>
-            <p>
-              All content on this platform is presented as AI-generated or
-              synthetic and is intended to depict adults only. Any content that
-              violates platform rules, applicable law, or safety standards is
-              prohibited.
-            </p>
-          </div>
-        </section>
-
-        <section className="faqSection">
+        <section className="downloadSection">
           <div className="sectionHeading">
-            <div className="sectionEyebrow">Help</div>
-            <h2>Frequently asked questions</h2>
+            <h2>Requirements</h2>
+            <p>Recommended for a comfortable desktop workflow.</p>
+          </div>
+
+          <div className="requirementsGrid">
+            <article className="requirementCard">
+              <h3>Minimum</h3>
+
+              <div className="requirementRow">
+                <span className="requirementLabel">GPU</span>
+                <span className="requirementValue">16GB NVIDIA GPU</span>
+              </div>
+
+              <div className="requirementRow">
+                <span className="requirementLabel">Memory</span>
+                <span className="requirementValue">32GB RAM</span>
+              </div>
+            </article>
+
+            <article className="requirementCard">
+              <h3>Recommended</h3>
+
+              <div className="requirementRow">
+                <span className="requirementLabel">GPU</span>
+                <span className="requirementValue">24GB NVIDIA GPU</span>
+              </div>
+
+              <div className="requirementRow">
+                <span className="requirementLabel">Memory</span>
+                <span className="requirementValue">64GB RAM</span>
+              </div>
+            </article>
+
+            <article className="requirementCard requirementCard--highlight">
+              <h3>Ideal</h3>
+
+              <div className="requirementRow">
+                <span className="requirementLabel">GPU</span>
+                <span className="requirementValue">
+                  RTX 5000 / 6000 Pro Blackwell
+                </span>
+              </div>
+
+                <div className="requirementRow">
+                <span className="requirementLabel">Memory</span>
+                <span className="requirementValue">64GB RAM</span>
+              </div>
+              
+            </article>
+          </div>
+        </section>
+
+        
+
+        <section className="downloadSection faqSection">
+          <div className="sectionHeading">
+            <h2>FAQ</h2>
           </div>
 
           <div className="faqList">
@@ -162,36 +294,37 @@ export default function Generate() {
             ))}
           </div>
         </section>
-
-        <section className="disclaimerSection">
-          <div className="sectionHeading">
-            <div className="sectionEyebrow">Important</div>
-            <h2>Disclaimers</h2>
-          </div>
-
-          <div className="disclaimerCard">
-            <p>
-              All content displayed or distributed through this platform is
-              represented as AI-generated, synthetic, or fictional and intended
-              to depict individuals aged 18 and over only.
-            </p>
-            <p>
-              Content that involves or appears to involve minors, coercion,
-              exploitation, non-consensual scenarios, unlawful material, or
-              prohibited real-person misuse is strictly forbidden.
-            </p>
-            <p>
-              Users are responsible for complying with all applicable laws,
-              regulations, and platform policies when accessing or using the
-              service.
-            </p>
-            <p>
-              Copyright, impersonation, privacy, and rights-holder complaints may
-              lead to removal of content and further moderation action.
-            </p>
-          </div>
-        </section>
       </div>
+
+      {modalOpen && (
+        <div
+          className="screenshotModalOverlay"
+          onClick={() => setModalOpen(false)}
+          role="dialog"
+          aria-modal="true"
+          aria-label={`${currentShot.title} screenshot enlarged`}
+        >
+          <div
+            className="screenshotModal"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              type="button"
+              className="screenshotModalClose"
+              onClick={() => setModalOpen(false)}
+              aria-label="Close screenshot"
+            >
+              ×
+            </button>
+
+            <img
+              className="screenshotModalImage"
+              src={currentShot.image}
+              alt={`${currentShot.title} screenshot enlarged`}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

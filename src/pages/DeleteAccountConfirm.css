@@ -1,0 +1,67 @@
+.deleteAccountPage {
+  width: min(100%, 1000px);
+  margin: 0 auto;
+  padding: 40px 20px 56px;
+}
+
+.deleteAccountCard {
+  max-width: 560px;
+  padding: 24px;
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.025), rgba(255,255,255,0.01)),
+    rgba(10, 10, 10, 0.94);
+}
+
+.deleteAccountTitle {
+  margin: 0 0 10px;
+  font-size: 32px;
+  color: #fff;
+}
+
+.deleteAccountText {
+  margin: 0 0 18px;
+  color: rgba(255, 255, 255, 0.72);
+  line-height: 1.65;
+}
+
+.deleteAccountForm {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.deleteAccountLabel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 14px;
+}
+
+.deleteAccountInput {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.03);
+  color: #fff;
+}
+
+.deleteAccountButton {
+  appearance: none;
+  border: 1px solid rgba(215, 76, 76, 0.22);
+  background: rgba(215, 76, 76, 0.14);
+  color: #fff;
+  border-radius: 14px;
+  padding: 13px 18px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.deleteAccountError {
+  color: #ff9c9c;
+  font-size: 14px;
+}

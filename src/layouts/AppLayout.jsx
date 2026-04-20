@@ -1,9 +1,37 @@
 import { useEffect, useState } from "react";
-import { NavLink, Outlet, useNavigate, useLocation } from "react-router-dom";
+import { NavLink, Outlet, useNavigate, useLocation, Link } from "react-router-dom";
 import Header from "../components/Header.jsx";
 import AuthModal from "../components/AuthModal.jsx";
 import Sidebar from "../components/Sidebar.jsx";
 import { resendVerificationEmail } from "../api.js";
+
+function PlatformNotice() {
+  return (
+    <section className="platformNotice" aria-label="Platform notice">
+      <div className="platformNoticeGrid">
+        <article className="platformNoticeCard">
+          <h3>DMCA & Rights</h3>
+          <p>
+            We review valid copyright and rights complaints and may remove content
+            or restrict accounts where necessary.
+          </p>
+          <Link to="/dmca" className="platformNoticeLink">
+            Read more
+          </Link>
+        </article>
+
+        <article className="platformNoticeCard">
+          <h3>Platform Notice</h3>
+          <p>
+            Content on this platform is presented as synthetic and intended to depict
+            adults aged 21+ and over only. Material that violates platform rules or
+            applicable law is prohibited.
+          </p>
+        </article>
+      </div>
+    </section>
+  );
+}
 
 export default function AppLayout({
   user,
@@ -27,7 +55,9 @@ export default function AppLayout({
 
   const isModerator = !!user?.isModerator;
   const isAccountRoute = location.pathname.startsWith("/account");
-  const hideSidebar = isAccountRoute;
+  const isLegalRoute = location.pathname.startsWith("/dmca");
+  const hideSidebar = isAccountRoute || isLegalRoute;
+  const useStandaloneLayout = isAccountRoute || isLegalRoute;
 
   useEffect(() => {
     if (hideSidebar) {
@@ -64,7 +94,11 @@ export default function AppLayout({
         setQ={setQ}
       />
 
-      <div className={`appShell ${isAccountRoute ? "appShell--account" : ""}`}>
+      <div
+        className={`appShell ${
+          useStandaloneLayout ? "appShell--account" : ""
+        }`}
+      >
         {!hideSidebar && (
           <Sidebar
             user={user}
@@ -74,9 +108,17 @@ export default function AppLayout({
           />
         )}
 
-        <main className={`appMain ${isAccountRoute ? "appMain--account" : ""}`}>
-          <div className={`appContent ${isAccountRoute ? "appContent--account" : ""}`}>
-            {user && user.emailVerified === false && (
+        <main
+          className={`appMain ${
+            useStandaloneLayout ? "appMain--account" : ""
+          }`}
+        >
+          <div
+            className={`appContent ${
+              useStandaloneLayout ? "appContent--account" : ""
+            }`}
+          >
+            {user && user.emailVerified === false && !isLegalRoute && (
               <div className="verifyBanner">
                 <div className="verifyBannerText">
                   Verify your email to unlock uploads, comments, ratings,
@@ -98,72 +140,59 @@ export default function AppLayout({
               </div>
             )}
 
-            {isAccountRoute ? (
+            {useStandaloneLayout ? (
               <Outlet context={{ q, setQ, user }} />
             ) : (
-              <section className="workspaceShell">
-                <nav className="folderTabs" aria-label="Workspace tabs">
-                  <NavLink
-                    to="/watch"
-                    end
-                    className={({ isActive }) => `folderTab ${isActive ? "active" : ""}`}
-                  >
-                    Watch
-                  </NavLink>
-
-                  {isModerator && (
+              <>
+                <section className="workspaceShell">
+                  <nav className="folderTabs" aria-label="Workspace tabs">
                     <NavLink
-                      to="/create"
+                      to="/watch"
+                      end
+                      className={({ isActive }) => `folderTab ${isActive ? "active" : ""}`}
+                    >
+                      Watch
+                    </NavLink>
+
+                    <NavLink
+                      to="/generate"
                       className={({ isActive }) =>
                         `folderTab ${isActive ? "active" : ""} ${!user ? "lockedTab" : ""}`
                       }
                       onClick={(e) => {
                         if (!user) {
                           e.preventDefault();
-                          onOpenLogin("/create");
+                          onOpenLogin("/generate");
                         }
                       }}
                     >
-                      Upload
+                      Generate
                     </NavLink>
-                  )}
 
-                  <NavLink
-                    to="/generate"
-                    className={({ isActive }) =>
-                      `folderTab ${isActive ? "active" : ""} ${!user ? "lockedTab" : ""}`
-                    }
-                    onClick={(e) => {
-                      if (!user) {
-                        e.preventDefault();
-                        onOpenLogin("/generate");
-                      }
-                    }}
-                  >
-                    Generate
-                  </NavLink>
-
-                  <NavLink
-                    to="/plans"
-                    className={({ isActive }) => `folderTab ${isActive ? "active" : ""}`}
-                  >
-                    Plans
-                  </NavLink>
-
-                  {isModerator && (
                     <NavLink
-                      to="/moderation"
+                      to="/plans"
                       className={({ isActive }) => `folderTab ${isActive ? "active" : ""}`}
                     >
-                      Moderation
+                      Plans
                     </NavLink>
-                  )}
-                </nav>
 
-                <div className="folderBody">
-                  <Outlet context={{ q, setQ, user }} />
-                </div>
-              </section>
+                    {isModerator && (
+                      <NavLink
+                        to="/moderation"
+                        className={({ isActive }) => `folderTab ${isActive ? "active" : ""}`}
+                      >
+                        Moderation
+                      </NavLink>
+                    )}
+                  </nav>
+
+                  <div className="folderBody">
+                    <Outlet context={{ q, setQ, user }} />
+                  </div>
+                </section>
+
+                <PlatformNotice />
+              </>
             )}
           </div>
         </main>

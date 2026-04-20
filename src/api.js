@@ -769,3 +769,37 @@ export async function saveProject(id, payload) {
   if (!r.ok) throw new Error("Failed to save project");
   return r.json();
 }
+
+
+export async function requestAccountDeletionEmail() {
+  const res = await fetch(`${API_BASE}/api/account/delete/request`, {
+    method: "POST",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+  });
+
+  const data = await res.json().catch(() => null);
+
+  if (!res.ok) {
+    throw new Error(data?.error || "Failed to request account deletion.");
+  }
+
+  return data;
+}
+
+export async function confirmAccountDeletion({ token, password }) {
+  const res = await fetch(`${API_BASE}/api/account/delete/confirm`, {
+    method: "POST",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ token, password }),
+  });
+
+  const data = await res.json().catch(() => null);
+
+  if (!res.ok) {
+    throw new Error(data?.error || "Failed to confirm account deletion.");
+  }
+
+  return data;
+}

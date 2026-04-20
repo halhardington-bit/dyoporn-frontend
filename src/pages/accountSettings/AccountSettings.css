@@ -606,3 +606,45 @@
   opacity: 0.6;
   cursor: default;
 }
+
+
+.accountDangerBlock {
+  max-width: 720px;
+}
+
+.accountDangerTitle {
+  margin: 0 0 10px;
+  font-size: 20px;
+  color: #fff;
+}
+
+.accountDangerText {
+  margin: 0 0 12px;
+  color: rgba(255, 255, 255, 0.72);
+  line-height: 1.65;
+}
+
+.accountDangerActions {
+  margin-top: 18px;
+}
+
+.accountDangerButton {
+  appearance: none;
+  border: 1px solid rgba(215, 76, 76, 0.22);
+  background: rgba(215, 76, 76, 0.14);
+  color: #fff;
+  border-radius: 14px;
+  padding: 13px 18px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.accountDangerButton:hover:not(:disabled) {
+  background: rgba(215, 76, 76, 0.2);
+}
+
+.accountDangerButton:disabled {
+  opacity: 0.72;
+  cursor: default;
+}

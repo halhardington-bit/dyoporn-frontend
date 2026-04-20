@@ -1,4 +1,4 @@
-.page--legal {
+.dmcaStandalonePage {
   padding: 28px 20px 56px;
 }
 
@@ -18,7 +18,7 @@
   background:
     radial-gradient(circle at top right, rgba(212, 175, 55, 0.09), transparent 28%),
     radial-gradient(circle at left center, rgba(255, 255, 255, 0.06), transparent 24%),
-    linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01)),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.01)),
     rgba(10, 10, 10, 0.94);
 }
 
@@ -28,12 +28,12 @@
   margin-bottom: 12px;
   padding: 7px 10px;
   border-radius: 999px;
-  border: 1px solid rgba(255,255,255,0.08);
-  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04);
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.12em;
-  color: rgba(255,255,255,0.62);
+  color: rgba(255, 255, 255, 0.62);
 }
 
 .dmcaHeroTitle {
@@ -48,7 +48,7 @@
   margin: 0;
   font-size: 15px;
   line-height: 1.65;
-  color: rgba(255,255,255,0.72);
+  color: rgba(255, 255, 255, 0.72);
 }
 
 .dmcaHeroCard {
@@ -59,27 +59,27 @@
   padding: 16px 18px;
   border-radius: 18px;
   border: 1px solid rgba(212, 175, 55, 0.16);
-  background: rgba(255,255,255,0.03);
+  background: rgba(255, 255, 255, 0.03);
 }
 
 .dmcaHeroCardLabel {
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.12em;
-  color: rgba(255,255,255,0.52);
   text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.52);
 }
 
 .dmcaHeroCardEmail {
   font-size: 22px;
   font-weight: 700;
-  color: #f4d377;
   line-height: 1.1;
+  color: #f4d377;
 }
 
 .dmcaHeroCardSub {
   font-size: 13px;
-  color: rgba(255,255,255,0.62);
+  color: rgba(255, 255, 255, 0.62);
 }
 
 .dmcaGrid {
@@ -91,16 +91,16 @@
 .dmcaPanel {
   padding: 24px;
   border-radius: 22px;
-  border: 1px solid rgba(255,255,255,0.07);
+  border: 1px solid rgba(255, 255, 255, 0.07);
   background:
-    linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01)),
     rgba(9, 9, 9, 0.94);
 }
 
 .dmcaPanelPrimary {
   background:
-    radial-gradient(circle at top left, rgba(255,255,255,0.04), transparent 28%),
-    linear-gradient(180deg, rgba(255,255,255,0.025), rgba(255,255,255,0.01)),
+    radial-gradient(circle at top left, rgba(255, 255, 255, 0.04), transparent 28%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.025), rgba(255, 255, 255, 0.01)),
     rgba(9, 9, 9, 0.94);
 }
 
@@ -123,9 +123,9 @@
   height: 34px;
   flex-shrink: 0;
   border-radius: 999px;
-  border: 1px solid rgba(255,255,255,0.08);
-  background: rgba(255,255,255,0.04);
-  color: rgba(255,255,255,0.68);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.68);
   font-size: 12px;
   font-weight: 700;
 }
@@ -133,31 +133,31 @@
 .dmcaPanel h2 {
   margin: 0;
   font-size: 21px;
-  color: #ffffff;
   line-height: 1.2;
+  color: #ffffff;
 }
 
 .dmcaPanel p {
   margin: 0;
-  color: rgba(255,255,255,0.72);
-  line-height: 1.65;
   font-size: 14px;
+  line-height: 1.65;
+  color: rgba(255, 255, 255, 0.72);
 }
 
 .dmcaChecklist {
+  display: grid;
+  gap: 12px;
   margin: 0;
   padding: 0;
   list-style: none;
-  display: grid;
-  gap: 12px;
 }
 
 .dmcaChecklist li {
   position: relative;
   padding-left: 18px;
-  color: rgba(255,255,255,0.74);
-  line-height: 1.6;
   font-size: 14px;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.74);
 }
 
 .dmcaChecklist li::before {
@@ -175,8 +175,8 @@
   margin-top: 16px;
   padding: 15px 16px;
   border-radius: 16px;
-  border: 1px solid rgba(255,255,255,0.07);
-  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: rgba(255, 255, 255, 0.03);
 }
 
 .dmcaCalloutRow + .dmcaCalloutRow {
@@ -189,20 +189,20 @@
   font-size: 11px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: rgba(255,255,255,0.5);
+  color: rgba(255, 255, 255, 0.5);
 }
 
 .dmcaCalloutValue {
   display: block;
-  color: rgba(255,255,255,0.88);
   font-size: 14px;
+  color: rgba(255, 255, 255, 0.88);
 }
 
 .dmcaQuote {
   padding: 16px 18px;
   border-radius: 16px;
-  border: 1px solid rgba(255,255,255,0.08);
-  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
 }
 
 .dmcaQuote p + p {
@@ -224,7 +224,7 @@
 }
 
 @media (max-width: 640px) {
-  .page--legal {
+  .dmcaStandalonePage {
     padding: 20px 14px 40px;
   }
 

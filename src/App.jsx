@@ -6,7 +6,6 @@ import AppLayout from "./layouts/AppLayout.jsx";
 import Home from "./pages/Home.jsx";
 import Watch from "./pages/Watch.jsx";
 import Plans from "./pages/Plans.jsx";
-import Create from "./pages/Create.jsx";
 import Profile from "./pages/Profile.jsx";
 import EditProfile from "./pages/EditProfile.jsx";
 import Generate from "./pages/Generate.jsx";
@@ -32,6 +31,8 @@ import AccountSettingsLayout from "./pages/accountSettings/AccountSettingsLayout
 import AccountSettingsLanding from "./pages/accountSettings/AccountSettingsLanding.jsx";
 import AccountSecurity from "./pages/accountSettings/AccountSecurity.jsx";
 import AccountBilling from "./pages/accountSettings/AccountBilling.jsx";
+import DeleteAccountConfirm from "./pages//DeleteAccountConfirm.jsx";
+import AccountDanger from "./pages/accountSettings/AccountDanger.jsx";
 
 const BETA_LOCK = false;
 const AGE_GATE_STORAGE_KEY = "dyop_age_gate_v1";
@@ -155,6 +156,7 @@ export default function App() {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/beta" element={<BetaSignup />} />
+        <Route path="/delete-account" element={<DeleteAccountConfirm />} />
 
         <Route
           element={
@@ -182,10 +184,7 @@ export default function App() {
             path="/watch/:id"
             element={<Watch user={user} onRequireLogin={openLogin} />}
           />
-          <Route
-            path="/create"
-            element={<Create user={user} onRequireLogin={openLogin} />}
-          />
+          
           <Route
             path="/plans"
             element={<Plans user={user} onRequireLogin={openLogin} />}
@@ -271,6 +270,11 @@ export default function App() {
             />
 
             <Route
+              path="danger"
+              element={<AccountDanger user={user} onLogout={handleLogout} />}
+            />
+
+            <Route
               path="billing"
               element={
                 <AccountBilling
@@ -280,6 +284,10 @@ export default function App() {
               }
             />
           </Route>
+
+          
+
+          
 
           
 

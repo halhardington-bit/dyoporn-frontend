@@ -4,10 +4,6 @@ import { getVideos, getHomeRows } from "../api.js";
 import { VideoShelf } from "../ui/VideoShelf.jsx";
 import VideoCard from "../ui/VideoCard.jsx";
 
-
-
-
-
 function normTag(t) {
   return String(t || "").trim().toLowerCase();
 }
@@ -55,10 +51,42 @@ function buildRowsByTags(videos, { maxRows = 8, minCount = 2 } = {}) {
   });
 
   if (other.length) {
-    rows.push({ title: "Other", key: "tag:other", videos: other });
+    rows.push({
+      title: "Other",
+      key: "tag:other",
+      videos: other,
+    });
   }
 
   return rows;
+}
+
+function dedupeShelfRows(rows, { minRowSize = 1 } = {}) {
+  if (!Array.isArray(rows)) return [];
+
+  const seen = new Set();
+  const dedupedRows = [];
+
+  for (const row of rows) {
+    const inputVideos = Array.isArray(row?.videos) ? row.videos : [];
+
+    const uniqueVideos = inputVideos.filter((video) => {
+      const id = String(video?.id ?? "").trim();
+      if (!id) return false;
+      if (seen.has(id)) return false;
+      seen.add(id);
+      return true;
+    });
+
+    if (uniqueVideos.length >= minRowSize) {
+      dedupedRows.push({
+        ...row,
+        videos: uniqueVideos,
+      });
+    }
+  }
+
+  return dedupedRows;
 }
 
 function getVideoCreatedAtMs(video) {
@@ -123,6 +151,36 @@ function HomeBetaBanner() {
   );
 }
 
+function PlatformNotice() {
+  return (
+    <section className="watchNotice">
+      <div className="watchNoticeInner">
+        <div className="watchNoticeGrid">
+          <div className="watchNoticeBlock">
+            <h3>DMCA & rights complaints</h3>
+            <p>
+              We review valid copyright and rights complaints and may remove
+              content or restrict accounts where necessary.
+            </p>
+            <Link to="/dmca" className="watchNoticeLink">
+              Read more
+            </Link>
+          </div>
+
+          <div className="watchNoticeBlock">
+            <h3>Platform notice</h3>
+            <p>
+              Content on this platform is presented as synthetic and intended to
+              depict adults aged 21+ and over only. Material that violates
+              platform rules or applicable law is prohibited.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export default function Home({ user, onRequireLogin }) {
   const outlet = useOutletContext?.() || {};
   const setQ = outlet.setQ || (() => {});
@@ -144,7 +202,6 @@ export default function Home({ user, onRequireLogin }) {
   const sort = (params.get("sort") || "").trim().toLowerCase();
   const time = (params.get("time") || "all").trim().toLowerCase();
   const refreshKey = (params.get("_refresh") || "").trim();
-  
 
   const [videos, setVideos] = useState([]);
   const [homeRows, setHomeRows] = useState([]);
@@ -208,7 +265,9 @@ export default function Home({ user, onRequireLogin }) {
         if (isLoggedIn) {
           const rows = await getHomeRows();
           if (!alive) return;
-          setHomeRows(Array.isArray(rows) ? rows : []);
+
+          const safeRows = Array.isArray(rows) ? rows : [];
+          setHomeRows(dedupeShelfRows(safeRows));
           setVideos([]);
           return;
         }
@@ -251,17 +310,20 @@ export default function Home({ user, onRequireLogin }) {
 
   const tagRows = useMemo(() => {
     if (isSearching || isLoggedIn) return [];
-    return buildRowsByTags(videos, { maxRows: 8, minCount: 2 });
+
+    return dedupeShelfRows(
+      buildRowsByTags(videos, { maxRows: 8, minCount: 2 })
+    );
   }, [isSearching, isLoggedIn, videos]);
 
   if (isSearching) {
     const headerLabel = isRatedMode
       ? "Recently Rated"
       : isHistoryMode
-      ? "Watch History"
-      : isWatchLaterMode
-      ? "Watch Later"
-      : `Results for “${urlQ}”`;
+        ? "Watch History"
+        : isWatchLaterMode
+          ? "Watch Later"
+          : `Results for “${urlQ}”`;
 
     return (
       <div className="page page--home">
@@ -273,10 +335,10 @@ export default function Home({ user, onRequireLogin }) {
                   {isRatedMode
                     ? "Loading recently rated…"
                     : isHistoryMode
-                    ? "Loading history…"
-                    : isWatchLaterMode
-                    ? "Loading Watch Later…"
-                    : "Searching…"}
+                      ? "Loading history…"
+                      : isWatchLaterMode
+                        ? "Loading Watch Later…"
+                        : "Searching…"}
                 </span>
               ) : (
                 <span>
@@ -294,10 +356,10 @@ export default function Home({ user, onRequireLogin }) {
                     isRatedMode
                       ? sort || "recent-rating"
                       : isHistoryMode
-                      ? sort || "recent-history"
-                      : isWatchLaterMode
-                      ? sort || "recent-watch-later"
-                      : sort || "newest"
+                        ? sort || "recent-history"
+                        : isWatchLaterMode
+                          ? sort || "recent-watch-later"
+                          : sort || "newest"
                   }
                   onChange={(e) => setParam({ sort: e.target.value })}
                 >
@@ -361,10 +423,10 @@ export default function Home({ user, onRequireLogin }) {
                 {isRatedMode
                   ? "No rated videos yet"
                   : isHistoryMode
-                  ? "No watch history yet"
-                  : isWatchLaterMode
-                  ? "No Watch Later videos yet"
-                  : "No results"}
+                    ? "No watch history yet"
+                    : isWatchLaterMode
+                      ? "No Watch Later videos yet"
+                      : "No results"}
               </div>
 
               <div className="emptySub">
@@ -416,7 +478,6 @@ export default function Home({ user, onRequireLogin }) {
 
   return (
     <div className="page page--home">
-
       {SHOW_BETA_BANNER && !isLoggedIn ? <HomeBetaBanner /> : null}
 
       {loading ? (
@@ -425,14 +486,15 @@ export default function Home({ user, onRequireLogin }) {
         <div className="feedInner">
           {isLoggedIn
             ? homeRows.map((row) => {
+                const rowVideos = row.videos || [];
                 const startIndex = cursor;
-                cursor += (row.videos || []).length;
+                cursor += rowVideos.length;
 
                 return (
                   <VideoShelf
                     key={row.key}
                     title={row.title}
-                    videos={row.videos || []}
+                    videos={rowVideos}
                     user={user}
                     onRequireLogin={onRequireLogin}
                     startIndex={startIndex}
@@ -441,14 +503,15 @@ export default function Home({ user, onRequireLogin }) {
                 );
               })
             : tagRows.map((row) => {
+                const rowVideos = row.videos || [];
                 const startIndex = cursor;
-                cursor += row.videos.length;
+                cursor += rowVideos.length;
 
                 return (
                   <VideoShelf
                     key={row.key}
                     title={row.title}
-                    videos={row.videos}
+                    videos={rowVideos}
                     user={user}
                     onRequireLogin={onRequireLogin}
                     startIndex={startIndex}
@@ -459,5 +522,6 @@ export default function Home({ user, onRequireLogin }) {
         </div>
       )}
     </div>
+    
   );
 }
