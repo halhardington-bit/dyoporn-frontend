@@ -55,7 +55,7 @@ const MONTHS = [
   { value: "6", label: "Jun" },
   { value: "7", label: "Jul" },
   { value: "8", label: "Aug" },
-  { value: "9", label: "Sept" },
+  { value: "9", label: "Sep" },
   { value: "10", label: "Oct" },
   { value: "11", label: "Nov" },
   { value: "12", label: "Dec" },
@@ -100,14 +100,14 @@ export default function BetaSignup() {
       return;
     }
 
-    const builtDob = buildDateOfBirth(birthYear, birthMonth, birthDay);
+    const dateOfBirth = buildDateOfBirth(birthYear, birthMonth, birthDay);
 
-    if (!builtDob) {
+    if (!dateOfBirth) {
       setError("Please enter your date of birth.");
       return;
     }
 
-    const age = calculateAge(builtDob);
+    const age = calculateAge(dateOfBirth);
 
     if (age == null) {
       setError("Please enter a valid date of birth.");
@@ -136,7 +136,7 @@ export default function BetaSignup() {
         email: email.trim().toLowerCase(),
         username: username.trim(),
         password,
-        dateOfBirth: builtDob,
+        dateOfBirth,
         country: country.trim() || null,
       });
 
@@ -229,52 +229,51 @@ export default function BetaSignup() {
               disabled={status === "loading"}
             />
 
-            <div className="betaDobGroup">
-              
+            <div className="betaDobRow">
+              <select
+                className="betaInput betaSelect"
+                value={birthDay}
+                onChange={(e) => setBirthDay(e.target.value)}
+                disabled={status === "loading"}
+                aria-label="Birth day"
+              >
+                <option value="">Day</option>
+                {dayOptions.map((day) => (
+                  <option key={day} value={day}>
+                    {day}
+                  </option>
+                ))}
+              </select>
 
-              <div className="betaDobRow">
-                <select
-                  className="betaInput betaSelect"
-                  value={birthDay}
-                  onChange={(e) => setBirthDay(e.target.value)}
-                  disabled={status === "loading"}
-                >
-                  <option value="">Day</option>
-                  {dayOptions.map((day) => (
-                    <option key={day} value={day}>
-                      {day}
-                    </option>
-                  ))}
-                </select>
+              <select
+                className="betaInput betaSelect"
+                value={birthMonth}
+                onChange={(e) => setBirthMonth(e.target.value)}
+                disabled={status === "loading"}
+                aria-label="Birth month"
+              >
+                <option value="">Month</option>
+                {MONTHS.map((month) => (
+                  <option key={month.value} value={month.value}>
+                    {month.label}
+                  </option>
+                ))}
+              </select>
 
-                <select
-                  className="betaInput betaSelect"
-                  value={birthMonth}
-                  onChange={(e) => setBirthMonth(e.target.value)}
-                  disabled={status === "loading"}
-                >
-                  <option value="">Month</option>
-                  {MONTHS.map((month) => (
-                    <option key={month.value} value={month.value}>
-                      {month.label}
-                    </option>
-                  ))}
-                </select>
-
-                <select
-                  className="betaInput betaSelect"
-                  value={birthYear}
-                  onChange={(e) => setBirthYear(e.target.value)}
-                  disabled={status === "loading"}
-                >
-                  <option value="">Year</option>
-                  {yearOptions.map((year) => (
-                    <option key={year} value={year}>
-                      {year}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              <select
+                className="betaInput betaSelect"
+                value={birthYear}
+                onChange={(e) => setBirthYear(e.target.value)}
+                disabled={status === "loading"}
+                aria-label="Birth year"
+              >
+                <option value="">Year</option>
+                {yearOptions.map((year) => (
+                  <option key={year} value={year}>
+                    {year}
+                  </option>
+                ))}
+              </select>
             </div>
 
             <input
