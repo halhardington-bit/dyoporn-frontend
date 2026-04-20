@@ -9,10 +9,16 @@
   color: #f5f5f5;
 }
 
+.betaNoise,
+.betaGlow,
+.betaGlowA,
+.betaGlowB {
+  pointer-events: none !important;
+}
+
 .betaNoise {
   position: absolute;
   inset: 0;
-  pointer-events: none;
   opacity: 0.05;
   background-image:
     linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px),
@@ -25,7 +31,6 @@
 .betaGlow {
   position: absolute;
   border-radius: 999px;
-  pointer-events: none;
   filter: blur(110px);
   opacity: 0.12;
 }
@@ -110,28 +115,33 @@
   display: inline-block;
 }
 
-.betaBrand {
-  position: relative;
-  z-index: 2;
-  font-size: clamp(3rem, 7vw, 5.9rem);
-  line-height: 0.9;
-  font-weight: 900;
-  letter-spacing: -0.07em;
-  color: #ffffff;
+.betaLogo {
+  width: 220px;
+  height: auto;
+  display: block;
+  filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.08));
 }
 
-.betaBrandShadow {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  transform: translate(7px, 6px);
-  font-size: clamp(3rem, 7vw, 5.9rem);
-  line-height: 0.9;
-  font-weight: 900;
-  letter-spacing: -0.07em;
-  color: rgba(255, 255, 255, 0.12);
-  user-select: none;
-  pointer-events: none;
+.betaSocials {
+  margin-bottom: 14px;
+}
+
+.betaDivider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin: 10px 0 18px;
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 0.9rem;
+}
+
+.betaDivider::before,
+.betaDivider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .betaForm {
@@ -140,13 +150,6 @@
   gap: 16px;
   width: 100%;
   max-width: 760px;
-}
-
-.betaInputRow {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 12px;
-  align-items: center;
 }
 
 .betaInput {
@@ -182,6 +185,28 @@
   box-shadow: none;
 }
 
+/* =========================
+   DATE INPUT FIX
+   ========================= */
+
+.betaInputDate {
+  height: 48px;
+  padding: 0 14px;
+  font-size: 0.95rem;
+  appearance: none;
+  -webkit-appearance: none;
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.betaInputDate::-webkit-date-and-time-value {
+  text-align: left;
+}
+
+.betaInputDate::-webkit-calendar-picker-indicator {
+  opacity: 0.9;
+  cursor: pointer;
+}
+
 .betaButton {
   height: 58px;
   min-width: 160px;
@@ -211,131 +236,20 @@
   cursor: default;
 }
 
-.betaOptional {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding-top: 2px;
-}
-
-.betaOptionalLabel {
-  font-size: 0.93rem;
-  line-height: 1.4;
-  color: rgba(255, 255, 255, 0.64);
-}
-
-.betaChecks {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-.betaCheck {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  min-height: 44px;
-  padding: 0 14px;
-  border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.09);
-  background: rgba(255, 255, 255, 0.035);
-  color: rgba(255, 255, 255, 0.9);
-  cursor: pointer;
-  user-select: none;
-  transition:
-    background 0.16s ease,
-    border-color 0.16s ease,
-    transform 0.16s ease;
-}
-
-.betaCheck:hover {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.14);
-  transform: translateY(-1px);
-}
-
-.betaCheck.isChecked {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.18);
-}
-
-.betaCheck input {
-  flex: 0 0 auto;
-  accent-color: white;
-  margin: 0;
-}
-
-.betaMessage {
-  margin-top: 2px;
-  padding: 13px 15px;
-  border-radius: 14px;
-  font-size: 0.94rem;
-  font-weight: 600;
-}
-
-.betaMessage.success {
-  background: rgba(255, 255, 255, 0.08);
+.betaButtonGoogle {
+  width: 100%;
   border: 1px solid rgba(255, 255, 255, 0.12);
-  color: #ffffff;
+  background: rgba(255, 255, 255, 0.03);
+  color: rgba(255, 255, 255, 0.92);
 }
 
-.betaMessage.error {
+.betaButtonGoogle:hover:not(:disabled) {
   background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #d8d8d8;
-}
-
-/* Make date input feel native + slimmer */
-.betaInput[type="date"] {
-  height: 48px;              /* smaller than 58px */
-  padding: 0 14px;
-  font-size: 0.95rem;
-}
-
-/* Mobile-specific tightening */
-@media (max-width: 760px) {
-  .betaInput[type="date"] {
-    height: 44px;
-    font-size: 0.9rem;
-  }
-}
-
-.betaInput[type="date"] {
-  appearance: none;
-  -webkit-appearance: none;
-}
-
-@media (max-width: 760px) {
-  .betaWrap {
-    padding: 20px;
-  }
-
-  .betaShell {
-    padding: 34px 24px 24px;
-    border-radius: 26px;
-  }
-
-  .betaInputRow {
-    grid-template-columns: 1fr;
-  }
-
-  .betaButton {
-    width: 100%;
-    min-width: 0;
-  }
-
-  .betaChecks {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .betaCheck {
-    width: 100%;
-    justify-content: flex-start;
-  }
 }
 
 .betaButtonPrimary {
+  margin-top: 10px;
+  align-self: flex-start;
   appearance: none;
   border: 1px solid rgba(212, 175, 55, 0.28);
   background:
@@ -364,7 +278,7 @@
     background 160ms ease;
 }
 
-.betaButtonPrimary:hover {
+.betaButtonPrimary:hover:not(:disabled) {
   border-color: rgba(212, 175, 55, 0.48);
   color: #e7c86f;
   box-shadow:
@@ -382,148 +296,48 @@
   cursor: not-allowed;
 }
 
-.betaButtonPrimary {
-  margin-top: 10px;
-  align-self: flex-start;
+.betaMessage {
+  margin-top: 2px;
+  padding: 13px 15px;
+  border-radius: 14px;
+  font-size: 0.94rem;
+  font-weight: 600;
 }
 
-.betaBrand {
-  position: relative;
-  z-index: 2;
-  font-family: "Space Grotesk", sans-serif;
-  font-size: clamp(3rem, 7vw, 5.8rem);
-  font-weight: 800;
-  letter-spacing: -0.03em;
-  color: white;
-  line-height: 0.9;
-}
-
-.betaSocials {
-  margin-bottom: 14px;
-}
-
-.betaDivider {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  margin: 10px 0 18px;
-  color: rgba(255, 255, 255, 0.45);
-  font-size: 0.9rem;
-}
-
-.betaDivider::before,
-.betaDivider::after {
-  content: "";
-  flex: 1;
-  height: 1px;
+.betaMessage.success {
   background: rgba(255, 255, 255, 0.08);
-}
-
-.betaButtonGoogle {
-  width: 100%;
   border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.03);
-  color: rgba(255, 255, 255, 0.92);
+  color: #ffffff;
 }
 
-.betaButtonGoogle:hover {
+.betaMessage.error {
   background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #d8d8d8;
 }
 
-.betaBrandShadow {
-  position: absolute;
-  inset: 0;
-  transform: translate(6px, 6px);
-  font-family: "Space Grotesk", sans-serif;
-  font-size: clamp(3rem, 7vw, 5.8rem);
-  font-weight: 800;
-  letter-spacing: -0.03em;
-  color: rgba(255,255,255,0.05);
-  pointer-events: none;
-}
+@media (max-width: 760px) {
+  .betaWrap {
+    padding: 20px;
+  }
 
-.betaCheck input {
-  width: 18px;
-  height: 18px;
-  accent-color: white;
-  margin: 0;
-}
+  .betaShell {
+    padding: 34px 24px 24px;
+    border-radius: 26px;
+  }
 
-.betaCheck.isChecked {
-  background: rgba(255, 255, 255, 0.16);
-  border-color: rgba(255, 255, 255, 0.32);
-}
+  .betaButton {
+    width: 100%;
+    min-width: 0;
+  }
 
-.betaCheck {
-  -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;
-}
+  .betaButtonPrimary {
+    align-self: stretch;
+  }
 
-.betaNoise,
-.betaGlow,
-.betaGlowA,
-.betaGlowB {
-  pointer-events: none !important;
-}
-
-.betaCheck {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  cursor: pointer;
-  position: relative;
-  user-select: none;
-}
-
-/* hide the native checkbox */
-.betaCheck input {
-  position: absolute;
-  opacity: 0;
-  pointer-events: none;
-}
-
-/* custom square */
-.betaCheck::before {
-  content: "";
-  width: 18px;
-  height: 18px;
-  border-radius: 4px;
-  border: 2px solid rgba(255,255,255,0.5);
-  background: transparent;
-  transition: all 0.15s ease;
-}
-
-/* checked state */
-.betaCheck.isChecked::before {
-  background: white;
-  border-color: white;
-}
-
-/* checkmark */
-.betaCheck.isChecked::after {
-  content: "";
-  position: absolute;
-  left: 21px;
-  top: 11px;
-  width: 6px;
-  height: 14px;
-  border: solid black;
-  border-width: 0 2px 2px 0;
-  transform: rotate(45deg);
-}
-
-.betaLogo {
-  width: 220px; /* tweak this */
-  height: auto;
-  display: block;
-}
-
-/* Optional: keep your glow vibe */
-.betaBrandBlock {
-  position: relative;
-}
-
-.betaLogo {
-  filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.08));
+  .betaInputDate {
+    height: 44px;
+    padding: 0 12px;
+    font-size: 0.9rem;
+  }
 }

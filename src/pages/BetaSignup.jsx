@@ -185,12 +185,13 @@ export default function BetaSignup() {
             />
 
             <input
-              className="betaInput"
+              className="betaInput betaInputDate"
               type="date"
               value={dateOfBirth}
               onChange={(e) => setDateOfBirth(e.target.value)}
               max={new Date().toISOString().split("T")[0]}
               disabled={status === "loading"}
+              aria-label="Date of birth"
             />
 
             <input
