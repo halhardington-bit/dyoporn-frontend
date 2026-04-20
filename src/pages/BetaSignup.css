@@ -152,6 +152,14 @@
   max-width: 760px;
 }
 
+.betaFieldLabel {
+  display: block;
+  margin: 2px 0 -6px;
+  font-size: 0.92rem;
+  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.5);
+}
+
 .betaInput {
   display: block;
   width: 100%;
@@ -187,6 +195,7 @@
 
 .betaInputDate {
   height: 58px;
+  color: rgba(255, 255, 255, 0.72);
   color-scheme: dark;
 }
 
@@ -194,12 +203,10 @@
   text-align: left;
 }
 
-.betaInputDate[type="text"] {
-  color: #ffffff;
-}
-
-.betaInputDate[type="text"]::placeholder {
-  color: rgba(255, 255, 255, 0.38);
+.betaInputDate::-webkit-calendar-picker-indicator {
+  opacity: 0.72;
+  cursor: pointer;
+  filter: invert(1);
 }
 
 .betaButton {
