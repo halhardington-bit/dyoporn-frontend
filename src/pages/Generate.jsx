@@ -111,34 +111,13 @@ export default function Generate() {
     setActiveShot((prev) => (prev === SCREENSHOTS.length - 1 ? 0 : prev + 1));
   }
 
-  async function handleDownload() {
-    if (loading) return;
-
-    setLoading(true);
-
-    try {
-      const res = await fetch(`${API_BASE}/system/latest-version.json`);
-      const data = await res.json().catch(() => null);
-
-      if (!res.ok) {
-        throw new Error(data?.error || "Failed to fetch version info");
-      }
-
-      const url = data?.engine_patch_url;
-
-      if (!url) {
-        alert("Download not available yet.");
-        return;
-      }
-
-      window.open(url, "_blank", "noopener,noreferrer");
-    } catch (err) {
-      console.error("Download failed:", err);
-      alert("Failed to fetch download.");
-    } finally {
-      setLoading(false);
-    }
-  }
+  function handleDownload() {
+  window.open(
+    "https://drive.google.com/uc?export=download&id=10QlyGqbgY9PGggz63oe37k01fsfZfcI4",
+    "_blank",
+    "noopener,noreferrer"
+  );
+}
 
   return (
     <div className="page">
