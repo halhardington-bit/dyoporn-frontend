@@ -170,15 +170,21 @@ export default function ModerationReports() {
                     return (
                       <tr key={row.id}>
                         <td>
-                          <Link
-                            to={`/watch/${row.videoId}`}
-                            className="moderationReportsLink"
-                          >
-                            {row.videoTitle || `Video #${row.videoId}`}
-                          </Link>
+                          {row.videoId ? (
+                            <Link
+                              to={`/watch/${row.videoId}`}
+                              className="moderationReportsLink"
+                            >
+                              {row.videoTitle || `Video #${row.videoId}`}
+                            </Link>
+                          ) : (
+                            <span className="moderationReportsDeletedVideo">
+                              {row.videoTitle || "Deleted video"}
+                            </span>
+                          )}
 
                           <div className="moderationReportsMeta">
-                            Video ID: {row.videoId}
+                            {row.videoId ? `Video ID: ${row.videoId}` : "Video deleted"}
                             {row.visibility ? ` • Visibility: ${row.visibility}` : ""}
                           </div>
                         </td>

@@ -283,6 +283,11 @@
   white-space: nowrap;
 }
 
+.moderationReportsDeletedVideo {
+  color: #ff9f9f;
+  font-weight: 800;
+}
+
 .moderationReportsPagination {
   display: flex;
   align-items: center;
