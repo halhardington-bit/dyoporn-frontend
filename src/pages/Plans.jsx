@@ -135,10 +135,17 @@ export default function Plans({ user, onRequireLogin }) {
               <div className="planInner">
                 <div className="planName">{plan.name}</div>
 
-                <div className="planPriceRow">
-                  <span className="planCurrency">$</span>
-                  <span className="planPrice">{plan.price}</span>
-                  <span className="planPer">/month</span>
+                <div className="planPriceStack">
+                  <div className="planPriceRow planPriceRow--beta">
+                    <span className="planCurrency">$</span>
+                    <span className="planPrice">{plan.price}</span>
+                    <span className="planPer">/month</span>
+                  </div>
+
+                  <div className="planBetaPrice">
+                    <span className="planBetaPriceMain">$0.00</span>
+                    <span className="planBetaPriceSub">During Beta</span>
+                  </div>
                 </div>
 
                 <div className="planSub">{plan.sub}</div>

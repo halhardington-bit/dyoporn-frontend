@@ -1101,6 +1101,51 @@ select {
   color: #fff;
 }
 
+.planPriceStack {
+  margin-top: 28px;
+  display: grid;
+  gap: 10px;
+}
+
+.planPriceRow--beta {
+  margin-top: 0;
+  opacity: 0.46;
+  position: relative;
+  width: fit-content;
+}
+
+.planPriceRow--beta::after {
+  content: "";
+  position: absolute;
+  left: -4px;
+  right: -8px;
+  top: 52%;
+  height: 2px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.75);
+  transform: rotate(-4deg);
+}
+
+.planBetaPrice {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.planBetaPriceMain {
+  font-size: clamp(38px, 4vw, 50px);
+  line-height: 0.95;
+  font-weight: 200;
+  letter-spacing: -0.04em;
+  color: #f4d377;
+}
+
+.planBetaPriceSub {
+  font-size: 14px;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.72);
+}
+
 .planCurrency {
   font-size: 24px;
   font-weight: 700;
