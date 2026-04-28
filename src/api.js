@@ -631,6 +631,33 @@ export async function updateModerationUser(userId, payload) {
   return data;
 }
 
+export async function apiFetch(url, options = {}) {
+  const res = await fetch(url, {
+    credentials: "include",
+    ...options,
+  });
+
+  let data = null;
+
+  try {
+    data = await res.json();
+  } catch {}
+
+  if (res.status === 403 && data?.code === "REGION_BLOCKED") {
+    alert("This service is only available in Australia.");
+
+    // optional redirect
+    window.location.href = "/";
+    return;
+  }
+
+  if (!res.ok) {
+    throw new Error(data?.error || "Request failed");
+  }
+
+  return data;
+}
+
 export async function registerBeta({
   email,
   username,
@@ -658,15 +685,11 @@ export async function registerBeta({
 
 // AUTH
 export async function login({ email, password }) {
-  const res = await fetch(`${API_BASE}/auth/login`, {
+  return apiFetch(`${API_BASE}/auth/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    credentials: "include",
     body: JSON.stringify({ email, password }),
   });
-  const data = await res.json().catch(() => null);
-  if (!res.ok) throw new Error(data?.error || `Login failed: ${res.status}`);
-  return data;
 }
 
 export async function register({
