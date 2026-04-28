@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useEffect, useState, useCallback } from "react";
-import { me, logout } from "./api";
+import { me, logout, checkRegion } from "./api";
 
 import AppLayout from "./layouts/AppLayout.jsx";
 import Home from "./pages/Home.jsx";
@@ -17,6 +17,7 @@ import BetaSignup from "./pages/BetaSignup.jsx";
 import VerifyEmail from "./pages/VerifyEmail.jsx";
 import ForgotPassword from "./pages/ForgotPassword.jsx";
 import ResetPassword from "./pages/ResetPassword.jsx";
+import SorryPage from "./pages/SorryPage.jsx";
 
 import Moderation from "./pages/Moderation.jsx";
 import ModerationReports from "./pages/moderation/ModerationReports.jsx";
@@ -72,6 +73,31 @@ export default function App() {
         if (alive) setUser(u || null);
       } catch {
         if (alive) setUser(null);
+      }
+    })();
+
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    let alive = true;
+
+    (async () => {
+      try {
+        const data = await checkRegion();
+
+        if (
+          alive &&
+          data?.enabled &&
+          data?.isAustralia &&
+          window.location.pathname !== "/sorry"
+        ) {
+          window.location.href = "/sorry";
+        }
+      } catch (err) {
+        console.warn("Region check failed:", err);
       }
     })();
 
@@ -157,6 +183,7 @@ export default function App() {
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/beta" element={<BetaSignup />} />
         <Route path="/delete-account" element={<DeleteAccountConfirm />} />
+        <Route path="/sorry" element={<SorryPage />} />
 
         <Route
           element={

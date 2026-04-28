@@ -1,0 +1,228 @@
+.sorryPage {
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 2rem;
+
+  background:
+    radial-gradient(circle at top left,
+      rgba(214, 178, 96, 0.12),
+      transparent 32rem),
+    radial-gradient(circle at bottom right,
+      rgba(214, 178, 96, 0.08),
+      transparent 30rem),
+    #040404;
+
+  color: #f7f3ec;
+}
+
+.sorryCard {
+  position: relative;
+  z-index: 2;
+
+  width: min(820px, 100%);
+
+  padding:
+    clamp(2.8rem, 5vw, 5rem)
+    clamp(1.8rem, 4vw, 4rem);
+
+  border-radius: 36px;
+
+  border: 1px solid rgba(214, 178, 96, 0.18);
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(10, 10, 10, 0.96),
+      rgba(6, 6, 6, 0.98)
+    );
+
+  box-shadow:
+    0 40px 120px rgba(0, 0, 0, 0.7),
+    inset 0 1px 0 rgba(255, 255, 255, 0.03);
+
+  backdrop-filter: blur(20px);
+
+  text-align: center;
+}
+
+.sorryLogo {
+  display: block;
+
+  width: 140px;
+  max-width: 55%;
+
+  margin:
+    0 auto
+    2.5rem;
+
+  opacity: 0.96;
+
+  filter:
+    drop-shadow(0 0 22px rgba(214, 178, 96, 0.14));
+}
+
+.sorryBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  margin-bottom: 2.2rem;
+
+  padding:
+    0.9rem
+    1.6rem;
+
+  border-radius: 999px;
+
+  border: 1px solid rgba(214, 178, 96, 0.28);
+
+  background:
+    rgba(214, 178, 96, 0.05);
+
+  color: #d6b260;
+
+  font-size: 0.84rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.sorryTitle {
+  margin: 0;
+
+  font-size: clamp(2.2rem, 5vw, 4.2rem);
+
+  line-height: 1.02;
+  letter-spacing: -0.06em;
+
+  font-weight: 300;
+
+  color: #f8f4ed;
+}
+
+.sorryAccent {
+  width: 120px;
+  height: 2px;
+
+  margin:
+    2.4rem auto
+    2rem;
+
+  border-radius: 999px;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      rgba(214, 178, 96, 0.9),
+      transparent
+    );
+
+  box-shadow:
+    0 0 18px rgba(214, 178, 96, 0.35);
+}
+
+.sorryText {
+  width: min(620px, 100%);
+
+  margin:
+    0 auto;
+
+  color:
+    rgba(245, 241, 232, 0.68);
+
+  font-size:
+    clamp(1rem, 2vw, 1.25rem);
+
+  line-height: 1.7;
+
+  font-weight: 300;
+}
+
+.sorryDivider {
+  width: 100%;
+  height: 1px;
+
+  margin:
+    3rem 0
+    2rem;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      rgba(214, 178, 96, 0.16),
+      transparent
+    );
+}
+
+.sorryFooter {
+  color:
+    rgba(245, 241, 232, 0.42);
+
+  font-size: 0.95rem;
+
+  line-height: 1.7;
+
+  font-weight: 300;
+}
+
+.sorryAmbient {
+  position: absolute;
+  border-radius: 999px;
+  filter: blur(120px);
+  pointer-events: none;
+}
+
+.sorryAmbientLeft {
+  top: -10%;
+  left: -10%;
+
+  width: 28rem;
+  height: 28rem;
+
+  background:
+    rgba(214, 178, 96, 0.12);
+}
+
+.sorryAmbientRight {
+  right: -12%;
+  bottom: -14%;
+
+  width: 30rem;
+  height: 30rem;
+
+  background:
+    rgba(214, 178, 96, 0.08);
+}
+
+@media (max-width: 768px) {
+  .sorryCard {
+    border-radius: 28px;
+    padding: 2.4rem 1.4rem;
+  }
+
+  .sorryLogo {
+    width: 112px;
+    margin-bottom: 2rem;
+  }
+
+  .sorryBadge {
+    margin-bottom: 1.8rem;
+    padding: 0.75rem 1.25rem;
+  }
+
+  .sorryAccent {
+    margin: 2rem auto 1.8rem;
+  }
+
+  .sorryDivider {
+    margin: 2.4rem 0 1.8rem;
+  }
+}

@@ -658,6 +658,20 @@ export async function apiFetch(url, options = {}) {
   return data;
 }
 
+export async function checkRegion() {
+  const res = await fetch(`${API_BASE}/api/region-check`, {
+    credentials: "include",
+  });
+
+  const data = await res.json().catch(() => null);
+
+  if (!res.ok) {
+    throw new Error(data?.error || "Failed to check region");
+  }
+
+  return data;
+}
+
 export async function registerBeta({
   email,
   username,
