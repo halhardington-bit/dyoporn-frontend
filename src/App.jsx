@@ -87,6 +87,7 @@ export default function App() {
     (async () => {
       try {
         const data = await checkRegion();
+        console.log("REGION CHECK:", data);
 
         if (
           alive &&
