@@ -24,7 +24,6 @@ import ModerationReports from "./pages/moderation/ModerationReports.jsx";
 import ModerationUsers from "./pages/moderation/ModerationUsers.jsx";
 import ModerationUserDetail from "./pages/moderation/ModerationUserDetail.jsx";
 
-
 import AgeGate from "./pages/AgeGate.jsx";
 import Dmca from "./pages/dmca.jsx";
 
@@ -47,6 +46,36 @@ export default function App() {
 
   const [ageVerified, setAgeVerified] = useState(false);
   const [ageGateReady, setAgeGateReady] = useState(false);
+  const [regionReady, setRegionReady] = useState(false);
+
+  useEffect(() => {
+    let alive = true;
+
+    (async () => {
+      try {
+        const data = await checkRegion();
+        console.log("REGION CHECK:", data);
+
+        if (
+          alive &&
+          data?.enabled &&
+          data?.isAustralia &&
+          window.location.pathname !== "/sorry"
+        ) {
+          window.location.replace("/sorry");
+          return;
+        }
+      } catch (err) {
+        console.warn("Region check failed:", err);
+      } finally {
+        if (alive) setRegionReady(true);
+      }
+    })();
+
+    return () => {
+      alive = false;
+    };
+  }, []);
 
   useEffect(() => {
     try {
@@ -73,32 +102,6 @@ export default function App() {
         if (alive) setUser(u || null);
       } catch {
         if (alive) setUser(null);
-      }
-    })();
-
-    return () => {
-      alive = false;
-    };
-  }, []);
-
-  useEffect(() => {
-    let alive = true;
-
-    (async () => {
-      try {
-        const data = await checkRegion();
-        console.log("REGION CHECK:", data);
-
-        if (
-          alive &&
-          data?.enabled &&
-          data?.isAustralia &&
-          window.location.pathname !== "/sorry"
-        ) {
-          window.location.href = "/sorry";
-        }
-      } catch (err) {
-        console.warn("Region check failed:", err);
       }
     })();
 
@@ -150,7 +153,7 @@ export default function App() {
     refreshMe();
   }, [refreshMe]);
 
-  if (!ageGateReady) {
+  if (!regionReady || !ageGateReady) {
     return null;
   }
 
@@ -212,7 +215,7 @@ export default function App() {
             path="/watch/:id"
             element={<Watch user={user} onRequireLogin={openLogin} />}
           />
-          
+
           <Route
             path="/plans"
             element={<Plans user={user} onRequireLogin={openLogin} />}
@@ -254,11 +257,7 @@ export default function App() {
           <Route
             path="/moderation/reports"
             element={
-              user?.isModerator ? (
-                <ModerationReports />
-              ) : (
-                <Navigate to="/watch" replace />
-              )
+              user?.isModerator ? <ModerationReports /> : <Navigate to="/watch" replace />
             }
           />
 
@@ -312,12 +311,6 @@ export default function App() {
               }
             />
           </Route>
-
-          
-
-          
-
-          
 
           <Route
             path="/u/:username"
