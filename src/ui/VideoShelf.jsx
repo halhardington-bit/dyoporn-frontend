@@ -9,18 +9,11 @@ export function VideoShelf({
   onRequireLogin,
   startIndex = 0,
   lockAfter = null,
-  onVideoDeleted, // optional callback
+  onVideoDeleted,
 }) {
-  const isLoggedIn = !!user?.id;
-
   async function handleDelete(v) {
-    // if you want, you can add confirm here too (VideoCard already confirms)
     await deleteVideo(v.id);
-
-    // let parent update state if it wants
     onVideoDeleted?.(v);
-
-    // If parent doesn't manage state, at least no crash (but you probably want parent state update)
   }
 
   return (
@@ -32,16 +25,19 @@ export function VideoShelf({
       <div className="shelfRow">
         {videos.map((video, idx) => {
           const globalIndex = startIndex + idx;
-          const locked = !isLoggedIn && lockAfter != null && globalIndex >= lockAfter;
+
+          const locked =
+            lockAfter != null &&
+            globalIndex >= lockAfter;
 
           return (
             <VideoCard
               key={video.id}
               video={video}
-              user={user}                 // ✅ critical
+              user={user}
               locked={locked}
               onRequireLogin={onRequireLogin}
-              onDelete={handleDelete}     // ✅ critical (Delete button only renders if onDelete exists)
+              onRequestDelete={handleDelete}
             />
           );
         })}

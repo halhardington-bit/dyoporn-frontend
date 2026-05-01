@@ -208,6 +208,15 @@ export default function Home({ user, onRequireLogin }) {
   const [loading, setLoading] = useState(false);
 
   const isLoggedIn = !!user?.id;
+  const tier = String(user?.tier || "Free").trim().toLowerCase();
+  const hasPaidTier = isLoggedIn && tier !== "free" && tier !== "";
+  const shouldLockFreeVideos = !hasPaidTier;
+
+  console.log(hasPaidTier)
+
+
+
+
   const isRatedMode = filter === "rated";
   const isHistoryMode = filter === "history";
   const isWatchLaterMode = filter === "watch-later";
@@ -463,7 +472,7 @@ export default function Home({ user, onRequireLogin }) {
               <VideoCard
                 key={video.id}
                 video={video}
-                locked={!isLoggedIn && idx >= 2}
+                locked={shouldLockFreeVideos}
                 onRequireLogin={onRequireLogin}
                 user={user}
               />
@@ -492,14 +501,14 @@ export default function Home({ user, onRequireLogin }) {
 
                 return (
                   <VideoShelf
-                    key={row.key}
-                    title={row.title}
-                    videos={rowVideos}
-                    user={user}
-                    onRequireLogin={onRequireLogin}
-                    startIndex={startIndex}
-                    lockAfter={2}
-                  />
+                  key={row.key}
+                  title={row.title}
+                  videos={rowVideos}
+                  user={user}
+                  onRequireLogin={onRequireLogin}
+                  startIndex={startIndex}
+                  lockAfter={shouldLockFreeVideos ? 2 : 999999}
+                />
                 );
               })
             : tagRows.map((row) => {

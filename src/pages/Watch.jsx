@@ -82,6 +82,13 @@ export default function Watch({ user, onRequireLogin }) {
 
   const isLoggedIn = !!user?.id;
 
+  const tier = String(user?.tier || "Free").trim().toLowerCase();
+
+  const hasPaidTier =
+    isLoggedIn &&
+    tier !== "free" &&
+    tier !== "";
+
   const restoreAttemptedRef = useRef(false);
   const pendingResumeRef = useRef(0);
 
@@ -409,6 +416,13 @@ export default function Watch({ user, onRequireLogin }) {
           all
             .filter((x) => String(x.id) !== String(id))
             .filter((x) => INCLUDE_TEST_DATA || !x?.isTestData)
+            .map((x) => ({
+              ...x,
+              requiresPlan:
+                x.requiresPlan ||
+                !isLoggedIn ||
+                !hasPaidTier,
+            }))
             .slice(0, 12)
         );
 
@@ -431,6 +445,10 @@ export default function Watch({ user, onRequireLogin }) {
         }
       } catch (e) {
         console.error(e);
+
+        if (e?.code === "PLAN_REQUIRED" || e?.message?.includes("Upgrade required")) {
+          nav("/plans", { replace: true });
+        }
       }
     })();
 

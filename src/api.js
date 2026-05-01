@@ -153,9 +153,18 @@ export async function getVideo(id) {
   const url = `${API_BASE}/api/videos/${id}${qs({
     includeTest: INCLUDE_TEST ? "1" : undefined,
   })}`;
+
   const res = await fetch(url, { credentials: "include" });
-  if (!res.ok) throw new Error(`getVideo failed: ${res.status}`);
-  return res.json();
+  const data = await res.json().catch(() => null);
+
+  if (!res.ok) {
+    const err = new Error(data?.error || `getVideo failed: ${res.status}`);
+    err.code = data?.code;
+    err.status = res.status;
+    throw err;
+  }
+
+  return data;
 }
 
 export async function getChannelSubscription(channelId) {

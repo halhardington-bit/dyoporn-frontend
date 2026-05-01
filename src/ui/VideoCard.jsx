@@ -129,7 +129,15 @@ export default function VideoCard({
   const previewEnabled = !locked && !!previewSrc;
 
   function handleClick() {
-    if (locked) return onRequireLogin?.();
+    if (locked) {
+      if (currentUser?.id) {
+        navigate("/plans");
+      } else {
+        onRequireLogin?.();
+      }
+      return;
+    }
+
     navigate(`/watch/${video.id}`);
   }
 
@@ -626,7 +634,7 @@ export default function VideoCard({
             <div className="lockOverlay">
               <div className="lockPill">
                 <span className="lockIcon">🔒</span>
-                <span>Log in to watch</span>
+                <span>Subscribe to Watch</span>
               </div>
             </div>
           )}
