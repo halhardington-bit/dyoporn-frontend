@@ -45,9 +45,9 @@
   }
 
   .shelfRow > .video-card {
-    flex: 0 0 55vw !important;
-    width: 55vw !important;
-    min-width: 55vw !important;
+    flex: 0 0 80vw !important;
+    width: 80vw !important;
+    min-width: 80vw !important;
     max-width: 420px !important;
   }
 }
@@ -55,14 +55,14 @@
 @media (max-width: 700px) {
   .shelfRow {
     gap: 28px !important;
-    column-gap: 125px !important;
+    column-gap: 260px !important;
     padding-inline: 14px;
   }
 
   .shelfRow > .video-card {
-    flex: 0 0 55vw !important;
-    width: 55vw !important;
-    min-width: 55vw !important;
+    flex: 0 0 83vw !important;
+    width: 83vw !important;
+    min-width: 83vw !important;
     max-width: 420px !important;
 
     margin-right: 28px !important;
