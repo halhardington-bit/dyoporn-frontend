@@ -167,6 +167,35 @@ export async function getVideo(id) {
   return data;
 }
 
+export async function trackPageView(path) {
+  try {
+    await fetch(`${API_BASE}/api/analytics/pageview`, {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ path }),
+    });
+  } catch {
+    // analytics should never break the app
+  }
+}
+
+
+export async function getModStats(days = 7) {
+  const res = await fetch(`${API_BASE}/api/mod/stats?days=${days}`, {
+    credentials: "include",
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to load moderation stats");
+  }
+
+  return res.json();
+}
+
+
 export async function getChannelSubscription(channelId) {
   const res = await fetch(`${API_BASE}/api/channels/${channelId}/subscription`, {
     credentials: "include",

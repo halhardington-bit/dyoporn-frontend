@@ -117,6 +117,9 @@ export default function VideoCard({
   const progressSeconds = Number(video.progressSeconds || 0);
   const durationSeconds = Number(video.durationSeconds || 0);
 
+  const [naturalAspect, setNaturalAspect] = useState("landscape");
+  const aspectType = naturalAspect;
+
   const showProgressBar =
     progressSeconds > 0 &&
     durationSeconds > 0 &&
@@ -140,6 +143,27 @@ export default function VideoCard({
 
     navigate(`/watch/${video.id}`);
   }
+
+  function getVideoAspect(video) {
+  const w =
+    Number(video.width) ||
+    Number(video.videoWidth) ||
+    Number(video.sourceWidth) ||
+    Number(video.metadata?.width) ||
+    Number(video.creation_data?.width);
+
+  const h =
+    Number(video.height) ||
+    Number(video.videoHeight) ||
+    Number(video.sourceHeight) ||
+    Number(video.metadata?.height) ||
+    Number(video.creation_data?.height);
+
+  if (!w || !h) return "landscape";
+  if (h > w) return "portrait";
+  if (w === h) return "square";
+  return "landscape";
+}
 
   function handleKeyDown(e) {
     if (e.key === "Enter" || e.key === " ") {
@@ -562,19 +586,27 @@ export default function VideoCard({
 
   return (
     <>
-      <div
-        className={`video-card ${locked ? "locked" : ""} ${
-          manageMenuOpen ? "menuOpen" : ""
-        }`}
-        onClick={handleClick}
-        onKeyDown={handleKeyDown}
-        role="button"
-        tabIndex={0}
-        onMouseEnter={startPreviewSoon}
-        onMouseLeave={stopPreview}
-        onFocus={startPreviewSoon}
-        onBlur={stopPreview}
-      >
+      <NavLink
+          to={locked ? "#" : `/watch/${video.id}`}
+          className={`video-card ${locked ? "locked" : ""} ${
+            manageMenuOpen ? "menuOpen" : ""
+          }`}
+          onClick={(e) => {
+            if (locked) {
+              e.preventDefault();
+
+              if (currentUser?.id) {
+                navigate("/plans");
+              } else {
+                onRequireLogin?.();
+              }
+            }
+          }}
+          onMouseEnter={startPreviewSoon}
+          onMouseLeave={stopPreview}
+          onFocus={startPreviewSoon}
+          onBlur={stopPreview}
+        >
         {canManage && (
           <div
             className={`vManageWrap ${manageMenuOpen ? "isOpen" : ""}`}
@@ -597,7 +629,7 @@ export default function VideoCard({
           </div>
         )}
 
-        <div className="thumb-wrapper">
+        <div className={`thumb-wrapper ${aspectType}`}>
           {src ? (
             <img
               className={`thumbImg ${showPreview ? "isHidden" : ""}`}
@@ -616,6 +648,16 @@ export default function VideoCard({
               muted
               playsInline
               loop
+              onLoadedMetadata={(e) => {
+                const el = e.currentTarget;
+                if (el.videoHeight > el.videoWidth) {
+                  setNaturalAspect("portrait");
+                } else if (el.videoHeight === el.videoWidth) {
+                  setNaturalAspect("square");
+                } else {
+                  setNaturalAspect("landscape");
+                }
+              }}
             />
           ) : null}
 
@@ -676,7 +718,7 @@ export default function VideoCard({
             </div>
           )}
         </div>
-      </div>
+      </NavLink>
 
       {menuPortal}
       {reportModal}

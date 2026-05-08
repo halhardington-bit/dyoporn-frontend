@@ -2,10 +2,7 @@
   margin-bottom: 26px;
 }
 
-.shelfHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+.shelfHead {
   margin-bottom: 12px;
 }
 
@@ -15,49 +12,67 @@
   font-weight: 600;
 }
 
-.shelfGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, 240px);
-  gap: 18px;
-  justify-content: start;
-  align-items: start;
-}
-
-
-/* Optional: prevent 1–2 giant cards on wide screens */
-/* VideoShelf.css (or wherever .shelfGrid lives) */
-.shelfGrid {
+.shelfRow {
   display: flex;
   gap: 18px;
   align-items: flex-start;
-
-  /* ✅ force single row */
   flex-wrap: nowrap;
-
-  /* ✅ horizontal scroll when needed */
   overflow-x: auto;
   overflow-y: hidden;
   padding-bottom: 10px;
-
-  /* optional: nicer scrolling */
   scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
 }
 
-/* each card should have a stable width so it doesn't stretch huge */
-.shelfGrid .video-card {
-  flex: 0 0 240px; /* adjust to taste: 220/240/260 */
-  scroll-snap-align: start;
-}
 
-/* optional: make scrollbar subtle */
-.shelfGrid::-webkit-scrollbar {
+.shelfRow::-webkit-scrollbar {
   height: 10px;
 }
-.shelfGrid::-webkit-scrollbar-thumb {
+
+.shelfRow::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.12);
   border-radius: 999px;
 }
-.shelfGrid::-webkit-scrollbar-track {
+
+.shelfRow::-webkit-scrollbar-track {
   background: transparent;
+}
+
+@media (max-width: 700px) {
+  .shelfRow {
+    gap: 22px;
+    padding-inline: 10px;
+  }
+
+  .shelfRow > .video-card {
+    flex: 0 0 55vw !important;
+    width: 55vw !important;
+    min-width: 55vw !important;
+    max-width: 420px !important;
+  }
+}
+
+@media (max-width: 700px) {
+  .shelfRow {
+    gap: 28px !important;
+    column-gap: 125px !important;
+    padding-inline: 14px;
+  }
+
+  .shelfRow > .video-card {
+    flex: 0 0 55vw !important;
+    width: 55vw !important;
+    min-width: 55vw !important;
+    max-width: 420px !important;
+
+    margin-right: 28px !important;
+
+    z-index: auto !important;
+    isolation: auto !important;
+    overflow: hidden !important;
+  }
+
+  .shelfRow > .video-card:last-child {
+    margin-right: 0 !important;
+  }
 }

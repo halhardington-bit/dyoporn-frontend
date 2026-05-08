@@ -1,0 +1,199 @@
+.modStatsPage {
+  width: min(1180px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 34px 0 80px;
+  color: #f4f1ea;
+}
+
+.modStatsHero {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.modStatsKicker {
+  color: #d3ad5f;
+  font-size: 0.76rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.modStatsHero h1 {
+  margin: 0;
+  font-size: clamp(2rem, 4vw, 3.4rem);
+  font-weight: 700;
+}
+
+.modStatsHero p {
+  max-width: 660px;
+  margin: 10px 0 0;
+  color: rgba(244, 241, 234, 0.68);
+  line-height: 1.6;
+}
+
+.modStatsSelect {
+  border: 1px solid rgba(211, 173, 95, 0.32);
+  background: #111;
+  color: #f4f1ea;
+  border-radius: 14px;
+  padding: 12px 42px 12px 14px;
+  outline: none;
+  cursor: pointer;
+  color-scheme: dark;
+}
+
+.modStatsSelect option {
+  background: #141414;
+  color: #f4f1ea;
+}
+
+.modStatsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.modStatCard,
+.modStatsPanel {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.035)),
+    #101010;
+  border-radius: 22px;
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.28);
+}
+
+.modStatCard {
+  padding: 18px;
+}
+
+.modStatLabel {
+  color: rgba(244, 241, 234, 0.6);
+  font-size: 0.82rem;
+  margin-bottom: 8px;
+}
+
+.modStatValue {
+  font-size: 2rem;
+  font-weight: 750;
+  letter-spacing: -0.04em;
+}
+
+.modStatSub {
+  margin-top: 6px;
+  color: rgba(244, 241, 234, 0.5);
+  font-size: 0.82rem;
+}
+
+.modStatsPanel {
+  padding: 18px;
+  margin-top: 18px;
+}
+
+.modStatsPanelHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.modStatsPanelHead h2 {
+  margin: 0;
+  font-size: 1.08rem;
+}
+
+.modStatsTableWrap {
+  overflow-x: auto;
+}
+
+.modStatsTable {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 780px;
+}
+
+.modStatsTable th,
+.modStatsTable td {
+  padding: 13px 12px;
+  text-align: left;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.075);
+  font-size: 0.92rem;
+}
+
+.modStatsTable th {
+  color: rgba(244, 241, 234, 0.5);
+  font-weight: 600;
+}
+
+.modStatsTable td {
+  color: rgba(244, 241, 234, 0.86);
+}
+
+.modStatsTwoCol {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+.modStatsList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.modStatsListItem {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 13px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.045);
+}
+
+.modStatsListItem strong {
+  display: block;
+  color: #f4f1ea;
+  margin-bottom: 4px;
+}
+
+.modStatsListItem span {
+  display: block;
+  color: rgba(244, 241, 234, 0.5);
+  font-size: 0.84rem;
+}
+
+.modStatsListMeta {
+  color: #d3ad5f;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.modStatsNotice {
+  padding: 22px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(244, 241, 234, 0.72);
+}
+
+.modStatsNotice.error {
+  color: #ff8f8f;
+}
+
+@media (max-width: 900px) {
+  .modStatsHero {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .modStatsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .modStatsTwoCol {
+    grid-template-columns: 1fr;
+  }
+}

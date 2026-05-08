@@ -497,6 +497,53 @@
   margin-bottom: 10px;
 }
 
+.thumb-wrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: 14px;
+  background: #080808;
+}
+
+.thumbImg,
+.thumbPreview {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.thumbImg {
+  object-fit: cover;
+}
+
+.thumbPreview {
+  object-fit: cover;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.thumbPreview.isVisible {
+  opacity: 1;
+}
+
+.thumbImg.isHidden {
+  opacity: 0;
+}
+
+.thumb-wrapper.portrait .thumbPreview,
+.thumb-wrapper.portrait .thumbImg {
+  object-fit: contain;
+  background: #050505;
+}
+
+.thumb-wrapper.square .thumbPreview,
+.thumb-wrapper.square .thumbImg {
+  object-fit: contain;
+  background: #050505;
+}
+
 .modalBody {
   font-size: 14px;
   line-height: 1.4;
@@ -571,4 +618,16 @@
     font-size: 12px;
     padding: 9px 11px;
   }
+}
+
+.video-card {
+  cursor: pointer;
+  color: inherit;
+  text-decoration: none;
+}
+
+.video-card:hover,
+.video-card:visited {
+  color: inherit;
+  text-decoration: none;
 }

@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { useEffect, useState, useCallback } from "react";
 import { me, logout, checkRegion } from "./api";
 
@@ -23,6 +23,7 @@ import Moderation from "./pages/Moderation.jsx";
 import ModerationReports from "./pages/moderation/ModerationReports.jsx";
 import ModerationUsers from "./pages/moderation/ModerationUsers.jsx";
 import ModerationUserDetail from "./pages/moderation/ModerationUserDetail.jsx";
+import ModStats from "./pages/moderation/ModStats.jsx";
 
 import AgeGate from "./pages/AgeGate.jsx";
 import Dmca from "./pages/dmca.jsx";
@@ -33,6 +34,18 @@ import AccountSecurity from "./pages/accountSettings/AccountSecurity.jsx";
 import AccountBilling from "./pages/accountSettings/AccountBilling.jsx";
 import DeleteAccountConfirm from "./pages//DeleteAccountConfirm.jsx";
 import AccountDanger from "./pages/accountSettings/AccountDanger.jsx";
+
+import { trackPageView } from "./api.js";
+
+function PageViewTracker() {
+  const location = useLocation();
+
+  useEffect(() => {
+    trackPageView(location.pathname);
+  }, [location.pathname]);
+
+  return null;
+}
 
 const BETA_LOCK = false;
 const AGE_GATE_STORAGE_KEY = "dyop_age_gate_v1";
@@ -180,6 +193,7 @@ export default function App() {
 
   return (
     <BrowserRouter>
+    <PageViewTracker />
       <Routes>
         <Route path="/" element={<Navigate to="/watch" replace />} />
         <Route path="/verify-email" element={<VerifyEmail />} />
@@ -258,6 +272,17 @@ export default function App() {
             path="/moderation/reports"
             element={
               user?.isModerator ? <ModerationReports /> : <Navigate to="/watch" replace />
+            }
+          />
+
+          <Route
+            path="/moderation/stats"
+            element={
+              user?.isModerator ? (
+                <ModStats />
+              ) : (
+                <Navigate to="/watch" replace />
+              )
             }
           />
 
