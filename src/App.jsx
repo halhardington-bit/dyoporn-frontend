@@ -23,6 +23,8 @@ import Moderation from "./pages/Moderation.jsx";
 import ModerationReports from "./pages/moderation/ModerationReports.jsx";
 import ModerationUsers from "./pages/moderation/ModerationUsers.jsx";
 import ModerationUserDetail from "./pages/moderation/ModerationUserDetail.jsx";
+import ModerationVideos from "./pages/moderation/ModerationVideos.jsx";
+import ModerationVideoDetail from "./pages/moderation/ModerationVideoDetail.jsx";
 import ModStats from "./pages/moderation/ModStats.jsx";
 
 import AgeGate from "./pages/AgeGate.jsx";
@@ -88,6 +90,59 @@ export default function App() {
     return () => {
       alive = false;
     };
+  }, []);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const ref = params.get("ref");
+
+    const referralCaptureKey = `dyop_ref_capture:${ref}:${window.location.pathname}:${window.location.search}`;
+
+    if (ref && sessionStorage.getItem(referralCaptureKey)) {
+      console.log("[REFERRAL] Already captured this referral landing.");
+      return;
+    }
+
+    const apiBase =
+      window.location.hostname === "localhost"
+        ? "http://localhost:3001"
+        : "https://api.dyop.ai";
+
+    const url =
+      `${apiBase}/api/referral/capture` +
+      `?ref=${encodeURIComponent(ref)}` +
+      `&path=${encodeURIComponent(
+        window.location.pathname + window.location.search
+      )}`;
+
+    console.log("[REFERRAL] Sending capture request:", url);
+    sessionStorage.setItem(referralCaptureKey, "1");
+
+    fetch(url, {
+      credentials: "include",
+    })
+      .then(async (res) => {
+        console.log("[REFERRAL] Response status:", res.status);
+
+        try {
+          const data = await res.json();
+          console.log("[REFERRAL] Response JSON:", data);
+        } catch (err) {
+          console.warn("[REFERRAL] Failed to parse JSON:", err);
+        }
+
+        // ✅ Remove referral param from URL after capture
+        const cleanUrl =
+          window.location.pathname +
+          window.location.hash;
+
+        window.history.replaceState({}, "", cleanUrl);
+
+        console.log("[REFERRAL] Cleaned URL:", cleanUrl);
+      })
+      .catch((err) => {
+        console.error("[REFERRAL] Capture failed:", err);
+      });
   }, []);
 
   useEffect(() => {
@@ -272,6 +327,20 @@ export default function App() {
             path="/moderation/reports"
             element={
               user?.isModerator ? <ModerationReports /> : <Navigate to="/watch" replace />
+            }
+          />
+
+          <Route
+            path="/moderation/videos"
+            element={
+              user?.isModerator ? <ModerationVideos /> : <Navigate to="/watch" replace />
+            }
+          />
+
+          <Route
+            path="/moderation/videos/:id"
+            element={
+              user?.isModerator ? <ModerationVideoDetail /> : <Navigate to="/watch" replace />
             }
           />
 

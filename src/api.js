@@ -167,6 +167,59 @@ export async function getVideo(id) {
   return data;
 }
 
+export async function getModerationVideoById(id) {
+  const res = await fetch(`${API_BASE}/api/mod/videos/${id}`, {
+    credentials: "include",
+  });
+
+  if (!res.ok) throw new Error("Failed to load moderation video");
+  return res.json();
+}
+
+export async function updateModerationVideo(id, payload) {
+  const res = await fetch(`${API_BASE}/api/mod/videos/${id}`, {
+    method: "PATCH",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!res.ok) throw new Error("Failed to update moderation video");
+  return res.json();
+}
+
+export async function getModerationVideos({ q = "", filterBy = "all", limit = 50, offset = 0 } = {}) {
+  const params = new URLSearchParams();
+
+  if (q) params.set("q", q);
+  if (filterBy) params.set("filterBy", filterBy);
+  params.set("limit", String(limit));
+  params.set("offset", String(offset));
+
+  const res = await fetch(`${API_BASE}/api/mod/videos?${params.toString()}`, {
+    credentials: "include",
+  });
+
+  if (!res.ok) throw new Error("Failed to load moderation videos");
+  return res.json();
+}
+
+export async function updateModerationVideoVisibility(videoId, visibility) {
+  const res = await fetch(`${API_BASE}/api/mod/videos/${videoId}/visibility`, {
+    method: "PATCH",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ visibility }),
+  });
+
+  if (!res.ok) throw new Error("Failed to update video visibility");
+  return res.json();
+}
+
 export async function trackPageView(path) {
   try {
     await fetch(`${API_BASE}/api/analytics/pageview`, {
@@ -708,6 +761,18 @@ export async function checkRegion() {
   }
 
   return data;
+}
+
+export async function getModerationVideoWatchAnalytics(videoId, bucket = 15) {
+  const res = await fetch(
+    `${API_BASE}/api/mod/videos/${videoId}/watch-analytics?bucket=${bucket}`,
+    {
+      credentials: "include",
+    }
+  );
+
+  if (!res.ok) throw new Error("Failed to load watch analytics");
+  return res.json();
 }
 
 export async function registerBeta({

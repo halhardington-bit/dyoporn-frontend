@@ -1,15 +1,29 @@
 import { useEffect, useMemo, useState } from "react";
 import { getModStats } from "../../api.js";
 import "./ModStats.css";
+import {
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  CartesianGrid,
+} from "recharts";
 
 function StatCard({ label, value, sub }) {
   return (
     <div className="modStatCard">
       <div className="modStatLabel">{label}</div>
-      <div className="modStatValue">{value}</div>
+      <div className="modStatValue">{Number(value || 0).toLocaleString()}</div>
       {sub ? <div className="modStatSub">{sub}</div> : null}
     </div>
   );
+}
+
+function formatDate(value) {
+  if (!value) return "—";
+  return new Date(value).toLocaleDateString();
 }
 
 export default function ModStats() {
@@ -25,6 +39,7 @@ export default function ModStats() {
       try {
         setLoading(true);
         setErr("");
+
         const stats = await getModStats(days);
         if (alive) setData(stats);
       } catch (e) {
@@ -71,6 +86,15 @@ export default function ModStats() {
     );
   }, [data]);
 
+  const referralSources = useMemo(() => {
+    return (data?.referrals?.sources || []).map((row) => ({
+      source: row.source || "unknown",
+      count: Number(row.count || 0),
+    }));
+  }, [data]);
+
+  const referralTotal = Number(data?.referrals?.total || 0);
+
   return (
     <main className="modStatsPage">
       <section className="modStatsHero">
@@ -104,7 +128,10 @@ export default function ModStats() {
           <section className="modStatsGrid">
             <StatCard label="Site visits" value={totals.siteVisits} />
             <StatCard label="Unique visitors" value={totals.uniqueVisitors} />
-            <StatCard label="Logged-in visitors" value={totals.loggedInVisitors} />
+            <StatCard
+              label="Logged-in visitors"
+              value={totals.loggedInVisitors}
+            />
             <StatCard label="Minutes watched" value={totals.minutesWatched} />
             <StatCard label="Videos watched" value={totals.videosWatched} />
             <StatCard label="Beta sign-ups" value={totals.betaSignups} />
@@ -131,16 +158,23 @@ export default function ModStats() {
                     <th>Reports</th>
                   </tr>
                 </thead>
+
                 <tbody>
-                  {(data.daily || []).map((row) => (
+                  {(data?.daily || []).map((row) => (
                     <tr key={row.day}>
-                      <td>{new Date(row.day).toLocaleDateString()}</td>
-                      <td>{row.site_visits}</td>
-                      <td>{row.unique_visitors}</td>
-                      <td>{row.minutes_watched}</td>
-                      <td>{row.beta_signups}</td>
-                      <td>{row.uploads}</td>
-                      <td>{row.reports_created}</td>
+                      <td>{formatDate(row.day)}</td>
+                      <td>{Number(row.site_visits || 0).toLocaleString()}</td>
+                      <td>
+                        {Number(row.unique_visitors || 0).toLocaleString()}
+                      </td>
+                      <td>
+                        {Number(row.minutes_watched || 0).toLocaleString()}
+                      </td>
+                      <td>{Number(row.beta_signups || 0).toLocaleString()}</td>
+                      <td>{Number(row.uploads || 0).toLocaleString()}</td>
+                      <td>
+                        {Number(row.reports_created || 0).toLocaleString()}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -155,17 +189,26 @@ export default function ModStats() {
               </div>
 
               <div className="modStatsList">
-                {(data.topVideos || []).map((video) => (
-                  <div className="modStatsListItem" key={video.id}>
-                    <div>
-                      <strong>{video.title}</strong>
-                      <span>{video.username || "Unknown creator"}</span>
+                {(data?.topVideos || []).length > 0 ? (
+                  data.topVideos.map((video) => (
+                    <div className="modStatsListItem" key={video.id}>
+                      <div>
+                        <strong>{video.title}</strong>
+                        <span>
+                          {video.displayName ||
+                            video.username ||
+                            "Unknown creator"}
+                        </span>
+                      </div>
+
+                      <div className="modStatsListMeta">
+                        {Number(video.minutesWatched || 0).toLocaleString()} min
+                      </div>
                     </div>
-                    <div className="modStatsListMeta">
-                      {video.minutesWatched} min
-                    </div>
-                  </div>
-                ))}
+                  ))
+                ) : (
+                  <div className="modStatsEmpty">No watched videos yet.</div>
+                )}
               </div>
             </div>
 
@@ -175,20 +218,91 @@ export default function ModStats() {
               </div>
 
               <div className="modStatsList">
-                {(data.topReported || []).map((video) => (
-                    <div className="modStatsListItem" key={video.videoId || video.title}>
-                        <div>
+                {(data?.topReported || []).length > 0 ? (
+                  data.topReported.map((video) => (
+                    <div
+                      className="modStatsListItem"
+                      key={video.videoId || video.title}
+                    >
+                      <div>
                         <strong>{video.title}</strong>
-                        <span>{video.displayName || video.username || "Unknown creator"}</span>
-                        </div>
+                        <span>
+                          {video.displayName ||
+                            video.username ||
+                            "Unknown creator"}
+                        </span>
+                      </div>
 
-                        <div className="modStatsListMeta">
-                        {Number(video.reports || 0)} reports
-                        </div>
+                      <div className="modStatsListMeta">
+                        {Number(video.reports || 0).toLocaleString()} reports
+                      </div>
                     </div>
-                    ))}
+                  ))
+                ) : (
+                  <div className="modStatsEmpty">No reports yet.</div>
+                )}
               </div>
             </div>
+          </section>
+
+          <section className="modStatsPanel modStatsReferralPanel">
+            <div className="modStatsPanelHead modStatsReferralHead">
+              <div>
+                <h2>Referral Traffic</h2>
+                <p>Visits captured from referral links like ?ref=4chan.</p>
+              </div>
+
+              <div className="modStatsReferralTotal">
+                <span>Total referrals</span>
+                <strong>{referralTotal.toLocaleString()}</strong>
+              </div>
+            </div>
+
+            {referralSources.length > 0 ? (
+              <div className="modStatsChart modStatsReferralChart">
+                <ResponsiveContainer width="100%" height={320}>
+                  <BarChart data={referralSources} margin={{ top: 18, right: 18, left: 0, bottom: 8 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(244, 241, 234, 0.12)" />
+                  <XAxis
+                    dataKey="source"
+                    tick={{ fill: "rgba(244, 241, 234, 0.62)", fontSize: 12 }}
+                    axisLine={{ stroke: "rgba(244, 241, 234, 0.16)" }}
+                    tickLine={false}
+                  />
+                  <YAxis
+                    allowDecimals={false}
+                    tick={{ fill: "rgba(244, 241, 234, 0.62)", fontSize: 12 }}
+                    axisLine={{ stroke: "rgba(244, 241, 234, 0.16)" }}
+                    tickLine={false}
+                  />
+                  <Tooltip
+                    cursor={{ fill: "rgba(211, 173, 95, 0.08)" }}
+                    contentStyle={{
+                      background: "rgba(15, 15, 18, 0.96)",
+                      border: "1px solid rgba(244, 241, 234, 0.1)",
+                      borderRadius: 12,
+                      color: "#f4f1ea",
+                    }}
+                    labelStyle={{
+                      color: "#d3ad5f",
+                      marginBottom: 6,
+                    }}
+                  />
+                  <Bar
+                    dataKey="count"
+                    name="Visits"
+                    fill="#d3ad5f"
+                    radius={[10, 10, 0, 0]}
+                    maxBarSize={80}
+                  />
+                </BarChart>
+                </ResponsiveContainer>
+              </div>
+            ) : (
+              <div className="modStatsEmpty">
+                No referral visits recorded yet.
+              </div>
+            )}
           </section>
         </>
       )}

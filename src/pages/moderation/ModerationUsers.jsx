@@ -2,6 +2,15 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { getModerationUsers } from "../../api.js";
 import "./ModerationUsers.css";
+import {
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  CartesianGrid,
+} from "recharts";
 
 const PAGE_SIZE = 50;
 
@@ -63,6 +72,27 @@ export default function ModerationUsers() {
   const canGoPrev = offset > 0;
   const canGoNext = rows.length === PAGE_SIZE;
 
+  const referralChartData = Object.values(
+  rows.reduce((acc, row) => {
+    const source =
+      row.referralSource &&
+      row.referralSource !== "unknown"
+        ? row.referralSource
+        : "Other";
+
+    if (!acc[source]) {
+      acc[source] = {
+        source,
+        count: 0,
+      };
+    }
+
+    acc[source].count += 1;
+
+    return acc;
+  }, {})
+).sort((a, b) => b.count - a.count);
+
   return (
     <div className="page page--moderationUsers">
       <div className="moderationUsersHeader">
@@ -85,6 +115,7 @@ export default function ModerationUsers() {
         <div className="moderationUsersPanelTop">
           <div className="moderationUsersPanelTitle">User Directory</div>
           <div className="moderationUsersPageInfo">Showing up to 50 users</div>
+          
         </div>
 
         <div className="moderationUsersToolbar">
@@ -225,6 +256,91 @@ export default function ModerationUsers() {
           </>
         )}
       </div>
+        <section className="moderationUsersReferralPanel">
+  <div className="moderationUsersReferralHead">
+    <div>
+      <div className="moderationUsersPanelTitle">
+        User Referral Sources
+      </div>
+
+      <p className="moderationUsersReferralSub">
+        Where currently listed users originally came from.
+      </p>
+    </div>
+
+    <div className="moderationUsersReferralTotal">
+      <span>Total users</span>
+      <strong>{rows.length}</strong>
+    </div>
+  </div>
+
+  {referralChartData.length > 0 ? (
+    <div className="moderationUsersReferralChart">
+      <ResponsiveContainer width="100%" height={300}>
+        <BarChart
+          data={referralChartData}
+          margin={{ top: 16, right: 12, left: 0, bottom: 8 }}
+        >
+          <CartesianGrid
+            strokeDasharray="3 3"
+            stroke="rgba(244,241,234,0.08)"
+          />
+
+          <XAxis
+            dataKey="source"
+            tick={{
+              fill: "rgba(244,241,234,0.65)",
+              fontSize: 12,
+            }}
+            tickLine={false}
+            axisLine={{
+              stroke: "rgba(244,241,234,0.12)",
+            }}
+          />
+
+          <YAxis
+            allowDecimals={false}
+            tick={{
+              fill: "rgba(244,241,234,0.65)",
+              fontSize: 12,
+            }}
+            tickLine={false}
+            axisLine={{
+              stroke: "rgba(244,241,234,0.12)",
+            }}
+          />
+
+          <Tooltip
+            cursor={{
+              fill: "rgba(211,173,95,0.06)",
+            }}
+            contentStyle={{
+              background: "rgba(12,12,14,0.96)",
+              border: "1px solid rgba(244,241,234,0.08)",
+              borderRadius: 12,
+              color: "#f4f1ea",
+            }}
+            labelStyle={{
+              color: "#d3ad5f",
+              marginBottom: 6,
+            }}
+          />
+
+          <Bar
+            dataKey="count"
+            fill="#d3ad5f"
+            radius={[10, 10, 0, 0]}
+            maxBarSize={80}
+          />
+        </BarChart>
+      </ResponsiveContainer>
+    </div>
+  ) : (
+    <div className="moderationUsersEmpty">
+      No referral data available.
+    </div>
+  )}
+</section>
     </div>
   );
 }

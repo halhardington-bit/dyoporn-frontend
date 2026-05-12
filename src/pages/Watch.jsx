@@ -103,6 +103,76 @@ export default function Watch({ user, onRequireLogin }) {
     return !!myUsername && !!normalizedOwner && myUsername === normalizedOwner;
   };
 
+  function getWatchSessionId() {
+    const key = "dyop_watch_session_id";
+    let id = sessionStorage.getItem(key);
+
+    if (!id) {
+      id = crypto.randomUUID();
+      sessionStorage.setItem(key, id);
+    }
+
+    return id;
+  }
+
+  function setupWatchAnalytics(videoEl, videoId) {
+  let lastTime = null;
+  let lastSentAt = Date.now();
+
+  async function sendRange(start, end) {
+    if (end <= start) return;
+
+    await fetch(`/api/videos/${videoId}/watch-event`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({
+        session_id: getWatchSessionId(),
+        watched_start_sec: Math.floor(start),
+        watched_end_sec: Math.floor(end),
+      }),
+    }).catch(() => {});
+  }
+
+  function tick() {
+    if (!videoEl || videoEl.paused || videoEl.ended) return;
+
+    const current = videoEl.currentTime;
+
+    if (lastTime != null) {
+      const gap = current - lastTime;
+
+      // Normal playback only. If they seeked, don't pretend they watched the skipped gap.
+      if (gap > 0 && gap < 3) {
+        const now = Date.now();
+
+        if (now - lastSentAt > 10000) {
+          sendRange(lastTime, current);
+          lastSentAt = now;
+        }
+      }
+    }
+
+    lastTime = current;
+  }
+
+  const interval = setInterval(tick, 1000);
+
+  videoEl.addEventListener("seeked", () => {
+    lastTime = videoEl.currentTime;
+  });
+
+  videoEl.addEventListener("pause", () => {
+    if (lastTime != null) sendRange(lastTime, videoEl.currentTime);
+  });
+
+  videoEl.addEventListener("ended", () => {
+    if (lastTime != null) sendRange(lastTime, videoEl.currentTime);
+  });
+
+  return () => clearInterval(interval);
+}
+
   function handleTagClick(tag) {
     const q = String(tag || "").trim();
     if (!q) return;
@@ -277,6 +347,13 @@ export default function Watch({ user, onRequireLogin }) {
     if (!Number.isFinite(saved) || saved <= 5) return;
     pendingResumeRef.current = saved;
   }, [id, user?.id, video?.id, video?.progressSeconds]);
+
+  useEffect(() => {
+    const videoEl = videoRef.current;
+    if (!videoEl || !video?.id) return;
+
+    return setupWatchAnalytics(videoEl, video.id);
+  }, [video?.id]);
 
   useEffect(() => {
     if (!user?.id || !video?.id) return;
