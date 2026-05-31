@@ -725,6 +725,69 @@
   gap: 8px;
 }
 
+.watchPageChannelTopLine {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.watchPageSubscribeBtn {
+  appearance: none;
+  border-radius: 999px;
+  padding: 7px 13px;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+  border: 1px solid rgba(212, 175, 55, 0.28);
+  background: rgba(14, 14, 14, 0.96);
+  color: #d8b65a;
+}
+
+.watchPageSubscribeBtn.subscribed {
+  border-color: rgba(255,255,255,0.14);
+  color: rgba(255,255,255,0.82);
+}
+
+.watchPageSubscribeBtn:disabled {
+  opacity: 0.72;
+  cursor: default;
+}
+
+.watchPageChannelSub {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.watchPageChannelSubscribers {
+  font-size: 0.9rem;
+  color: rgba(255,255,255,0.75);
+}
+
+.watchPageChannelStats {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.55);
+}
+
+.watchPageSubscribeBtn {
+  position: relative;
+  z-index: 5;
+  pointer-events: auto;
+}
+
+@media (max-width: 520px) {
+  .watchPageSubscribeBtn {
+    padding: 6px 10px;
+    font-size: 11px;
+  }
+}
+
 @media (max-width: 900px) {
   .watchPageLayout {
     width: 100%;

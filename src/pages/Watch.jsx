@@ -10,6 +10,9 @@ import {
   recordHistory,
   removeHistoryItem,
   updateVideo,
+  getChannelSubscription,
+  subscribeToChannel,
+  unsubscribeFromChannel,
 } from "../api.js";
 import StarRating from "../ui/StarRating.jsx";
 import CommentsSection from "../ui/CommentsSection.jsx";
@@ -65,6 +68,11 @@ export default function Watch({ user, onRequireLogin }) {
   const [myRatingLoaded, setMyRatingLoaded] = useState(false);
   const [ratingBusy, setRatingBusy] = useState(false);
 
+  const [subscribed, setSubscribed] = useState(false);
+  const [subscriberCount, setSubscriberCount] = useState(0);
+  const [subBusy, setSubBusy] = useState(false);
+  const [subErr, setSubErr] = useState("");
+
   const [editingTitle, setEditingTitle] = useState(false);
   const [titleInput, setTitleInput] = useState("");
   const [titleBusy, setTitleBusy] = useState(false);
@@ -102,6 +110,72 @@ export default function Watch({ user, onRequireLogin }) {
       : null;
     return !!myUsername && !!normalizedOwner && myUsername === normalizedOwner;
   };
+
+  const channelUserId =
+  video?.channelUserId ||
+  video?.channel_user_id ||
+  video?.userId ||
+  video?.user_id ||
+  null;
+
+  useEffect(() => {
+    let alive = true;
+
+    (async () => {
+      if (!channelUserId) {
+        setSubscribed(false);
+        setSubscriberCount(0);
+        setSubErr("");
+        return;
+      }
+
+      try {
+        setSubErr("");
+        const data = await getChannelSubscription(channelUserId);
+        if (!alive) return;
+
+        setSubscribed(!!data?.subscribed);
+        setSubscriberCount(Number(data?.subscriberCount || 0));
+      } catch (e) {
+        if (!alive) return;
+        setSubErr(e?.message || "Failed to load subscription info");
+      }
+    })();
+
+    return () => {
+      alive = false;
+    };
+  }, [channelUserId, user?.id]);
+
+  async function handleToggleSubscription() {
+    console.log("subscribe click", { channelUserId, video });
+    if (!channelUserId || subBusy) return;
+
+    if (!isLoggedIn) {
+      return onRequireLogin?.(`/watch/${video.id}`);
+    }
+
+    if (isOwner(video)) return;
+
+    try {
+      setSubBusy(true);
+      setSubErr("");
+
+      if (subscribed) {
+        const data = await unsubscribeFromChannel(channelUserId);
+        setSubscribed(false);
+        setSubscriberCount(Number(data?.subscriberCount || 0));
+      } else {
+        const data = await subscribeToChannel(channelUserId);
+        setSubscribed(true);
+        setSubscriberCount(Number(data?.subscriberCount || 0));
+      }
+    } catch (e) {
+      setSubErr(e?.message || "Failed to update subscription");
+    } finally {
+      setSubBusy(false);
+    }
+}
 
   function getWatchSessionId() {
     const key = "dyop_watch_session_id";
@@ -704,24 +778,44 @@ export default function Watch({ user, onRequireLogin }) {
               </NavLink>
 
               <div className="watchPageChannelMeta">
-                <NavLink
-                  to={channelUsername ? `/u/${channelUsername}` : "#"}
-                  className="watchPageChannelNameLink"
-                  onClick={(e) => {
-                    if (!channelUsername) e.preventDefault();
-                  }}
-                >
-                  <div className="watchPageChannelName">{channelDisplay}</div>
-                </NavLink>
+                <div className="watchPageChannelTopLine">
+                  <NavLink
+                    to={channelUsername ? `/u/${channelUsername}` : "#"}
+                    className="watchPageChannelNameLink"
+                    onClick={(e) => {
+                      if (!channelUsername) e.preventDefault();
+                    }}
+                  >
+                    <div className="watchPageChannelName">{channelDisplay}</div>
+                  </NavLink>
+
+                  {!isOwner(video) ? (
+                    <button
+                      type="button"
+                      className={`watchPageSubscribeBtn ${subscribed ? "subscribed" : ""}`}
+                      onClick={handleToggleSubscription}
+                      disabled={subBusy}
+                    >
+                      {subBusy ? "Working..." : subscribed ? "Subscribed" : "Subscribe"}
+                    </button>
+                  ) : null}
+                </div>
 
                 <div className="watchPageChannelSub">
-                  <span>{formatInt(video.views)} views</span>
-                  {video.createdAt ? (
-                    <>
-                      <span className="dot">•</span>
-                      <span>Uploaded {timeAgo(video.createdAt)}</span>
-                    </>
-                  ) : null}
+                  <div className="watchPageChannelSubscribers">
+                    {formatInt(subscriberCount)} subscribers
+                  </div>
+
+                  <div className="watchPageChannelStats">
+                    <span>{formatInt(video.views)} views</span>
+
+                    {video.createdAt ? (
+                      <>
+                        <span className="dot">•</span>
+                        <span>Uploaded {timeAgo(video.createdAt)}</span>
+                      </>
+                    ) : null}
+                  </div>
                 </div>
               </div>
             </div>
