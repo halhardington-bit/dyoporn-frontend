@@ -250,6 +250,71 @@
   color: #ebcb75;
 }
 
+.editProfileAvatarWrap {
+  flex: 0 0 auto;
+}
+
+.editProfileAvatarPicker {
+  position: relative;
+  display: block;
+  width: 96px;
+  height: 96px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.editProfileAvatarPicker.isUploading {
+  pointer-events: none;
+  opacity: 0.75;
+}
+
+.editProfileAvatarPicker .editProfileAvatar {
+  width: 100%;
+  height: 100%;
+}
+
+.editProfileAvatarOverlay {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.48);
+  opacity: 0;
+  transition: opacity 0.16s ease;
+}
+
+.editProfileAvatarPicker:hover .editProfileAvatarOverlay {
+  opacity: 1;
+}
+
+.editProfileAvatarEditIcon {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+  color: white;
+  font-size: 18px;
+  font-weight: 800;
+  backdrop-filter: blur(8px);
+}
+
+@media (max-width: 720px) {
+  .editProfileAvatarPicker {
+    width: 84px;
+    height: 84px;
+  }
+}
+
+@media (max-width: 520px) {
+  .editProfileAvatarPicker {
+    width: 76px;
+    height: 76px;
+  }
+}
+
 @media (max-width: 900px) {
   .editProfileHeroInner {
     padding: 0 20px 20px;

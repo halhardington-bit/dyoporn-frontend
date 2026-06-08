@@ -70,12 +70,18 @@ export default function CommentsSection({
   const myUserId = user?.id != null ? Number(user.id) : null;
   const myUsername = user?.username ? String(user.username).toLowerCase() : null;
 
-  const canPost = useMemo(() => commentBody.trim().length > 0, [commentBody]);
 
-  const canSaveEdit = useMemo(
-    () => editingBody.trim().length > 0 && !!editing,
-    [editingBody, editing]
-  );
+  const COMMENT_MAX_LENGTH = 2000;
+
+  const canPost = useMemo(() => {
+    const len = commentBody.trim().length;
+    return len > 0 && len <= COMMENT_MAX_LENGTH;
+  }, [commentBody]);
+
+  const canSaveEdit = useMemo(() => {
+    const len = editingBody.trim().length;
+    return len > 0 && len <= COMMENT_MAX_LENGTH && !!editing;
+  }, [editingBody, editing]);
 
   const isOwner = (item) => {
     const ownerUsername =
@@ -96,6 +102,24 @@ export default function CommentsSection({
         : null;
 
     return myUserId != null && itemUserId === myUserId;
+  }
+
+  function Avatar({ url, name, small = false }) {
+    if (url) {
+      return (
+        <img
+          src={url}
+          alt={name || "User avatar"}
+          className={`watchPageCommentAvatar ${small ? "small" : ""}`}
+        />
+      );
+    }
+
+    return (
+      <div className={`watchPageCommentAvatar ${small ? "small" : ""}`}>
+        {initialLetter(name)}
+      </div>
+    );
   }
 
   function normalizeComments(items = []) {
@@ -150,6 +174,13 @@ export default function CommentsSection({
 
     const body = commentBody.trim();
     if (!body) return;
+
+      if (body.length > COMMENT_MAX_LENGTH) {
+        setCommentError(
+          `Comments cannot exceed ${COMMENT_MAX_LENGTH.toLocaleString()} characters.`
+        );
+        return;
+      }
 
     try {
       setCommentPostBusy(true);
@@ -252,6 +283,13 @@ export default function CommentsSection({
 
     const body = editingBody.trim();
     if (!body) return;
+
+      if (body.length > COMMENT_MAX_LENGTH) {
+        setCommentError(
+          `Comments cannot exceed ${COMMENT_MAX_LENGTH.toLocaleString()} characters.`
+        );
+        return;
+      }
 
     try {
       setEditBusy(true);
@@ -421,6 +459,20 @@ export default function CommentsSection({
               rows={3}
               disabled={!isLoggedIn || commentPostBusy}
             />
+            <div
+              style={{
+                marginTop: 6,
+                textAlign: "right",
+                fontSize: 12,
+                opacity: 0.7,
+                color:
+                  commentBody.length > COMMENT_MAX_LENGTH
+                    ? "#ff8f8f"
+                    : "rgba(255,255,255,0.7)",
+              }}
+            >
+              {commentBody.length.toLocaleString()} / {COMMENT_MAX_LENGTH.toLocaleString()}
+            </div>
             <div className="watchPageCommentComposerActions">
               <div className="watchPageCommentComposerButtons">
                 <button
@@ -474,9 +526,7 @@ export default function CommentsSection({
                       }}
                       title={commentName}
                     >
-                      <div className="watchPageCommentAvatar">
-                        {initialLetter(commentName)}
-                      </div>
+                      <Avatar url={c.avatarUrl} name={commentName} />
                     </NavLink>
 
                     <NavLink
@@ -655,9 +705,7 @@ export default function CommentsSection({
                                   }}
                                   title={replyName}
                                 >
-                                  <div className="watchPageCommentAvatar small">
-                                    {initialLetter(replyName)}
-                                  </div>
+                                  <Avatar url={r.avatarUrl} name={replyName} small />
                                 </NavLink>
 
                                 <NavLink

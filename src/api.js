@@ -792,6 +792,25 @@ export async function getModerationVideoWatchAnalytics(videoId, bucket = 15) {
   return res.json();
 }
 
+export async function uploadMyAvatar(file) {
+  const fd = new FormData();
+  fd.append("avatar", file);
+
+  const res = await fetch(`${API_BASE}/api/me/avatar`, {
+    method: "POST",
+    credentials: "include",
+    body: fd,
+  });
+
+  const data = await res.json().catch(() => ({}));
+
+  if (!res.ok) {
+    throw new Error(data.error || "Failed to upload avatar.");
+  }
+
+  return data;
+}
+
 export async function registerBeta({
   email,
   username,

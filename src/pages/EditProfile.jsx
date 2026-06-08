@@ -1,15 +1,21 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getMyProfile, updateMyProfile } from "../api.js";
 import "./EditProfile.css";
+import { getMyProfile, updateMyProfile, uploadMyAvatar } from "../api.js";
 
-export default function EditProfile({ user, onRequireLogin, onUserUpdated, refreshMe }) {
+export default function EditProfile({
+  user,
+  onRequireLogin,
+  onUserUpdated,
+  refreshMe,
+}) {
   const nav = useNavigate();
 
   const [form, setForm] = useState(null);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
+  const [avatarUploading, setAvatarUploading] = useState(false);
 
   useEffect(() => {
     let alive = true;
@@ -28,6 +34,7 @@ export default function EditProfile({ user, onRequireLogin, onUserUpdated, refre
         setErr("");
 
         const me = await getMyProfile();
+
         if (!alive) return;
         setForm(me);
       } catch (e) {
@@ -45,18 +52,54 @@ export default function EditProfile({ user, onRequireLogin, onUserUpdated, refre
   }, [user]);
 
   function setField(key, value) {
-    setForm((prev) => ({ ...prev, [key]: value }));
+    setForm((prev) => ({
+      ...(prev || {}),
+      [key]: value,
+    }));
   }
 
   const avatarPreview = useMemo(() => {
     if (form?.avatarUrl) return form.avatarUrl;
-    const fallback = form?.displayName || user?.username || "?";
-    return fallback;
+    return form?.displayName || user?.username || "?";
   }, [form?.avatarUrl, form?.displayName, user?.username]);
 
   const bannerStyle = form?.bannerUrl
     ? { backgroundImage: `url(${form.bannerUrl})` }
     : undefined;
+
+  async function uploadAvatar(file) {
+    if (!file) return;
+
+    setErr("");
+
+    try {
+      setAvatarUploading(true);
+
+      const result = await uploadMyAvatar(file);
+
+      setForm((prev) => ({
+        ...(prev || {}),
+        avatarUrl: result.avatarUrl,
+      }));
+
+      if (typeof onUserUpdated === "function" && result?.avatarUrl) {
+        onUserUpdated((prev) => ({
+          ...(prev || user || {}),
+          avatarUrl: result.avatarUrl,
+        }));
+      }
+
+      if (typeof refreshMe === "function") {
+        try {
+          await refreshMe();
+        } catch {}
+      }
+    } catch (e) {
+      setErr(e?.message || "Failed to upload avatar.");
+    } finally {
+      setAvatarUploading(false);
+    }
+  }
 
   async function save() {
     setErr("");
@@ -155,21 +198,54 @@ export default function EditProfile({ user, onRequireLogin, onUserUpdated, refre
       <div className="editProfilePage">
         <section className="editProfileHero">
           <div className="editProfileHeroBanner" style={bannerStyle}>
-            {!form?.bannerUrl ? <div className="editProfileHeroBannerFallback" /> : null}
+            {!form?.bannerUrl ? (
+              <div className="editProfileHeroBannerFallback" />
+            ) : null}
           </div>
 
           <div className="editProfileHeroInner">
             <div className="editProfileAvatarWrap">
-              {form?.avatarUrl ? (
-                <div
-                  className="editProfileAvatar"
-                  style={{ backgroundImage: `url(${form.avatarUrl})` }}
-                />
-              ) : (
-                <div className="editProfileAvatar editProfileAvatarFallback">
-                  {String(avatarPreview).charAt(0).toUpperCase()}
+              <label
+                className={`editProfileAvatarPicker ${
+                  avatarUploading ? "isUploading" : ""
+                }`}
+                title={
+                  avatarUploading ? "Uploading…" : "Edit profile picture"
+                }
+              >
+                {form?.avatarUrl ? (
+                  <div
+                    className="editProfileAvatar"
+                    style={{ backgroundImage: `url(${form.avatarUrl})` }}
+                  />
+                ) : (
+                  <div className="editProfileAvatar editProfileAvatarFallback">
+                    {String(avatarPreview).charAt(0).toUpperCase()}
+                  </div>
+                )}
+
+                <div className="editProfileAvatarOverlay">
+                  <span className="editProfileAvatarEditIcon">
+                    {avatarUploading ? "…" : "✎"}
+                  </span>
                 </div>
-              )}
+
+                <input
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp"
+                  hidden
+                  disabled={avatarUploading || busy}
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+
+                    if (file) {
+                      uploadAvatar(file);
+                    }
+
+                    e.target.value = "";
+                  }}
+                />
+              </label>
             </div>
 
             <div className="editProfileHeroText">
@@ -223,7 +299,7 @@ export default function EditProfile({ user, onRequireLogin, onUserUpdated, refre
               className="editProfileBtn"
               type="button"
               onClick={() => nav(-1)}
-              disabled={busy}
+              disabled={busy || avatarUploading}
             >
               Cancel
             </button>
@@ -232,7 +308,7 @@ export default function EditProfile({ user, onRequireLogin, onUserUpdated, refre
               className="editProfileBtn editProfileBtnPrimary"
               type="button"
               onClick={save}
-              disabled={busy}
+              disabled={busy || avatarUploading}
             >
               {busy ? "Saving…" : "Save changes"}
             </button>

@@ -223,6 +223,7 @@ export default function AppLayout({
         <CompleteGoogleSignupModal
           onSuccess={(updatedUser) => {
             onAuthSuccess(updatedUser);
+            window.location.reload();
           }}
         />
       )}

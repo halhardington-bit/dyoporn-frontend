@@ -43,6 +43,12 @@
   box-sizing: border-box;
 }
 
+.watchPageCommentAvatar {
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
 .watchPageCommentComposerBody {
   flex: 1;
   min-width: 0;
@@ -339,6 +345,27 @@
 
 .dot {
   opacity: 0.5;
+}
+
+.watchPageCommentAvatar {
+  width: 34px;
+  height: 34px;
+  min-width: 34px;
+  min-height: 34px;
+  flex: 0 0 34px;
+  border-radius: 999px;
+  object-fit: cover;
+  display: block;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.watchPageCommentAvatar.small {
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  min-height: 28px;
+  flex-basis: 28px;
 }
 
 @media (max-width: 700px) {
