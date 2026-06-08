@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { NavLink, Outlet, useNavigate, useLocation, Link } from "react-router-dom";
 import Header from "../components/Header.jsx";
 import AuthModal from "../components/AuthModal.jsx";
+import CompleteGoogleSignupModal from "../components/CompleteGoogleSignupModal.jsx";
 import Sidebar from "../components/Sidebar.jsx";
 import { resendVerificationEmail } from "../api.js";
 
@@ -198,7 +199,7 @@ export default function AppLayout({
         </main>
       </div>
 
-      {authOpen && (
+            {authOpen && (
         <AuthModal
           mode={authMode}
           onClose={onCloseAuth}
@@ -215,6 +216,14 @@ export default function AppLayout({
               ? onOpenLogin(postAuthPath)
               : onOpenRegister(postAuthPath)
           }
+        />
+      )}
+
+      {user?.usernameNeedsSetup && (
+        <CompleteGoogleSignupModal
+          onSuccess={(updatedUser) => {
+            onAuthSuccess(updatedUser);
+          }}
         />
       )}
     </div>

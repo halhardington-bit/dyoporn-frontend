@@ -763,6 +763,23 @@ export async function checkRegion() {
   return data;
 }
 
+export async function completeGoogleSignup({ username }) {
+  const res = await fetch(`${API_BASE}/auth/complete-google-signup`, {
+    method: "POST",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username }),
+  });
+
+  const data = await res.json().catch(() => ({}));
+
+  if (!res.ok) {
+    throw new Error(data?.error || "Failed to update username");
+  }
+
+  return data;
+}
+
 export async function getModerationVideoWatchAnalytics(videoId, bucket = 15) {
   const res = await fetch(
     `${API_BASE}/api/mod/videos/${videoId}/watch-analytics?bucket=${bucket}`,
