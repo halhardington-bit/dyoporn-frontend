@@ -4,9 +4,10 @@ import Header from "../components/Header.jsx";
 import AuthModal from "../components/AuthModal.jsx";
 import CompleteGoogleSignupModal from "../components/CompleteGoogleSignupModal.jsx";
 import Sidebar from "../components/Sidebar.jsx";
+import TermsModal from "../components/TermsModal.jsx";
 import { resendVerificationEmail } from "../api.js";
 
-function PlatformNotice() {
+function PlatformNotice({ onOpenTerms }) {
   return (
     <section className="platformNotice" aria-label="Platform notice">
       <div className="platformNoticeGrid">
@@ -28,6 +29,14 @@ function PlatformNotice() {
             adults aged 21+ and over only. Material that violates platform rules or
             applicable law is prohibited.
           </p>
+
+          <button
+            type="button"
+            className="platformNoticeLink platformNoticeButton"
+            onClick={onOpenTerms}
+          >
+            Terms and Conditions
+          </button>
         </article>
       </div>
     </section>
@@ -50,6 +59,7 @@ export default function AppLayout({
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [verifyBusy, setVerifyBusy] = useState(false);
   const [verifyMsg, setVerifyMsg] = useState("");
+  const [termsOpen, setTermsOpen] = useState(false);
 
   const nav = useNavigate();
   const location = useLocation();
@@ -95,11 +105,7 @@ export default function AppLayout({
         setQ={setQ}
       />
 
-      <div
-        className={`appShell ${
-          useStandaloneLayout ? "appShell--account" : ""
-        }`}
-      >
+      <div className={`appShell ${useStandaloneLayout ? "appShell--account" : ""}`}>
         {!hideSidebar && (
           <Sidebar
             user={user}
@@ -109,16 +115,8 @@ export default function AppLayout({
           />
         )}
 
-        <main
-          className={`appMain ${
-            useStandaloneLayout ? "appMain--account" : ""
-          }`}
-        >
-          <div
-            className={`appContent ${
-              useStandaloneLayout ? "appContent--account" : ""
-            }`}
-          >
+        <main className={`appMain ${useStandaloneLayout ? "appMain--account" : ""}`}>
+          <div className={`appContent ${useStandaloneLayout ? "appContent--account" : ""}`}>
             {user && user.emailVerified === false && !isLegalRoute && (
               <div className="verifyBanner">
                 <div className="verifyBannerText">
@@ -192,14 +190,16 @@ export default function AppLayout({
                   </div>
                 </section>
 
-                <PlatformNotice />
+                <PlatformNotice onOpenTerms={() => setTermsOpen(true)} />
               </>
             )}
           </div>
         </main>
       </div>
 
-            {authOpen && (
+      <TermsModal open={termsOpen} onClose={() => setTermsOpen(false)} />
+
+      {authOpen && (
         <AuthModal
           mode={authMode}
           onClose={onCloseAuth}

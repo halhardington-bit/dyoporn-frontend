@@ -183,6 +183,7 @@
   margin: 10px 0 12px;
 }
 
+
 .modal-socials .btn {
   width: 100%;
 }
@@ -260,3 +261,81 @@
   text-shadow: 0 0 8px rgba(120, 180, 255, 0.35);
 }
 
+
+.termsCheckboxRow {
+  display: grid;
+  grid-template-columns: 18px 1fr;
+  column-gap: 10px;
+  align-items: start;
+  margin-top: 10px;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.termsCheckboxRow input {
+  width: 16px;
+  height: 16px;
+  margin: 2px 0 0;
+  accent-color: #d4af37;
+}
+
+.termsCheckboxText {
+  min-width: 0;
+}
+
+.termsInlineLink {
+  display: inline;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: #8ab4ff;
+  font: inherit;
+  cursor: pointer;
+}
+
+.termsAgreement {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.termsAgreement input[type="checkbox"] {
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  accent-color: #d4af37;
+}
+
+.termsAgreementLabel {
+  flex: 1;
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.termsInlineLink {
+  display: inline;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  background: none;
+  color: #d4af37;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+.termsInlineLink:hover {
+  color: #f0cb54;
+}
+
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  filter: grayscale(0.4);
+}

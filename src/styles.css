@@ -1126,6 +1126,14 @@ select {
   transform: rotate(-4deg);
 }
 
+.platformNoticeButton {
+  border: 0;
+  padding: 0;
+  background: none;
+  cursor: pointer;
+  font: inherit;
+}
+
 .planBetaPrice {
   display: flex;
   align-items: baseline;

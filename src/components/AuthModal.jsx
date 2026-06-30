@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import "./LoginModal.css";
+import TermsModal from "./TermsModal.jsx";
 import { login, register } from "../api";
 
 function calculateAge(dateString) {
@@ -24,7 +25,7 @@ function calculateAge(dateString) {
 }
 
 export default function AuthModal({
-  mode = "login", // "login" | "register"
+  mode = "login",
   onClose,
   onSuccess,
   onSwitchMode,
@@ -37,20 +38,35 @@ export default function AuthModal({
   const [confirm, setConfirm] = useState("");
   const [dateOfBirth, setDateOfBirth] = useState("");
   const [country, setCountry] = useState("");
+  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [termsOpen, setTermsOpen] = useState(false);
   const [error, setError] = useState("");
 
   const backdropRef = useRef(null);
 
   useEffect(() => {
     const onKeyDown = (e) => {
-      if (e.key === "Escape") {
-        onClose?.();
+      if (e.key !== "Escape") return;
+
+      if (termsOpen) {
+        setTermsOpen(false);
+        return;
       }
+
+      onClose?.();
     };
 
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [onClose]);
+  }, [onClose, termsOpen]);
+
+  useEffect(() => {
+    setError("");
+
+    if (isLogin) {
+      setTermsAccepted(false);
+    }
+  }, [isLogin]);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -62,6 +78,11 @@ export default function AuthModal({
     }
 
     if (!isLogin) {
+      if (!termsAccepted) {
+        setError("Please confirm that you have read the Terms and Conditions.");
+        return;
+      }
+
       if (!username.trim()) {
         setError("Please choose a username.");
         return;
@@ -110,64 +131,71 @@ export default function AuthModal({
   }
 
   return (
-    <div
-      className="modal-backdrop"
-      ref={backdropRef}
-      onMouseDown={(e) => {
-        if (e.target === backdropRef.current) {
-          backdropRef.current._mouseDownOnBackdrop = true;
-        }
-      }}
-      onMouseUp={(e) => {
-        if (
-          backdropRef.current?._mouseDownOnBackdrop &&
-          e.target === backdropRef.current
-        ) {
-          onClose?.();
-        }
-        if (backdropRef.current) {
-          backdropRef.current._mouseDownOnBackdrop = false;
-        }
-      }}
-    >
-      <div className="modal" onClick={(e) => e.stopPropagation()}>
-        <div className="modal-header">
-          <div className="modal-header-left">
-            <h2 className="modal-title">
-              {isLogin ? "Log in" : "Create account"}
-            </h2>
+    <>
+      <div
+        className="modal-backdrop"
+        ref={backdropRef}
+        onMouseDown={(e) => {
+          if (e.target === backdropRef.current) {
+            backdropRef.current._mouseDownOnBackdrop = true;
+          }
+        }}
+        onMouseUp={(e) => {
+          if (
+            backdropRef.current?._mouseDownOnBackdrop &&
+            e.target === backdropRef.current
+          ) {
+            onClose?.();
+          }
 
-            <span className="signup-hint inline">
-              {isLogin ? (
-                <>
-                  Not a member?{" "}
-                  <button
-                    className="signup-link"
-                    type="button"
-                    onClick={() => onSwitchMode?.("register")}
-                  >
-                    Sign up now
-                  </button>
-                </>
-              ) : (
-                <>
-                  Already have an account?{" "}
-                  <button
-                    className="signup-link"
-                    type="button"
-                    onClick={() => onSwitchMode?.("login")}
-                  >
-                    Log in
-                  </button>
-                </>
-              )}
-            </span>
+          if (backdropRef.current) {
+            backdropRef.current._mouseDownOnBackdrop = false;
+          }
+        }}
+      >
+        <div className="modal" onClick={(e) => e.stopPropagation()}>
+          <div className="modal-header">
+            <div className="modal-header-left">
+              <h2 className="modal-title">
+                {isLogin ? "Log in" : "Create account"}
+              </h2>
+
+              <span className="signup-hint inline">
+                {isLogin ? (
+                  <>
+                    Not a member?{" "}
+                    <button
+                      className="signup-link"
+                      type="button"
+                      onClick={() => onSwitchMode?.("register")}
+                    >
+                      Sign up now
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    Already have an account?{" "}
+                    <button
+                      className="signup-link"
+                      type="button"
+                      onClick={() => onSwitchMode?.("login")}
+                    >
+                      Log in
+                    </button>
+                  </>
+                )}
+              </span>
+            </div>
+
+            <button
+              className="icon-btn"
+              type="button"
+              onClick={onClose}
+              aria-label="Close"
+            >
+              ✕
+            </button>
           </div>
-
-          <button className="icon-btn" onClick={onClose} aria-label="Close">
-            ✕
-          </button>
-        </div>
 
           <div className="modal-socials">
             <button
@@ -186,117 +214,147 @@ export default function AuthModal({
             </button>
           </div>
 
-          <div
-            style={{
-              opacity: 0.5,
-              textAlign: "center",
-              margin: "10px 0",
-            }}
-          >
+          <div style={{ opacity: 0.5, textAlign: "center", margin: "10px 0" }}>
             or
           </div>
 
-        <form className="modal-form" onSubmit={handleSubmit}>
-          {!isLogin && (
+          <form className="modal-form" onSubmit={handleSubmit}>
+            {!isLogin && (
+              <label className="field">
+                <span className="label">Username</span>
+                <input
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  placeholder="Your username"
+                  autoFocus
+                />
+              </label>
+            )}
+
             <label className="field">
-              <span className="label">Username</span>
+              <span className="label">Email</span>
               <input
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder="Your username"
-                autoFocus
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                type="email"
+                placeholder="you@example.com"
+                autoFocus={isLogin}
               />
             </label>
-          )}
 
-          <label className="field">
-            <span className="label">Email</span>
-            <input
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              type="email"
-              placeholder="you@example.com"
-              autoFocus={isLogin}
-            />
-          </label>
+            {!isLogin && (
+              <label className="field">
+                <span className="label">Date of birth</span>
+                <input
+                  value={dateOfBirth}
+                  onChange={(e) => setDateOfBirth(e.target.value)}
+                  type="date"
+                  max={new Date().toISOString().split("T")[0]}
+                />
+              </label>
+            )}
 
-          {!isLogin && (
+            {!isLogin && (
+              <label className="field">
+                <span className="label">
+                  Country <span style={{ opacity: 0.7 }}>(optional)</span>
+                </span>
+                <input
+                  value={country}
+                  onChange={(e) => setCountry(e.target.value)}
+                  type="text"
+                  placeholder="e.g. Japan"
+                />
+              </label>
+            )}
+
             <label className="field">
-              <span className="label">Date of birth</span>
+              <span className="label">Password</span>
               <input
-                value={dateOfBirth}
-                onChange={(e) => setDateOfBirth(e.target.value)}
-                type="date"
-                max={new Date().toISOString().split("T")[0]}
-              />
-            </label>
-          )}
-
-          {!isLogin && (
-            <label className="field">
-              <span className="label">Country <span style={{ opacity: 0.7 }}>(optional)</span></span>
-              <input
-                value={country}
-                onChange={(e) => setCountry(e.target.value)}
-                type="text"
-                placeholder="e.g. Japan"
-              />
-            </label>
-          )}
-
-          <label className="field">
-            <span className="label">Password</span>
-            <input
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              type="password"
-              placeholder="••••••••"
-            />
-          </label>
-
-          {!isLogin && (
-            <label className="field">
-              <span className="label">Confirm password</span>
-              <input
-                value={confirm}
-                onChange={(e) => setConfirm(e.target.value)}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 type="password"
                 placeholder="••••••••"
               />
             </label>
-          )}
 
-          {isLogin ? (
-            <div style={{ marginTop: 8 }}>
+            {!isLogin && (
+              <label className="field">
+                <span className="label">Confirm password</span>
+                <input
+                  value={confirm}
+                  onChange={(e) => setConfirm(e.target.value)}
+                  type="password"
+                  placeholder="••••••••"
+                />
+              </label>
+            )}
+
+            {!isLogin && (
+              <div className="termsAgreement">
+                <input
+                  id="termsAccepted"
+                  type="checkbox"
+                  checked={termsAccepted}
+                  onChange={(e) => setTermsAccepted(e.target.checked)}
+                />
+
+                <label htmlFor="termsAccepted" className="termsAgreementLabel">
+                  I confirm that I have read and agree to the{" "}
+                  <button
+                    type="button"
+                    className="termsInlineLink"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setTermsOpen(true);
+                    }}
+                  >
+                    Terms and Conditions
+                  </button>
+                  .
+                </label>
+              </div>
+            )}
+
+            {isLogin && (
+              <div style={{ marginTop: 8 }}>
+                <button
+                  type="button"
+                  className="signup-link"
+                  onClick={() => {
+                    onClose?.();
+                    window.location.href = "/forgot-password";
+                  }}
+                >
+                  Forgot password?
+                </button>
+              </div>
+            )}
+
+            {error && (
+              <div style={{ marginTop: 8, opacity: 0.9 }}>
+                <span style={{ color: "salmon" }}>{error}</span>
+              </div>
+            )}
+
+            <div className="modal-actions">
               <button
-                type="button"
-                className="signup-link"
-                onClick={() => {
-                  onClose?.();
-                  window.location.href = "/forgot-password";
-                }}
+                className="btn btn-primary"
+                type="submit"
+                disabled={!isLogin && !termsAccepted}
               >
-                Forgot password?
+                {isLogin ? "Log in" : "Create account"}
+              </button>
+
+              <button className="btn btn-ghost" type="button" onClick={onClose}>
+                Cancel
               </button>
             </div>
-          ) : null}
-
-          {error && (
-            <div style={{ marginTop: 8, opacity: 0.9 }}>
-              <span style={{ color: "salmon" }}>{error}</span>
-            </div>
-          )}
-
-          <div className="modal-actions">
-            <button className="btn btn-primary" type="submit">
-              {isLogin ? "Log in" : "Create account"}
-            </button>
-            <button className="btn btn-ghost" type="button" onClick={onClose}>
-              Cancel
-            </button>
-          </div>
-        </form>
+          </form>
+        </div>
       </div>
-    </div>
+
+      <TermsModal open={termsOpen} onClose={() => setTermsOpen(false)} />
+    </>
   );
 }
