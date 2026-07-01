@@ -1,0 +1,181 @@
+@import "./dmca.css";
+
+.privacyStandalonePage { padding: 28px 20px 56px; }
+.privacyPage { width: 100%; max-width: 1120px; margin: 0 auto; }
+
+.privacyHero,
+.privacyPanel,
+.privacyHeroCard,
+.privacyCallout,
+.privacyQuote {
+  /* uses same visual language as DMCA page */
+}
+
+.privacyHero {
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 22px;
+  padding: 34px 34px 28px;
+  border-radius: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background:
+    radial-gradient(circle at top right, rgba(212, 175, 55, 0.09), transparent 28%),
+    radial-gradient(circle at left center, rgba(255, 255, 255, 0.06), transparent 24%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.01)),
+    rgba(10, 10, 10, 0.94);
+}
+
+.privacyHeroBadge {
+  display: inline-flex;
+  margin-bottom: 12px;
+  padding: 7px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: rgba(255, 255, 255, 0.62);
+}
+
+.privacyHeroTitle {
+  margin: 0 0 12px;
+  font-size: 42px;
+  line-height: 0.98;
+  color: #fff;
+}
+
+.privacyHeroText,
+.privacyPanel p,
+.privacyChecklist li {
+  font-size: 14px;
+  line-height: 1.65;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.privacyGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+.privacyPanel {
+  padding: 24px;
+  border-radius: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: rgba(9, 9, 9, 0.94);
+}
+
+.privacyPanelHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.privacyStep {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.68);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.privacyPanel h2 {
+  margin: 0;
+  font-size: 21px;
+  color: #fff;
+}
+
+.privacyChecklist {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.privacyChecklist li {
+  position: relative;
+  padding-left: 18px;
+}
+
+.privacyChecklist li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.62em;
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(212, 175, 55, 0.78);
+}
+
+.privacyHeroCard,
+.privacyCallout {
+  margin-top: 18px;
+  padding: 16px 18px;
+  border-radius: 18px;
+  border: 1px solid rgba(212, 175, 55, 0.16);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.privacyHeroCardLabel,
+.privacyCalloutLabel {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.52);
+}
+
+.privacyHeroCardEmail {
+  font-size: 22px;
+  font-weight: 700;
+  color: #f4d377;
+}
+
+.privacyHeroCardSub,
+.privacyCalloutValue {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.privacyCalloutRow + .privacyCalloutRow {
+  margin-top: 10px;
+}
+
+@media (max-width: 900px) {
+  .privacyGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .privacyHeroTitle {
+    font-size: 34px;
+  }
+}
+
+@media (max-width: 640px) {
+  .privacyStandalonePage {
+    padding: 20px 14px 40px;
+  }
+
+  .privacyHero {
+    padding: 22px 18px 18px;
+    border-radius: 22px;
+  }
+
+  .privacyHeroTitle {
+    font-size: 28px;
+  }
+
+  .privacyPanel {
+    padding: 18px;
+  }
+}

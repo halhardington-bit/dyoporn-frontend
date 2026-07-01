@@ -11,16 +11,6 @@ function PlatformNotice({ onOpenTerms }) {
   return (
     <section className="platformNotice" aria-label="Platform notice">
       <div className="platformNoticeGrid">
-        <article className="platformNoticeCard">
-          <h3>DMCA & Rights</h3>
-          <p>
-            We review valid copyright and rights complaints and may remove content
-            or restrict accounts where necessary.
-          </p>
-          <Link to="/dmca" className="platformNoticeLink">
-            Read more
-          </Link>
-        </article>
 
         <article className="platformNoticeCard">
           <h3>Platform Notice</h3>
@@ -38,6 +28,29 @@ function PlatformNotice({ onOpenTerms }) {
             Terms and Conditions
           </button>
         </article>
+
+        <article className="platformNoticeCard">
+          <h3>Privacy Policy</h3>
+          <p>
+            Learn what information DYOP collects, how it is used, and the choices
+            users have regarding their data.
+          </p>
+          <Link to="/privacy" className="platformNoticeLink">
+            Read more
+          </Link>
+        </article>
+
+        <article className="platformNoticeCard">
+          <h3>DMCA & Rights</h3>
+          <p>
+            We review valid copyright and rights complaints and may remove content
+            or restrict accounts where necessary.
+          </p>
+          <Link to="/dmca" className="platformNoticeLink">
+            Read more
+          </Link>
+        </article>
+
       </div>
     </section>
   );
@@ -66,7 +79,9 @@ export default function AppLayout({
 
   const isModerator = !!user?.isModerator;
   const isAccountRoute = location.pathname.startsWith("/account");
-  const isLegalRoute = location.pathname.startsWith("/dmca");
+  const isLegalRoute =
+    location.pathname.startsWith("/dmca") ||
+    location.pathname.startsWith("/privacy");
   const hideSidebar = isAccountRoute || isLegalRoute;
   const useStandaloneLayout = isAccountRoute || isLegalRoute;
 

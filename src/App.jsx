@@ -29,6 +29,7 @@ import ModStats from "./pages/moderation/ModStats.jsx";
 
 import AgeGate from "./pages/AgeGate.jsx";
 import Dmca from "./pages/dmca.jsx";
+import PrivacyPolicy from "./pages/PrivacyPolicy.jsx";
 
 import AccountSettingsLayout from "./pages/accountSettings/AccountSettingsLayout.jsx";
 import AccountSettingsLanding from "./pages/accountSettings/AccountSettingsLanding.jsx";
@@ -290,6 +291,7 @@ export default function App() {
             element={<Plans user={user} onRequireLogin={openLogin} />}
           />
           <Route path="/dmca" element={<Dmca />} />
+          <Route path="/privacy" element={<PrivacyPolicy />} />
 
           <Route
             path="/generate"

@@ -125,7 +125,7 @@ function applyTimeFilter(videos, timeFilter) {
   });
 }
 
-const SHOW_BETA_BANNER = true;
+const SHOW_BETA_BANNER = false;
 
 function HomeBetaBanner() {
   return (
