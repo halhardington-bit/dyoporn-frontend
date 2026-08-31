@@ -28,7 +28,7 @@ import {
 } from "../api.js";
 
 const FLOATING_VIDEO_VAST_URL =
-  "https://servedby.revive-adserver.net/fc.php?script=apVideo:vast2&zoneid=30344";
+  `${API_BASE}/api/ads/vast?zoneId=30344`;
 
 
 function PlatformNotice({
@@ -611,7 +611,7 @@ export default function AppLayout({
       !user?.usernameNeedsSetup && (
 
         <FloatingVideoAd
-          vastUrl={`${API_BASE}/api/ads/vast?zoneId=YOUR_FLOATING_ZONE_ID`}
+          vastUrl={FLOATING_VIDEO_VAST_URL}
         />
 
       )}

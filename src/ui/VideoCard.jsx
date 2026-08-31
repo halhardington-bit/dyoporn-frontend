@@ -676,7 +676,7 @@ export default function VideoCard({
             <div className="lockOverlay">
               <div className="lockPill">
                 <span className="lockIcon">🔒</span>
-                <span>Subscribe to Watch</span>
+                <span>Signup for Free to Watch</span>
               </div>
             </div>
           )}
