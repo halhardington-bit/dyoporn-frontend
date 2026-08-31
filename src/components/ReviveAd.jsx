@@ -9,49 +9,59 @@ const REVIVE_ID =
 const REVIVE_SCRIPT =
   "https://servedby.revive-adserver.net/asyncjs.php";
 
-let reviveLoadScheduled = false;
+let reviveScriptPromise = null;
 
-function scheduleReviveLoad() {
-  if (reviveLoadScheduled) {
-    return;
+function ensureReviveScript() {
+  if (reviveScriptPromise) {
+    return reviveScriptPromise;
   }
 
-  reviveLoadScheduled = true;
-
-  window.setTimeout(() => {
-    reviveLoadScheduled = false;
-
-    /*
-     * Remove the previous loader script so running it again
-     * causes Revive to scan newly-rendered <ins> elements.
-     */
-    document
-      .querySelectorAll(
-        'script[data-dyop-revive-loader="true"]'
-      )
-      .forEach((script) => {
-        script.remove();
-      });
-
-    const script =
-      document.createElement(
-        "script"
+  reviveScriptPromise = new Promise((resolve, reject) => {
+    const existing =
+      document.querySelector(
+        `script[src^="${REVIVE_SCRIPT}"]`
       );
 
+    if (existing) {
+      if (
+        window.reviveAsync?.[
+          REVIVE_ID
+        ]
+      ) {
+        resolve();
+        return;
+      }
+
+      existing.addEventListener(
+        "load",
+        resolve,
+        { once: true }
+      );
+
+      existing.addEventListener(
+        "error",
+        reject,
+        { once: true }
+      );
+
+      return;
+    }
+
+    const script =
+      document.createElement("script");
+
     script.async = true;
+    script.src = REVIVE_SCRIPT;
 
-    script.src =
-      `${REVIVE_SCRIPT}?cb=${Date.now()}`;
-
-    script.setAttribute(
-      "data-dyop-revive-loader",
-      "true"
-    );
+    script.onload = resolve;
+    script.onerror = reject;
 
     document.body.appendChild(
       script
     );
-  }, 0);
+  });
+
+  return reviveScriptPromise;
 }
 
 export default function ReviveAd({
@@ -97,10 +107,6 @@ export default function ReviveAd({
       );
     });
 
-  /* =========================================================
-     GLOBAL AD SUSPENSION
-     ========================================================= */
-
   useEffect(() => {
     function handleSuspended(event) {
       setSuspended(
@@ -120,10 +126,6 @@ export default function ReviveAd({
       );
     };
   }, []);
-
-  /* =========================================================
-     MOBILE BREAKPOINT
-     ========================================================= */
 
   useEffect(() => {
     const mediaQuery =
@@ -156,10 +158,6 @@ export default function ReviveAd({
     mobileBreakpoint,
   ]);
 
-  /* =========================================================
-     ACTIVE ZONE
-     ========================================================= */
-
   const useMobileAd =
     isMobile &&
     mobileZoneId != null;
@@ -179,10 +177,6 @@ export default function ReviveAd({
       ? mobileHeight
       : height;
 
-  /* =========================================================
-     TELL REVIVE TO SCAN AFTER REACT RENDER
-     ========================================================= */
-
   useEffect(() => {
     if (
       suspended ||
@@ -191,12 +185,57 @@ export default function ReviveAd({
       return;
     }
 
-    scheduleReviveLoad();
+    let cancelled = false;
+
+    ensureReviveScript()
+      .then(() => {
+        if (cancelled) {
+          return;
+        }
+
+        /*
+         * Give React one frame to make sure the
+         * <ins> is committed to the DOM.
+         */
+        requestAnimationFrame(() => {
+          if (cancelled) {
+            return;
+          }
+
+          try {
+            const revive =
+              window.reviveAsync?.[
+                REVIVE_ID
+              ];
+
+            if (
+              revive &&
+              typeof revive.refresh ===
+                "function"
+            ) {
+              revive.refresh();
+            }
+          } catch (err) {
+            console.warn(
+              "Revive refresh failed:",
+              err
+            );
+          }
+        });
+      })
+      .catch((err) => {
+        console.warn(
+          "Revive script failed:",
+          err
+        );
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, [
     suspended,
     activeZoneId,
-    activeWidth,
-    activeHeight,
   ]);
 
   if (
@@ -205,10 +244,6 @@ export default function ReviveAd({
   ) {
     return null;
   }
-
-  /* =========================================================
-     REVIVE SLOT
-     ========================================================= */
 
   const slot = (
     <ins
@@ -221,16 +256,15 @@ export default function ReviveAd({
       }
       style={{
         display: "inline-block",
-        width: `${activeWidth}px`,
-        height: `${activeHeight}px`,
-        maxWidth: "100%",
+        width:
+          `${activeWidth}px`,
+        height:
+          `${activeHeight}px`,
+        maxWidth:
+          "100%",
       }}
     />
   );
-
-  /* =========================================================
-     BARE
-     ========================================================= */
 
   if (bare) {
     return (
@@ -250,10 +284,6 @@ export default function ReviveAd({
       </div>
     );
   }
-
-  /* =========================================================
-     STANDARD
-     ========================================================= */
 
   return (
     <section
