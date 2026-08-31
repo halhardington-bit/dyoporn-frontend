@@ -149,10 +149,16 @@ export default function ReviveAd({
         Math.random() * 1000000
       )}`;
 
+    const pageUrl =
+      typeof window !== "undefined"
+        ? window.location.href
+        : "";
+
     const src =
       `https://servedby.revive-adserver.net/afr.php` +
       `?zoneid=${encodeURIComponent(activeZoneId)}` +
-      `&cb=${cacheBuster}`;
+      `&cb=${cacheBuster}` +
+      `&loc=${encodeURIComponent(pageUrl)}`;
 
     const iframe =
       document.createElement(
@@ -179,6 +185,9 @@ export default function ReviveAd({
 
     iframe.title =
       "Advertisement";
+
+    iframe.referrerPolicy =
+    "strict-origin-when-cross-origin";
 
     iframe.setAttribute(
       "aria-label",

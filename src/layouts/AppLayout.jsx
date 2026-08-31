@@ -607,9 +607,7 @@ export default function AppLayout({
       !user?.usernameNeedsSetup && (
 
         <FloatingVideoAd
-          vastUrl={
-            FLOATING_VIDEO_VAST_URL
-          }
+          vastUrl={`${API_BASE}/api/ads/vast?zoneId=YOUR_FLOATING_ZONE_ID`}
         />
 
       )}
