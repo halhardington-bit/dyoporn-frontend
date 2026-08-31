@@ -416,44 +416,25 @@ export default function Home({
           return;
         }
 
-        if (isLoggedIn) {
-          const rows =
-            await getHomeRows();
+        const rows =
+  await getHomeRows();
 
-          if (!alive) {
-            return;
-          }
+if (!alive) {
+  return;
+}
 
-          const safeRows =
-            Array.isArray(rows)
-              ? rows
-              : [];
+const safeRows =
+  Array.isArray(rows)
+    ? rows
+    : [];
 
-          setHomeRows(
-            dedupeShelfRows(safeRows)
-          );
+setHomeRows(
+  dedupeShelfRows(safeRows)
+);
 
-          setVideos([]);
+setVideos([]);
 
-          return;
-        }
-
-        const vids =
-          await getVideos({});
-
-        if (!alive) {
-          return;
-        }
-
-        const filteredVids = applyTimeFilter(
-          Array.isArray(vids)
-            ? vids
-            : [],
-          time
-        );
-
-        setVideos(filteredVids);
-        setHomeRows([]);
+return;
       } catch (err) {
         console.error(
           "Home fetch failed:",
@@ -822,97 +803,58 @@ export default function Home({
       ) : (
         <div className="feedInner">
 
-          {isLoggedIn
-            ? homeRows.map(
-                (row, rowIndex) => {
-                  const rowVideos =
-                    row.videos || [];
+          {homeRows.map(
+            (row, rowIndex) => {
+              const rowVideos =
+                row.videos || [];
 
-                  const startIndex =
-                    cursor;
+              const startIndex =
+                cursor;
 
-                  cursor +=
-                    rowVideos.length;
+              cursor +=
+                rowVideos.length;
 
-                  return (
-                    <Fragment key={row.key}>
+              return (
+                <Fragment key={row.key}>
 
-                      <VideoShelf
-                        title={row.title}
-                        videos={rowVideos}
-                        user={user}
-                        onRequireLogin={
-                          onRequireLogin
-                        }
-                        startIndex={
-                          startIndex
-                        }
-                        lockAfter={
-                          shouldLockFreeVideos
-                            ? 2
-                            : 999999
-                        }
-                      />
+                  <VideoShelf
+                    title={row.title}
+                    videos={rowVideos}
+                    user={user}
+                    onRequireLogin={
+                      onRequireLogin
+                    }
+                    startIndex={
+                      startIndex
+                    }
+                    lockAfter={
+                      isLoggedIn
+                        ? (
+                            shouldLockFreeVideos
+                              ? 2
+                              : 999999
+                          )
+                        : 2
+                    }
+                  />
 
-                      {(rowIndex === 0 || (rowIndex + 1) % 10 === 0) ? (
-                        <ReviveAd
-                          zoneId={30239}
-                          width={728}
-                          height={90}
+                  {(rowIndex === 0 ||
+                    (rowIndex + 1) % 10 === 0) ? (
+                    <ReviveAd
+                      zoneId={30239}
+                      width={728}
+                      height={90}
 
-                          mobileZoneId={30470}
-                          mobileWidth={300}
-                          mobileHeight={100}
-                        />
-                      ) : null}
+                      mobileZoneId={30470}
+                      mobileWidth={300}
+                      mobileHeight={100}
+                    />
+                  ) : null}
 
-                    </Fragment>
-                  );
-                }
-              )
-            : tagRows.map(
-                (row, rowIndex) => {
-                  const rowVideos =
-                    row.videos || [];
-
-                  const startIndex =
-                    cursor;
-
-                  cursor +=
-                    rowVideos.length;
-
-                  return (
-                    <Fragment key={row.key}>
-
-                      <VideoShelf
-                        title={row.title}
-                        videos={rowVideos}
-                        user={user}
-                        onRequireLogin={
-                          onRequireLogin
-                        }
-                        startIndex={
-                          startIndex
-                        }
-                        lockAfter={2}
-                      />
-
-                      {(rowIndex === 0 || (rowIndex + 1) % 10 === 0) ? (
-                        <ReviveAd
-                          zoneId={30239}
-                          width={728}
-                          height={90}
-
-                          mobileZoneId={30470}
-                          mobileWidth={300}
-                          mobileHeight={100}
-                        />
-                      ) : null}
-
-                    </Fragment>
-                  );
-                }
-              )}
+                </Fragment>
+              );
+            }
+          )}
 
         </div>
       )}
