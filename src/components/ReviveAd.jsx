@@ -1,8 +1,58 @@
 import {
   useEffect,
-  useRef,
   useState,
 } from "react";
+
+const REVIVE_ID =
+  "727bec5e09208690b050ccfc6a45d384";
+
+const REVIVE_SCRIPT =
+  "https://servedby.revive-adserver.net/asyncjs.php";
+
+let reviveLoadScheduled = false;
+
+function scheduleReviveLoad() {
+  if (reviveLoadScheduled) {
+    return;
+  }
+
+  reviveLoadScheduled = true;
+
+  window.setTimeout(() => {
+    reviveLoadScheduled = false;
+
+    /*
+     * Remove the previous loader script so running it again
+     * causes Revive to scan newly-rendered <ins> elements.
+     */
+    document
+      .querySelectorAll(
+        'script[data-dyop-revive-loader="true"]'
+      )
+      .forEach((script) => {
+        script.remove();
+      });
+
+    const script =
+      document.createElement(
+        "script"
+      );
+
+    script.async = true;
+
+    script.src =
+      `${REVIVE_SCRIPT}?cb=${Date.now()}`;
+
+    script.setAttribute(
+      "data-dyop-revive-loader",
+      "true"
+    );
+
+    document.body.appendChild(
+      script
+    );
+  }, 0);
+}
 
 export default function ReviveAd({
   zoneId,
@@ -19,30 +69,36 @@ export default function ReviveAd({
   className = "",
   bare = false,
 }) {
-  const mountRef = useRef(null);
+  const [isMobile, setIsMobile] =
+    useState(() => {
+      if (
+        typeof window === "undefined"
+      ) {
+        return false;
+      }
 
-  const [isMobile, setIsMobile] = useState(() => {
-    if (typeof window === "undefined") {
-      return false;
-    }
+      return window.matchMedia(
+        `(max-width: ${mobileBreakpoint}px)`
+      ).matches;
+    });
 
-    return window.matchMedia(
-      `(max-width: ${mobileBreakpoint}px)`
-    ).matches;
-  });
+  const [suspended, setSuspended] =
+    useState(() => {
+      if (
+        typeof document === "undefined"
+      ) {
+        return false;
+      }
 
-  const [suspended, setSuspended] = useState(() => {
-    if (typeof document === "undefined") {
-      return false;
-    }
-
-    return (
-      document.documentElement.dataset.adsSuspended === "true"
-    );
-  });
+      return (
+        document.documentElement
+          .dataset.adsSuspended ===
+        "true"
+      );
+    });
 
   /* =========================================================
-     LISTEN FOR GLOBAL AD SUSPENSION
+     GLOBAL AD SUSPENSION
      ========================================================= */
 
   useEffect(() => {
@@ -101,7 +157,7 @@ export default function ReviveAd({
   ]);
 
   /* =========================================================
-     ACTIVE ZONE / SIZE
+     ACTIVE ZONE
      ========================================================= */
 
   const useMobileAd =
@@ -124,19 +180,10 @@ export default function ReviveAd({
       : height;
 
   /* =========================================================
-     CREATE REVIVE IFRAME
+     TELL REVIVE TO SCAN AFTER REACT RENDER
      ========================================================= */
 
   useEffect(() => {
-    const mount =
-      mountRef.current;
-
-    if (!mount) {
-      return;
-    }
-
-    mount.replaceChildren();
-
     if (
       suspended ||
       !activeZoneId
@@ -144,87 +191,7 @@ export default function ReviveAd({
       return;
     }
 
-    const cacheBuster =
-      `${Date.now()}${Math.floor(
-        Math.random() * 1000000
-      )}`;
-
-    const pageUrl =
-      typeof window !== "undefined"
-        ? window.location.href
-        : "";
-
-    const src =
-      `https://servedby.revive-adserver.net/afr.php` +
-      `?zoneid=${encodeURIComponent(activeZoneId)}` +
-      `&cb=${cacheBuster}` +
-      `&loc=${encodeURIComponent(pageUrl)}`;
-
-    const iframe =
-      document.createElement(
-        "iframe"
-      );
-
-    iframe.src =
-      src;
-
-    iframe.width =
-      String(activeWidth);
-
-    iframe.height =
-      String(activeHeight);
-
-    iframe.frameBorder =
-      "0";
-
-    iframe.scrolling =
-      "no";
-
-    iframe.allow =
-      "autoplay";
-
-    iframe.title =
-      "Advertisement";
-
-    iframe.referrerPolicy =
-    "strict-origin-when-cross-origin";
-
-    iframe.setAttribute(
-      "aria-label",
-      "Advertisement"
-    );
-
-    iframe.style.display =
-      "block";
-
-    iframe.style.border =
-      "0";
-
-    iframe.style.width =
-      `${activeWidth}px`;
-
-    iframe.style.height =
-      `${activeHeight}px`;
-
-    iframe.style.maxWidth =
-      "100%";
-
-    iframe.style.pointerEvents =
-      "auto";
-
-    mount.appendChild(
-      iframe
-    );
-
-    return () => {
-      if (
-        iframe.parentNode === mount
-      ) {
-        mount.removeChild(
-          iframe
-        );
-      }
-    };
+    scheduleReviveLoad();
   }, [
     suspended,
     activeZoneId,
@@ -232,16 +199,37 @@ export default function ReviveAd({
     activeHeight,
   ]);
 
-  /* =========================================================
-     SUSPENDED
-     ========================================================= */
-
-  if (suspended) {
+  if (
+    suspended ||
+    !activeZoneId
+  ) {
     return null;
   }
 
   /* =========================================================
-     BARE MODE
+     REVIVE SLOT
+     ========================================================= */
+
+  const slot = (
+    <ins
+      key={String(activeZoneId)}
+      data-revive-zoneid={
+        String(activeZoneId)
+      }
+      data-revive-id={
+        REVIVE_ID
+      }
+      style={{
+        display: "inline-block",
+        width: `${activeWidth}px`,
+        height: `${activeHeight}px`,
+        maxWidth: "100%",
+      }}
+    />
+  );
+
+  /* =========================================================
+     BARE
      ========================================================= */
 
   if (bare) {
@@ -251,21 +239,20 @@ export default function ReviveAd({
         style={{
           width:
             `${activeWidth}px`,
+          minHeight:
+            `${activeHeight}px`,
           maxWidth:
             "100%",
         }}
         aria-label="Advertisement"
       >
-        <div
-          ref={mountRef}
-          className="reviveAdMount"
-        />
+        {slot}
       </div>
     );
   }
 
   /* =========================================================
-     STANDARD MODULE
+     STANDARD
      ========================================================= */
 
   return (
@@ -282,14 +269,10 @@ export default function ReviveAd({
       <div
         className="reviveAdFrame"
         style={{
-          maxWidth:
-            "100%",
+          maxWidth: "100%",
         }}
       >
-        <div
-          ref={mountRef}
-          className="reviveAdMount"
-        />
+        {slot}
       </div>
     </section>
   );

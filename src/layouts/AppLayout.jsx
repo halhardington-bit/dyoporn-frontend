@@ -19,6 +19,10 @@ import TermsModal from "../components/TermsModal.jsx";
 import ReviveAd from "../components/ReviveAd.jsx";
 import FloatingVideoAd from "../components/FloatingVideoAd.jsx";
 
+const API_BASE =
+  (import.meta.env.VITE_API_BASE || "http://localhost:3001")
+    .replace(/\/$/, "");
+
 import {
   resendVerificationEmail,
 } from "../api.js";
