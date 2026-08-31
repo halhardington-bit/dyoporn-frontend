@@ -20,8 +20,12 @@ import "./Watch.css";
 import ReviveAd from "../components/ReviveAd.jsx";
 import DyopVideoPlayer from "../components/DyopVideoPlayer.jsx";
 
+const API_BASE =
+  (import.meta.env.VITE_API_BASE || "http://localhost:3001")
+    .replace(/\/$/, "");
+
 const REVIVE_PREROLL_VAST_URL =
-  "https://servedby.revive-adserver.net/fc.php?script=apVideo:vast2&zoneid=30344";
+  `${API_BASE}/api/ads/vast?zoneId=30344`;
 
 const INCLUDE_TEST_DATA =
   String(import.meta.env.VITE_INCLUDE_TEST_DATA || "0") === "1";
