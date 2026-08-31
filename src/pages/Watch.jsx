@@ -17,6 +17,11 @@ import {
 import StarRating from "../ui/StarRating.jsx";
 import CommentsSection from "../ui/CommentsSection.jsx";
 import "./Watch.css";
+import ReviveAd from "../components/ReviveAd.jsx";
+import DyopVideoPlayer from "../components/DyopVideoPlayer.jsx";
+
+const REVIVE_PREROLL_VAST_URL =
+  "https://servedby.revive-adserver.net/fc.php?script=apVideo:vast2&zoneid=30344";
 
 const INCLUDE_TEST_DATA =
   String(import.meta.env.VITE_INCLUDE_TEST_DATA || "0") === "1";
@@ -87,6 +92,9 @@ export default function Watch({ user, onRequireLogin }) {
   const [tagsInput, setTagsInput] = useState("");
   const [tagsBusy, setTagsBusy] = useState(false);
   const [tagsError, setTagsError] = useState("");
+
+  const [contentPlaybackActive, setContentPlaybackActive] =
+    useState(false);
 
   const isLoggedIn = !!user?.id;
 
@@ -423,14 +431,31 @@ export default function Watch({ user, onRequireLogin }) {
   }, [id, user?.id, video?.id, video?.progressSeconds]);
 
   useEffect(() => {
-    const videoEl = videoRef.current;
-    if (!videoEl || !video?.id) return;
+    if (!contentPlaybackActive) {
+      return;
+    }
 
-    return setupWatchAnalytics(videoEl, video.id);
-  }, [video?.id]);
+    const videoEl = videoRef.current;
+
+    if (!videoEl || !video?.id) {
+      return;
+    }
+
+    return setupWatchAnalytics(
+      videoEl,
+      video.id
+    );
+  }, [video?.id, contentPlaybackActive]);
+
 
   useEffect(() => {
-    if (!user?.id || !video?.id) return;
+    if (
+      !contentPlaybackActive ||
+      !user?.id ||
+      !video?.id
+    ) {
+      return;
+    }
 
     let sent = false;
     let finished = false;
@@ -512,7 +537,16 @@ export default function Watch({ user, onRequireLogin }) {
         recordHistory(video.id, el.currentTime).catch(() => {});
       }
     };
-  }, [user?.id, video?.id]);
+  }, [
+    user?.id,
+    video?.id,
+    contentPlaybackActive,
+  ]);
+
+
+  useEffect(() => {
+    setContentPlaybackActive(false);
+  }, [id]);
 
   useEffect(() => {
     let cancelled = false;
@@ -560,22 +594,71 @@ export default function Watch({ user, onRequireLogin }) {
           }
         }
 
-        const all = await getVideos({ category: v.category });
-        if (cancelled) return;
+        const categoryVideos = await getVideos({
+  category: v.category,
+});
 
-        setSuggested(
-          all
-            .filter((x) => String(x.id) !== String(id))
-            .filter((x) => INCLUDE_TEST_DATA || !x?.isTestData)
-            .map((x) => ({
-              ...x,
-              requiresPlan:
-                x.requiresPlan ||
-                !isLoggedIn ||
-                !hasPaidTier,
-            }))
-            .slice(0, 12)
-        );
+if (cancelled) return;
+
+const generalVideos = await getVideos();
+  if (cancelled) return;
+
+  const combined = [
+    ...(Array.isArray(categoryVideos)
+      ? categoryVideos
+      : []),
+
+    ...(Array.isArray(generalVideos)
+      ? generalVideos
+      : []),
+  ];
+
+  const seen = new Set();
+
+  const recommendations = combined
+    .filter((item) => {
+      if (!item?.id) {
+        return false;
+      }
+
+      if (
+        String(item.id) ===
+        String(id)
+      ) {
+        return false;
+      }
+
+      if (
+        !INCLUDE_TEST_DATA &&
+        item?.isTestData
+      ) {
+        return false;
+      }
+
+      const key =
+        String(item.id);
+
+      if (seen.has(key)) {
+        return false;
+      }
+
+      seen.add(key);
+
+      return true;
+    })
+    .map((item) => ({
+      ...item,
+
+      requiresPlan:
+        item.requiresPlan ||
+        !isLoggedIn ||
+        !hasPaidTier,
+    }))
+    .slice(0, 12);
+
+  setSuggested(
+    recommendations
+  );
 
         if (isLoggedIn) {
           try {
@@ -639,6 +722,8 @@ export default function Watch({ user, onRequireLogin }) {
     }
   }
 
+
+
   function tryRestorePlaybackPosition() {
     const el = videoRef.current;
     if (!el) return;
@@ -675,14 +760,19 @@ export default function Watch({ user, onRequireLogin }) {
     <div className="shell">
       <main className="watchPageLayout">
         <section className="watchPageMain">
-          <video
-            key={video.id}
+          <DyopVideoPlayer
             ref={videoRef}
-            className="watchPagePlayer"
-            controls
-            src={streamUrl(video)}
-            onLoadedMetadata={tryRestorePlaybackPosition}
-            onCanPlay={tryRestorePlaybackPosition}
+            contentSrc={streamUrl(video)}
+            vastUrl={REVIVE_PREROLL_VAST_URL}
+            onContentLoadedMetadata={() => {
+              tryRestorePlaybackPosition();
+            }}
+            onContentCanPlay={() => {
+              tryRestorePlaybackPosition();
+            }}
+            onContentPlay={() => {
+              setContentPlaybackActive(true);
+            }}
           />
 
           <div className={`watchPageTitleRow ${isOwner(video) ? "isOwner" : ""}`}>
@@ -701,6 +791,7 @@ export default function Watch({ user, onRequireLogin }) {
                       e.preventDefault();
                       saveTitleEdit();
                     }
+
                     if (e.key === "Escape") {
                       e.preventDefault();
                       cancelTitleEdit();
@@ -773,7 +864,9 @@ export default function Watch({ user, onRequireLogin }) {
                   }
                   aria-label="Channel avatar"
                 >
-                  {!channelAvatarUrl ? (channelDisplay?.[0]?.toUpperCase() || "?") : null}
+                  {!channelAvatarUrl
+                    ? channelDisplay?.[0]?.toUpperCase() || "?"
+                    : null}
                 </div>
               </NavLink>
 
@@ -786,17 +879,25 @@ export default function Watch({ user, onRequireLogin }) {
                       if (!channelUsername) e.preventDefault();
                     }}
                   >
-                    <div className="watchPageChannelName">{channelDisplay}</div>
+                    <div className="watchPageChannelName">
+                      {channelDisplay}
+                    </div>
                   </NavLink>
 
                   {!isOwner(video) ? (
                     <button
                       type="button"
-                      className={`watchPageSubscribeBtn ${subscribed ? "subscribed" : ""}`}
+                      className={`watchPageSubscribeBtn ${
+                        subscribed ? "subscribed" : ""
+                      }`}
                       onClick={handleToggleSubscription}
                       disabled={subBusy}
                     >
-                      {subBusy ? "Working..." : subscribed ? "Subscribed" : "Subscribe"}
+                      {subBusy
+                        ? "Working..."
+                        : subscribed
+                        ? "Subscribed"
+                        : "Subscribe"}
                     </button>
                   ) : null}
                 </div>
@@ -823,9 +924,15 @@ export default function Watch({ user, onRequireLogin }) {
 
           {(video.description || editingDescription) && (
             <div className="watchPageDescriptionBlock">
-              <div className={`watchPageDescriptionArea ${isOwner(video) ? "isOwner" : ""}`}>
+              <div
+                className={`watchPageDescriptionArea ${
+                  isOwner(video) ? "isOwner" : ""
+                }`}
+              >
                 <div className="watchPageDescriptionHeader">
-                  <div className="watchPageSectionLabel">Description:</div>
+                  <div className="watchPageSectionLabel">
+                    Description:
+                  </div>
 
                   {isOwner(video) && !editingDescription ? (
                     <button
@@ -845,15 +952,21 @@ export default function Watch({ user, onRequireLogin }) {
                     <textarea
                       className="watchPageDescriptionTextarea"
                       value={descriptionInput}
-                      onChange={(e) => setDescriptionInput(e.target.value)}
+                      onChange={(e) =>
+                        setDescriptionInput(e.target.value)
+                      }
                       rows={5}
                       autoFocus
                       disabled={descriptionBusy}
                       onKeyDown={(e) => {
-                        if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
+                        if (
+                          (e.metaKey || e.ctrlKey) &&
+                          e.key === "Enter"
+                        ) {
                           e.preventDefault();
                           saveDescriptionEdit();
                         }
+
                         if (e.key === "Escape") {
                           e.preventDefault();
                           cancelDescriptionEdit();
@@ -882,13 +995,17 @@ export default function Watch({ user, onRequireLogin }) {
                     </div>
 
                     {descriptionError ? (
-                      <div className="watchPageInlineError">{descriptionError}</div>
+                      <div className="watchPageInlineError">
+                        {descriptionError}
+                      </div>
                     ) : null}
                   </div>
                 ) : (
                   <div className="watchPageDescription">
                     {video.description || (
-                      <span className="watchPageMuted">No description yet.</span>
+                      <span className="watchPageMuted">
+                        No description yet.
+                      </span>
                     )}
                   </div>
                 )}
@@ -908,10 +1025,15 @@ export default function Watch({ user, onRequireLogin }) {
             <div className="watchPageRatingMeta">
               {myRating ? (
                 <div className="watchPageYourRating">
-                  Your rating: <span className="watchPageYourRatingValue">{myRating}</span>
+                  Your rating:{" "}
+                  <span className="watchPageYourRatingValue">
+                    {myRating}
+                  </span>
                 </div>
               ) : (
-                <div className="watchPageYourRating watchPageMuted">Your rating: —</div>
+                <div className="watchPageYourRating watchPageMuted">
+                  Your rating: —
+                </div>
               )}
 
               <div className="watchPageCommunityRating watchPageMuted">
@@ -922,8 +1044,13 @@ export default function Watch({ user, onRequireLogin }) {
             </div>
           </div>
 
-          {((Array.isArray(video.tags) && video.tags.length > 0) || editingTags) && (
-            <div className={`watchPageTagsBlock ${isOwner(video) ? "isOwner" : ""}`}>
+          {((Array.isArray(video.tags) && video.tags.length > 0) ||
+            editingTags) && (
+            <div
+              className={`watchPageTagsBlock ${
+                isOwner(video) ? "isOwner" : ""
+              }`}
+            >
               <div className="watchPageTagsHeader">
                 {isOwner(video) && !editingTags ? (
                   <button
@@ -953,6 +1080,7 @@ export default function Watch({ user, onRequireLogin }) {
                         e.preventDefault();
                         saveTagsEdit();
                       }
+
                       if (e.key === "Escape") {
                         e.preventDefault();
                         cancelTagsEdit();
@@ -984,14 +1112,22 @@ export default function Watch({ user, onRequireLogin }) {
                     </button>
                   </div>
 
-                  <div className="watchPageTagsHint">Separate tags with commas.</div>
+                  <div className="watchPageTagsHint">
+                    Separate tags with commas.
+                  </div>
 
                   {tagsError ? (
-                    <div className="watchPageInlineError">{tagsError}</div>
+                    <div className="watchPageInlineError">
+                      {tagsError}
+                    </div>
                   ) : null}
                 </div>
-              ) : Array.isArray(video.tags) && video.tags.length > 0 ? (
-                <div className="watchPageTags" aria-label="Video tags">
+              ) : Array.isArray(video.tags) &&
+                video.tags.length > 0 ? (
+                <div
+                  className="watchPageTags"
+                  aria-label="Video tags"
+                >
                   {video.tags.map((tag) => (
                     <button
                       key={tag}
@@ -1004,10 +1140,23 @@ export default function Watch({ user, onRequireLogin }) {
                   ))}
                 </div>
               ) : (
-                <div className="watchPageMuted">No tags yet.</div>
+                <div className="watchPageMuted">
+                  No tags yet.
+                </div>
               )}
             </div>
           )}
+
+          {/* Existing leaderboard ad above comments */}
+         <ReviveAd
+            zoneId={30248}
+            width={728}
+            height={90}
+
+            mobileZoneId={30490}
+            mobileWidth={300}
+            mobileHeight={100}
+          />
 
           <CommentsSection
             videoId={id}
@@ -1015,6 +1164,147 @@ export default function Watch({ user, onRequireLogin }) {
             onRequireLogin={onRequireLogin}
           />
         </section>
+
+        {/* Desktop watch-page sidebar */}
+        {/* Desktop watch-page sidebar */}
+        <aside
+          className="watchPageSidebar"
+          aria-label="Sponsored and related videos"
+        >
+          <div className="watchPageSidebarSticky">
+
+            <div className="watchPageSidebarAdCard">
+              <div className="watchPageSidebarAdHeader">
+                <span>Sponsored</span>
+                <span>Advertisement</span>
+              </div>
+
+              <ReviveAd
+                zoneId={30251}
+                width={300}
+                height={250}
+                bare
+              />
+            </div>
+
+            {suggested.length > 0 ? (
+              <section className="watchPageRelated">
+
+                <div className="watchPageRelatedHeader">
+                  <h2>Up Next</h2>
+                </div>
+
+                <div className="watchPageRelatedList">
+
+                  {suggested
+                    .slice(0, 8)
+                    .map((item) => {
+
+                      const thumbnail =
+                        item.thumbUrl ||
+                        item.thumb ||
+                        "";
+
+                      const creator =
+                        item.channelDisplayName ||
+                        item.channelUsername ||
+                        item.username ||
+                        "";
+
+                      return (
+                        <article
+                          key={item.id}
+                          className="watchPageRelatedItem"
+                        >
+                          <NavLink
+                            to={`/watch/${item.id}`}
+                            className="watchPageRelatedThumbLink"
+                            aria-label={`Watch ${item.title}`}
+                          >
+                            <div className="watchPageRelatedThumb">
+                              {thumbnail ? (
+                                <img
+                                  src={thumbnail}
+                                  alt=""
+                                  loading="lazy"
+                                />
+                              ) : (
+                                <div className="watchPageRelatedThumbFallback" />
+                              )}
+
+                              {item.durationText ? (
+                                <span className="watchPageRelatedDuration">
+                                  {item.durationText}
+                                </span>
+                              ) : null}
+                            </div>
+                          </NavLink>
+
+                          <div className="watchPageRelatedMeta">
+
+                            <NavLink
+                              to={`/watch/${item.id}`}
+                              className="watchPageRelatedTitle"
+                            >
+                              {item.title}
+                            </NavLink>
+
+                            {creator ? (
+                              <NavLink
+                                to={`/u/${encodeURIComponent(
+                                  item.channelUsername ||
+                                  item.username ||
+                                  ""
+                                )}`}
+                                className="watchPageRelatedChannel"
+                              >
+                                {creator}
+                              </NavLink>
+                            ) : null}
+
+                            <div className="watchPageRelatedStatsRow">
+
+                              <span className="watchPageRelatedStats">
+                                {formatInt(item.views)} views
+                              </span>
+
+                              {Number(item.ratingCount || 0) > 0 ? (
+                                <span className="watchPageRelatedRating">
+                                  <span className="watchPageRelatedStar">
+                                    ★
+                                  </span>
+
+                                  <span>
+                                    {Number(item.ratingAvg || 0).toFixed(2)}
+                                  </span>
+
+                                  <span className="watchPageRelatedRatingCount">
+                                    ({formatInt(item.ratingCount)})
+                                  </span>
+                                </span>
+                              ) : (
+                                <span className="watchPageRelatedUnrated">
+                                  Not yet rated
+                                </span>
+                              )}
+
+                            </div>
+                          </div>
+                        </article>
+                      );
+                    })}
+
+                </div>
+
+              </section>
+            ) : (
+              <div className="watchPageRelatedEmpty">
+                No recommendations available.
+              </div>
+            )}
+
+          </div>
+        </aside>
       </main>
     </div>
   );

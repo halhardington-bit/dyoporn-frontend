@@ -86,6 +86,24 @@ select {
   min-height: 100vh;
 }
 
+.reviveAdDevPlaceholder {
+  width: min(100%, 728px);
+  min-height: 90px;
+  margin: 16px auto 24px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px dashed rgba(255,255,255,0.1);
+  border-radius: 12px;
+
+  color: rgba(255,255,255,0.35);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
 /* =========================
    Topbar
    ========================= */
@@ -1126,6 +1144,125 @@ select {
   transform: rotate(-4deg);
 }
 
+.reviveAdModule {
+  width: 100%;
+  margin: 16px 0 24px;
+  padding: 14px 18px 18px;
+  box-sizing: border-box;
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(212, 175, 55, 0.05),
+      transparent 30%
+    ),
+    rgba(10, 10, 10, 0.72);
+}
+
+.reviveAdHeader {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 8px;
+
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.reviveAdFrame {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  width: 100%;
+  min-height: 90px;
+  overflow: hidden;
+  border-radius: 10px;
+}
+
+.reviveAdFrame iframe {
+  display: block;
+  width: 728px;
+  max-width: 100%;
+  height: 90px;
+  border: 0;
+}
+
+.reviveAd {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  width: 100%;
+  min-height: 90px;
+
+  margin: 18px 0 22px;
+}
+
+.reviveAd ins {
+  display: block;
+}
+
+.platformNoticeAd {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+
+  margin: 34px 0 30px;
+}
+
+.reviveAdModule {
+  width: fit-content;
+  max-width: 100%;
+  margin: 16px auto 24px;
+  padding: 10px 12px 12px;
+  box-sizing: border-box;
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(212, 175, 55, 0.05),
+      transparent 30%
+    ),
+    rgba(10, 10, 10, 0.72);
+}
+
+.reviveAdHeader {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 6px;
+
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.reviveAdFrame {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+
+  border-radius: 10px;
+}
+
+.reviveAdFrame iframe {
+  display: block;
+  width: 728px;
+  height: 90px;
+  border: 0;
+}
+
 .platformNoticeButton {
   border: 0;
   padding: 0;
@@ -1950,5 +2087,45 @@ select {
   .platformNoticeCard {
     padding: 18px;
     border-radius: 18px;
+  }
+}
+
+
+/* =========================
+   Mobile Revive Ads
+   ========================= */
+
+@media (max-width: 700px) {
+  .reviveAdModule {
+    width: fit-content;
+    max-width: 100%;
+    margin: 12px auto 16px;
+    padding: 0;
+
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+  }
+
+  .reviveAdHeader {
+    margin: 0 2px 4px 0;
+    font-size: 7px;
+    line-height: 1;
+  }
+
+  .reviveAdFrame {
+    width: 300px;
+    max-width: 100%;
+    height: 100px;
+    min-height: 0;
+    border-radius: 7px;
+    overflow: hidden;
+  }
+
+  .reviveAdFrame iframe {
+    width: 300px !important;
+    max-width: 100%;
+    height: 100px !important;
+    border: 0;
   }
 }

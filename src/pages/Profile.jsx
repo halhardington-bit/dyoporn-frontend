@@ -12,6 +12,8 @@ import {
   unsubscribeFromChannel,
 } from "../api.js";
 
+import ReviveAd from "../components/ReviveAd.jsx";
+
 function norm(s) {
   return String(s || "").toLowerCase().trim();
 }
@@ -403,6 +405,16 @@ export default function Profile({ user, onRequireLogin }) {
             </div>
           </div>
         </section>
+
+        <ReviveAd
+          zoneId={30250}
+          width={728}
+          height={90}
+
+          mobileZoneId={30492}
+          mobileWidth={300}
+          mobileHeight={100}
+        />
 
         <section className="profilePanel">
           <div className="profilePanelTop">

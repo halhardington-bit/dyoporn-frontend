@@ -21,58 +21,101 @@ export default function TermsModal({ open, onClose }) {
 
         <div className="termsBody">
           <p>
-            Welcome to DYOP. By using this platform, you agree to follow these
-            Terms and Conditions.
+            Welcome to DYOP. By creating an account or using this platform, you
+            agree to these Terms and Conditions. If you do not agree with these
+            terms, you should not use DYOP.
           </p>
 
           <h3>1. User Content</h3>
           <p>
-            You are responsible for the videos, audio, images, comments, and any
-            other content you upload or post. You must only publish content that
-            adheres to the conditions.
+            You are responsible for all videos, audio, images, comments, profile
+            pictures, and any other content you upload or publish on DYOP.
+          </p>
+          <p>
+            You may only publish content that complies with these Terms and all
+            applicable laws.
+          </p>
+          <p>
+            Content created using DYOP&apos;s built-in content generation tools,
+            including but not limited to images, videos, audio, text, or other
+            generated media, is the property of DYOP.
           </p>
 
           <h3>2. Prohibited Content</h3>
+          <p>You must not upload, publish, or distribute content that is:</p>
+          <ul>
+            <li>Illegal or promotes illegal activity.</li>
+            <li>Exploitative or abusive.</li>
+            <li>Hateful or intended to harass or threaten others.</li>
+            <li>Infringing on another person&apos;s intellectual property rights.</li>
+            <li>Fraudulent or misleading.</li>
+            <li>Otherwise prohibited by applicable law or platform policies.</li>
+          </ul>
           <p>
-            You may not upload illegal, abusive, exploitative, hateful,
-            threatening, or infringing content. We may remove content or suspend
-            accounts that violate these rules.
+            DYOP reserves the right to remove content or suspend accounts that
+            violate these Terms.
           </p>
 
           <h3>3. Copyright</h3>
           <p>
-            Do not upload copyrighted material unless you have the legal right to
-            do so. We may remove content that appears to infringe another
-            person’s rights.
+            You must not publish copyrighted material unless you own the rights
+            to the content or have permission from the copyright owner.
+          </p>
+          <p>
+            If we receive a valid copyright complaint, we may remove or disable
+            access to the content while the matter is reviewed.
           </p>
 
           <h3>4. Accounts</h3>
           <p>
-            You are responsible for keeping your account secure. You must not
-            impersonate others or misuse the platform.
+            You are responsible for maintaining the security of your account and
+            password.
           </p>
+          <p>You must not:</p>
+          <ul>
+            <li>Impersonate another individual or organization.</li>
+            <li>Share your account with others.</li>
+            <li>Attempt to gain unauthorized access to other accounts or systems.</li>
+          </ul>
+          <p>You are responsible for all activity that occurs under your account.</p>
 
           <h3>5. Platform Availability</h3>
           <p>
-            We may update, modify, pause, or discontinue parts of the platform at
-            any time.
+            DYOP may modify, update, suspend, or discontinue any feature or part
+            of the platform at any time without prior notice.
           </p>
+          <p>We do not guarantee uninterrupted availability of the service.</p>
 
           <h3>6. Limitation of Liability</h3>
+          <p>DYOP is provided on an &quot;as is&quot; and &quot;as available&quot; basis.</p>
           <p>
-            The platform is provided “as is”. We are not responsible for losses,
-            damages, or issues caused by your use of the platform.
+            To the fullest extent permitted by law, DYOP is not responsible for
+            any direct, indirect, incidental, consequential, or other damages
+            arising from your use of the platform or your inability to use the
+            platform.
           </p>
 
-          <h3>7. Changes to These Terms</h3>
+          <h3>7. Account Termination</h3>
           <p>
-            We may update these terms from time to time. Continued use of the
-            platform means you accept the updated terms.
+            We reserve the right to suspend, restrict, or terminate accounts that
+            violate these Terms, engage in unlawful activity, or misuse the
+            platform.
+          </p>
+          <p>
+            Where appropriate, we may also remove content that breaches these
+            Terms.
           </p>
 
-          <p className="termsNote">
-            Last updated: July 1, 2026
+          <h3>8. Changes to These Terms</h3>
+          <p>
+            We may update these Terms and Conditions from time to time.
           </p>
+          <p>
+            Continued use of DYOP after changes are published constitutes your
+            acceptance of the updated Terms.
+          </p>
+
+          <p className="termsNote">Last updated: July 1, 2026</p>
         </div>
 
         <div className="termsFooter">

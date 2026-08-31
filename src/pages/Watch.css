@@ -1031,3 +1031,584 @@
   transition: all 0.15s ease;
   z-index: 2;
 }
+
+/* =========================================================
+   WATCH PAGE - DESKTOP AD SIDEBAR
+   ========================================================= */
+
+.watchPageLayout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 324px;
+  gap: 24px;
+  align-items: start;
+  width: 100%;
+}
+
+.watchPageMain {
+  min-width: 0;
+  width: 100%;
+}
+
+.watchPageSidebar {
+  width: 324px;
+  min-width: 324px;
+  display: block;
+
+  /* Preserve the positioning you already liked. */
+  transform: translateX(60px);
+}
+
+.watchPageSidebarSticky {
+  position: sticky;
+  top: 90px;
+
+  width: 324px;
+}
+
+/*
+ * DYOP owns this outer presentation.
+ * Revive only supplies the 300 × 250 creative inside it.
+ */
+.watchPageSidebarAdCard {
+  width: 324px;
+  margin: 0;
+  padding: 10px 11px 12px;
+  box-sizing: border-box;
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(212, 175, 55, 0.055),
+      transparent 45%
+    ),
+    rgba(255, 255, 255, 0.018);
+
+  box-shadow:
+    0 14px 35px rgba(0, 0, 0, 0.22);
+}
+
+/* Small native-looking label above the creative. */
+.watchPageSidebarAdHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+
+  padding: 0 3px 8px;
+
+  color: rgba(255, 255, 255, 0.35);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+/*
+ * This ad uses ReviveAd's bare mode, so there is no second
+ * Revive card/header inside our DYOP sidebar module.
+ */
+.watchPageSidebarAdCard .reviveAdBare {
+  width: 300px;
+  height: 250px;
+  max-width: 100%;
+
+  margin: 0 auto;
+
+  overflow: hidden;
+
+  border-radius: 10px;
+
+  background: #000;
+}
+
+.watchPageSidebarAdCard .reviveAdMount {
+  width: 300px;
+  height: 250px;
+  max-width: 100%;
+}
+
+.watchPageSidebarAdCard .reviveAdBare iframe,
+.watchPageSidebarAdCard .reviveAdMount iframe {
+  display: block;
+
+  width: 300px !important;
+  height: 250px !important;
+
+  max-width: 100%;
+
+  border: 0;
+}
+
+/* =========================================================
+   DYOP VIDEO PLAYER
+   ========================================================= */
+
+.watchPagePlayer {
+  background: #000;
+}
+
+/* Main timeline */
+.watchPagePlayer::-webkit-media-controls-timeline {
+  accent-color: #d4af37;
+}
+
+/* Volume slider */
+.watchPagePlayer::-webkit-media-controls-volume-slider {
+  accent-color: #d4af37;
+}
+
+.watchPagePlayer {
+  accent-color: #d4af37;
+}
+
+/* ---------------------------------------------------------
+   HIDE SIDEBAR WHEN THERE ISN'T ENOUGH ROOM
+   --------------------------------------------------------- */
+
+@media (max-width: 1180px) {
+  .watchPageLayout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .watchPageSidebar {
+    display: none;
+  }
+}
+
+
+/* =========================================================
+   WATCH SIDEBAR - RELATED / UP NEXT
+   ========================================================= */
+
+.watchPageRelated {
+  width: 100%;
+  margin-top: 18px;
+}
+
+.watchPageRelatedHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 10px;
+  padding: 0 2px;
+}
+
+.watchPageRelatedHeader h2 {
+  margin: 0;
+
+  color: rgba(255, 255, 255, 0.92);
+
+  font-size: 15px;
+  font-weight: 800;
+  line-height: 1.2;
+
+  letter-spacing: -0.01em;
+}
+
+.watchPageRelatedList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.watchPageRelatedItem {
+  display: grid;
+  grid-template-columns: 120px minmax(0, 1fr);
+  gap: 10px;
+
+  min-width: 0;
+
+  padding: 6px;
+
+  border: 1px solid transparent;
+  border-radius: 12px;
+
+  background: transparent;
+
+  color: inherit;
+  text-decoration: none;
+
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    transform 0.15s ease;
+}
+
+.watchPageRelatedItem:hover {
+  background: rgba(255, 255, 255, 0.035);
+  border-color: rgba(255, 255, 255, 0.06);
+
+  transform: translateY(-1px);
+}
+
+
+/* =========================================================
+   THUMBNAIL
+   ========================================================= */
+
+.watchPageRelatedThumb {
+  position: relative;
+
+  width: 120px;
+  aspect-ratio: 16 / 9;
+
+  overflow: hidden;
+
+  border-radius: 9px;
+
+  background: #050505;
+}
+
+.watchPageRelatedThumb img {
+  display: block;
+
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+}
+
+.watchPageRelatedThumbFallback {
+  width: 100%;
+  height: 100%;
+
+  background:
+    radial-gradient(
+      circle at center,
+      rgba(212, 175, 55, 0.08),
+      transparent 55%
+    ),
+    rgba(255, 255, 255, 0.025);
+}
+
+.watchPageRelatedDuration {
+  position: absolute;
+
+  right: 5px;
+  bottom: 5px;
+
+  padding: 2px 5px;
+
+  border-radius: 5px;
+
+  background: rgba(0, 0, 0, 0.82);
+
+  color: rgba(255, 255, 255, 0.94);
+
+  font-size: 9px;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+
+/* =========================================================
+   VIDEO META
+   ========================================================= */
+
+.watchPageRelatedMeta {
+  min-width: 0;
+
+  padding-top: 1px;
+}
+
+.watchPageRelatedTitle {
+  display: -webkit-box;
+
+  overflow: hidden;
+
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+
+  color: rgba(255, 255, 255, 0.9);
+
+  font-size: 12px;
+  font-weight: 750;
+  line-height: 1.3;
+}
+
+.watchPageRelatedChannel,
+.watchPageRelatedStats {
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  color: rgba(255, 255, 255, 0.46);
+
+  font-size: 10px;
+  line-height: 1.35;
+}
+
+.watchPageRelatedChannel {
+  margin-top: 6px;
+}
+
+.watchPageRelatedStats {
+  margin-top: 2px;
+}
+
+
+/* =========================================================
+   EMPTY STATE
+   ========================================================= */
+
+.watchPageRelatedEmpty {
+  margin-top: 18px;
+
+  padding: 14px 12px;
+
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+
+  background: rgba(255, 255, 255, 0.018);
+
+  color: rgba(255, 255, 255, 0.38);
+
+  font-size: 11px;
+  text-align: center;
+}
+
+
+/* =========================================================
+   SMALLER DESKTOP SIDEBAR TUNING
+   ========================================================= */
+
+@media (max-width: 1280px) and (min-width: 1181px) {
+  .watchPageRelatedItem {
+    grid-template-columns: 110px minmax(0, 1fr);
+  }
+
+  .watchPageRelatedThumb {
+    width: 110px;
+  }
+
+  .watchPageRelatedTitle {
+    font-size: 11px;
+  }
+}
+
+/* =========================================================
+   WATCH SIDEBAR - RELATED RATINGS
+   ========================================================= */
+
+.watchPageRelatedStatsRow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+
+  gap: 5px 8px;
+
+  margin-top: 3px;
+}
+
+.watchPageRelatedStats {
+  margin-top: 0;
+
+  color: rgba(255, 255, 255, 0.46);
+
+  font-size: 10px;
+  line-height: 1.35;
+}
+
+.watchPageRelatedRating {
+  display: inline-flex;
+  align-items: center;
+
+  gap: 3px;
+
+  color: rgba(255, 255, 255, 0.72);
+
+  font-size: 10px;
+  font-weight: 650;
+
+  line-height: 1.35;
+}
+
+.watchPageRelatedStar {
+  color: #d4af37;
+
+  font-size: 10px;
+}
+
+.watchPageRelatedRatingCount {
+  color: rgba(255, 255, 255, 0.38);
+
+  font-weight: 500;
+}
+
+.watchPageRelatedUnrated {
+  color: rgba(255, 255, 255, 0.34);
+
+  font-size: 9px;
+}
+
+.watchPageRelatedItem {
+  display: grid;
+  grid-template-columns: 120px minmax(0, 1fr);
+  gap: 10px;
+
+  min-width: 0;
+  padding: 6px;
+
+  border: 1px solid transparent;
+  border-radius: 12px;
+
+  background: transparent;
+
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    transform 0.15s ease;
+}
+
+.watchPageRelatedItem:hover {
+  background: rgba(255, 255, 255, 0.035);
+  border-color: rgba(255, 255, 255, 0.06);
+  transform: translateY(-1px);
+}
+
+
+/* Thumbnail link */
+
+.watchPageRelatedThumbLink {
+  display: block;
+
+  color: inherit;
+  text-decoration: none;
+}
+
+
+/* Video title link */
+
+.watchPageRelatedTitle {
+  display: -webkit-box;
+
+  overflow: hidden;
+
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+
+  color: rgba(255, 255, 255, 0.9);
+
+  font-size: 12px;
+  font-weight: 750;
+  line-height: 1.3;
+
+  text-decoration: none;
+}
+
+.watchPageRelatedTitle:hover {
+  color: #fff;
+}
+
+
+/* Creator profile link */
+
+.watchPageRelatedChannel {
+  display: block;
+
+  width: fit-content;
+  max-width: 100%;
+
+  margin-top: 6px;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  color: rgba(255, 255, 255, 0.46);
+
+  font-size: 10px;
+  line-height: 1.35;
+
+  text-decoration: none;
+
+  transition: color 0.15s ease;
+}
+
+.watchPageRelatedChannel:hover {
+  color: #d4af37;
+  text-decoration: underline;
+}
+
+@media (max-width: 1180px) {
+  .watchPageLayout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .watchPageSidebar {
+    display: block;
+
+    width: 100%;
+    min-width: 0;
+
+    transform: none;
+
+    margin-top: 18px;
+  }
+
+  .watchPageSidebarSticky {
+    position: static;
+
+    width: 100%;
+  }
+
+  .watchPageSidebarAdCard {
+    width: fit-content;
+    max-width: 100%;
+
+    margin: 0 auto;
+  }
+
+  .watchPageRelated {
+    width: 100%;
+
+    margin-top: 22px;
+  }
+}
+
+@media (max-width: 700px) {
+  .watchPageSidebar {
+    margin-top: 14px;
+  }
+
+  .watchPageRelatedHeader h2 {
+    font-size: 16px;
+  }
+
+  .watchPageRelatedList {
+    gap: 8px;
+  }
+
+  .watchPageRelatedItem {
+    grid-template-columns: 135px minmax(0, 1fr);
+
+    gap: 10px;
+
+    padding: 6px 2px;
+
+    border-radius: 10px;
+  }
+
+  .watchPageRelatedThumb {
+    width: 135px;
+
+    border-radius: 8px;
+  }
+
+  .watchPageRelatedTitle {
+    font-size: 13px;
+  }
+
+  .watchPageRelatedChannel,
+  .watchPageRelatedStats,
+  .watchPageRelatedRating {
+    font-size: 10px;
+  }
+}
+

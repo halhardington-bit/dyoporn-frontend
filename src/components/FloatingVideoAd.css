@@ -1,0 +1,327 @@
+.floatingVideoAd {
+  position: fixed;
+
+  right: 28px;
+  bottom: 28px;
+
+  width: 320px;
+  aspect-ratio: 16 / 9;
+
+  z-index: 85;
+
+  opacity: 0;
+
+  transform:
+    translateY(16px)
+    scale(0.98);
+
+  transition:
+    opacity 0.22s ease,
+    transform 0.22s ease;
+
+  pointer-events: none;
+
+  filter:
+    drop-shadow(
+      0 22px 48px
+      rgba(0, 0, 0, 0.62)
+    );
+}
+
+.floatingVideoAd--ready {
+  opacity: 1;
+
+  transform:
+    translateY(0)
+    scale(1);
+
+  pointer-events: auto;
+}
+
+.floatingVideoAdShell {
+  position: relative;
+
+  width: 100%;
+  height: 100%;
+
+  overflow: visible;
+}
+
+.floatingVideoAdMedia {
+  position: absolute;
+  inset: 0;
+
+  display: block;
+
+  width: 100%;
+  height: 100%;
+
+  padding: 0;
+
+  overflow: hidden;
+
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.15);
+
+  border-radius: 16px;
+
+  background: #000;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 0 0 1px
+      rgba(0, 0, 0, 0.35),
+    0 20px 55px
+      rgba(0, 0, 0, 0.54);
+}
+
+.floatingVideoAdVideo {
+  display: block;
+
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+
+  background: #000;
+
+  pointer-events: none;
+}
+
+.floatingVideoAdShade {
+  position: absolute;
+
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  height: 45%;
+
+  pointer-events: none;
+
+  background:
+    linear-gradient(
+      to top,
+      rgba(0, 0, 0, 0.72),
+      rgba(0, 0, 0, 0)
+    );
+}
+
+/* =========================================
+   TOP CONTROLS
+   ========================================= */
+
+.floatingVideoAdTopControls {
+  position: absolute;
+
+  top: 12px;
+  right: 12px;
+
+  z-index: 10;
+
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+
+  pointer-events: auto;
+}
+
+.floatingVideoAdAudioButton,
+.floatingVideoAdClose {
+  width: 46px;
+  height: 46px;
+
+  display: grid;
+  place-items: center;
+
+  padding: 0;
+
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.18);
+
+  border-radius: 999px;
+
+  background:
+    rgba(5, 5, 5, 0.88);
+
+  color: #fff;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 8px 22px
+    rgba(0, 0, 0, 0.42);
+
+  backdrop-filter: blur(8px);
+
+  transition:
+    transform 0.14s ease,
+    background 0.14s ease,
+    border-color 0.14s ease;
+}
+
+.floatingVideoAdAudioButton {
+  font-size: 20px;
+}
+
+.floatingVideoAdClose {
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.floatingVideoAdAudioButton:hover,
+.floatingVideoAdClose:hover {
+  transform: scale(1.08);
+
+  background:
+    rgba(22, 22, 22, 0.96);
+
+  border-color:
+    rgba(255, 255, 255, 0.32);
+}
+
+.floatingVideoAdAudioButton:active,
+.floatingVideoAdClose:active {
+  transform: scale(0.96);
+}
+
+/* =========================================
+   LABEL
+   ========================================= */
+
+.floatingVideoAdLabel {
+  position: absolute;
+
+  left: 14px;
+  bottom: 12px;
+
+  z-index: 8;
+
+  display: flex;
+  align-items: center;
+
+  gap: 8px;
+
+  pointer-events: none;
+
+  color:
+    rgba(255, 255, 255, 0.9);
+
+  font-size: 11px;
+  font-weight: 800;
+
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.floatingVideoAdFinished {
+  opacity: 0.62;
+
+  font-size: 9px;
+  font-weight: 700;
+}
+
+/* =========================================
+   MEDIUM SCREENS
+   ========================================= */
+
+@media (max-width: 1100px) {
+  .floatingVideoAd {
+    width: 360px;
+
+    right: 20px;
+    bottom: 20px;
+  }
+
+  .floatingVideoAdAudioButton,
+  .floatingVideoAdClose {
+    width: 42px;
+    height: 42px;
+  }
+}
+
+/* =========================================
+   MOBILE
+   ========================================= */
+
+@media (max-width: 700px) {
+  .floatingVideoAd {
+    width:
+      min(
+        86vw,
+        340px
+      );
+
+    right: 12px;
+    bottom: 16px;
+  }
+
+  .floatingVideoAdMedia {
+    border-radius: 13px;
+  }
+
+  .floatingVideoAdTopControls {
+    top: 9px;
+    right: 9px;
+
+    gap: 8px;
+  }
+
+  .floatingVideoAdAudioButton,
+  .floatingVideoAdClose {
+    width: 42px;
+    height: 42px;
+  }
+
+  .floatingVideoAdAudioButton {
+    font-size: 19px;
+  }
+
+  .floatingVideoAdClose {
+    font-size: 17px;
+  }
+
+  .floatingVideoAdLabel {
+    left: 10px;
+    bottom: 8px;
+
+    font-size: 9px;
+  }
+}
+
+/* =========================================
+   VIDEO PROGRESS
+   ========================================= */
+
+.floatingVideoAdProgress {
+  position: absolute;
+
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  z-index: 9;
+
+  height: 4px;
+
+  overflow: hidden;
+
+  background:
+    rgba(255, 255, 255, 0.18);
+
+  pointer-events: none;
+}
+
+.floatingVideoAdProgressFill {
+  width: 0%;
+  height: 100%;
+
+  background: #ffd400;
+
+  transition:
+    width 0.12s linear;
+}

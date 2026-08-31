@@ -1,8 +1,17 @@
-import { useEffect, useMemo, useState } from "react";
-import { useOutletContext, useSearchParams, Link, NavLink } from "react-router-dom";
+import { Fragment, useEffect, useMemo, useState } from "react";
+import {
+  useOutletContext,
+  useSearchParams,
+  Link,
+  NavLink,
+} from "react-router-dom";
+
 import { getVideos, getHomeRows } from "../api.js";
 import { VideoShelf } from "../ui/VideoShelf.jsx";
 import VideoCard from "../ui/VideoCard.jsx";
+import ReviveAd from "../components/ReviveAd.jsx";
+
+const SEARCH_AD_ZONE_ID = 30249;
 
 function normTag(t) {
   return String(t || "").trim().toLowerCase();
@@ -10,7 +19,11 @@ function normTag(t) {
 
 function titleTag(t) {
   const s = String(t || "").trim();
-  if (!s) return "Other";
+
+  if (!s) {
+    return "Other";
+  }
+
   return s
     .split(/[\s_-]+/)
     .filter(Boolean)
@@ -18,36 +31,70 @@ function titleTag(t) {
     .join(" ");
 }
 
-function buildRowsByTags(videos, { maxRows = 8, minCount = 2 } = {}) {
+function chunkArray(items, size) {
+  const chunks = [];
+
+  for (let i = 0; i < items.length; i += size) {
+    chunks.push(items.slice(i, i + size));
+  }
+
+  return chunks;
+}
+
+function buildRowsByTags(
+  videos,
+  {
+    maxRows = 8,
+    minCount = 2,
+  } = {}
+) {
   const counts = new Map();
 
-  for (const v of videos) {
-    const tags = Array.isArray(v.tags) ? v.tags : [];
+  for (const video of videos) {
+    const tags = Array.isArray(video.tags)
+      ? video.tags
+      : [];
+
     for (const raw of tags) {
-      const t = normTag(raw);
-      if (!t) continue;
-      counts.set(t, (counts.get(t) || 0) + 1);
+      const tag = normTag(raw);
+
+      if (!tag) {
+        continue;
+      }
+
+      counts.set(tag, (counts.get(tag) || 0) + 1);
     }
   }
 
   const topTags = [...counts.entries()]
-    .filter(([, c]) => c >= minCount)
+    .filter(([, count]) => count >= minCount)
     .sort((a, b) => b[1] - a[1])
     .slice(0, maxRows)
-    .map(([t]) => t);
+    .map(([tag]) => tag);
 
   const rows = topTags.map((tag) => ({
     title: titleTag(tag),
     key: `tag:${tag}`,
-    videos: videos.filter((v) =>
-      (Array.isArray(v.tags) ? v.tags : []).some((x) => normTag(x) === tag)
+
+    videos: videos.filter((video) =>
+      (Array.isArray(video.tags) ? video.tags : []).some(
+        (x) => normTag(x) === tag
+      )
     ),
   }));
 
-  const other = videos.filter((v) => {
-    const tags = Array.isArray(v.tags) ? v.tags : [];
-    if (!tags.length) return true;
-    return !tags.some((x) => topTags.includes(normTag(x)));
+  const other = videos.filter((video) => {
+    const tags = Array.isArray(video.tags)
+      ? video.tags
+      : [];
+
+    if (!tags.length) {
+      return true;
+    }
+
+    return !tags.some((x) =>
+      topTags.includes(normTag(x))
+    );
   });
 
   if (other.length) {
@@ -61,19 +108,35 @@ function buildRowsByTags(videos, { maxRows = 8, minCount = 2 } = {}) {
   return rows;
 }
 
-function dedupeShelfRows(rows, { minRowSize = 1 } = {}) {
-  if (!Array.isArray(rows)) return [];
+function dedupeShelfRows(
+  rows,
+  {
+    minRowSize = 1,
+  } = {}
+) {
+  if (!Array.isArray(rows)) {
+    return [];
+  }
 
   const seen = new Set();
   const dedupedRows = [];
 
   for (const row of rows) {
-    const inputVideos = Array.isArray(row?.videos) ? row.videos : [];
+    const inputVideos = Array.isArray(row?.videos)
+      ? row.videos
+      : [];
 
     const uniqueVideos = inputVideos.filter((video) => {
       const id = String(video?.id ?? "").trim();
-      if (!id) return false;
-      if (seen.has(id)) return false;
+
+      if (!id) {
+        return false;
+      }
+
+      if (seen.has(id)) {
+        return false;
+      }
+
       seen.add(id);
       return true;
     });
@@ -97,14 +160,21 @@ function getVideoCreatedAtMs(video) {
     video.published_at ||
     null;
 
-  if (!raw) return null;
+  if (!raw) {
+    return null;
+  }
 
   const ms = new Date(raw).getTime();
-  return Number.isFinite(ms) ? ms : null;
+
+  return Number.isFinite(ms)
+    ? ms
+    : null;
 }
 
 function applyTimeFilter(videos, timeFilter) {
-  if (!Array.isArray(videos)) return [];
+  if (!Array.isArray(videos)) {
+    return [];
+  }
 
   const now = Date.now();
 
@@ -116,11 +186,18 @@ function applyTimeFilter(videos, timeFilter) {
   };
 
   const cutoff = cutoffByFilter[timeFilter];
-  if (!cutoff) return videos;
+
+  if (!cutoff) {
+    return videos;
+  }
 
   return videos.filter((video) => {
     const createdMs = getVideoCreatedAtMs(video);
-    if (!createdMs) return false;
+
+    if (!createdMs) {
+      return false;
+    }
+
     return createdMs >= cutoff;
   });
 }
@@ -129,20 +206,31 @@ const SHOW_BETA_BANNER = false;
 
 function HomeBetaBanner() {
   return (
-    <section className="watchBetaBanner" aria-label="Beta signup banner">
+    <section
+      className="watchBetaBanner"
+      aria-label="Beta signup banner"
+    >
       <div className="watchBetaBannerInner">
         <div className="watchBetaBannerCopy">
-          <div className="watchBetaBannerEyebrow">EARLY ACCESS</div>
+          <div className="watchBetaBannerEyebrow">
+            EARLY ACCESS
+          </div>
+
           <h2 className="watchBetaBannerTitle">
             Want Premium access? Join the beta.
           </h2>
+
           <p className="watchBetaBannerText">
-            Create a beta account to access Premium while early access is open.
+            Create a beta account to access Premium while
+            early access is open.
           </p>
         </div>
 
         <div className="watchBetaBannerActions">
-          <NavLink to="/beta" className="watchBetaBannerButton">
+          <NavLink
+            to="/beta"
+            className="watchBetaBannerButton"
+          >
             Join Beta
           </NavLink>
         </div>
@@ -156,72 +244,124 @@ function PlatformNotice() {
     <section className="watchNotice">
       <div className="watchNoticeInner">
         <div className="watchNoticeGrid">
+
           <div className="watchNoticeBlock">
             <h3>DMCA & rights complaints</h3>
+
             <p>
-              We review valid copyright and rights complaints and may remove
-              content or restrict accounts where necessary.
+              We review valid copyright and rights complaints
+              and may remove content or restrict accounts
+              where necessary.
             </p>
-            <Link to="/dmca" className="watchNoticeLink">
+
+            <Link
+              to="/dmca"
+              className="watchNoticeLink"
+            >
               Read more
             </Link>
           </div>
 
           <div className="watchNoticeBlock">
             <h3>Platform notice</h3>
+
             <p>
-              Content on this platform is presented as synthetic and intended to
-              depict adults aged 21+ and over only. Material that violates
-              platform rules or applicable law is prohibited.
+              Content on this platform is presented as synthetic
+              and intended to depict adults aged 21+ and over only.
+              Material that violates platform rules or applicable
+              law is prohibited.
             </p>
           </div>
+
         </div>
       </div>
     </section>
   );
 }
 
-export default function Home({ user, onRequireLogin }) {
+export default function Home({
+  user,
+  onRequireLogin,
+}) {
   const outlet = useOutletContext?.() || {};
   const setQ = outlet.setQ || (() => {});
 
-  const [params, setSearchParams] = useSearchParams();
+  const [params, setSearchParams] =
+    useSearchParams();
 
   function setParam(next) {
     const sp = new URLSearchParams(params);
-    for (const [k, v] of Object.entries(next)) {
-      const val = String(v ?? "").trim();
-      if (!val) sp.delete(k);
-      else sp.set(k, val);
+
+    for (const [key, value] of Object.entries(next)) {
+      const val = String(value ?? "").trim();
+
+      if (!val) {
+        sp.delete(key);
+      } else {
+        sp.set(key, val);
+      }
     }
-    setSearchParams(sp, { replace: true });
+
+    setSearchParams(sp, {
+      replace: true,
+    });
   }
 
-  const urlQ = (params.get("q") || "").trim();
-  const filter = (params.get("filter") || "").trim().toLowerCase();
-  const sort = (params.get("sort") || "").trim().toLowerCase();
-  const time = (params.get("time") || "all").trim().toLowerCase();
-  const refreshKey = (params.get("_refresh") || "").trim();
+  const urlQ =
+    (params.get("q") || "").trim();
+
+  const filter =
+    (params.get("filter") || "")
+      .trim()
+      .toLowerCase();
+
+  const sort =
+    (params.get("sort") || "")
+      .trim()
+      .toLowerCase();
+
+  const time =
+    (params.get("time") || "all")
+      .trim()
+      .toLowerCase();
+
+  const refreshKey =
+    (params.get("_refresh") || "").trim();
 
   const [videos, setVideos] = useState([]);
   const [homeRows, setHomeRows] = useState([]);
   const [loading, setLoading] = useState(false);
 
   const isLoggedIn = !!user?.id;
-  const tier = String(user?.tier || "Free").trim().toLowerCase();
-  const hasPaidTier = isLoggedIn && tier !== "free" && tier !== "";
-  const shouldLockFreeVideos = !hasPaidTier;
 
-  console.log(hasPaidTier)
+  const tier = String(
+    user?.tier || "Free"
+  )
+    .trim()
+    .toLowerCase();
 
+  const hasPaidTier =
+    isLoggedIn &&
+    tier !== "free" &&
+    tier !== "";
 
+  const shouldLockFreeVideos =
+    !hasPaidTier;
 
+  const isRatedMode =
+    filter === "rated";
 
-  const isRatedMode = filter === "rated";
-  const isHistoryMode = filter === "history";
-  const isWatchLaterMode = filter === "watch-later";
+  const isHistoryMode =
+    filter === "history";
+
+  const isWatchLaterMode =
+    filter === "watch-later";
+
   const isSearching =
-    urlQ.length > 0 || isRatedMode || isHistoryMode || isWatchLaterMode;
+    urlQ.length > 0 ||
+    isRatedMode ||
+    isHistoryMode ||
+    isWatchLaterMode;
 
   useEffect(() => {
     setQ(urlQ);
@@ -259,45 +399,77 @@ export default function Home({ user, onRequireLogin }) {
             });
           }
 
-          if (!alive) return;
+          if (!alive) {
+            return;
+          }
 
           const filteredVids = applyTimeFilter(
-            Array.isArray(vids) ? vids : [],
+            Array.isArray(vids)
+              ? vids
+              : [],
             time
           );
 
           setVideos(filteredVids);
           setHomeRows([]);
+
           return;
         }
 
         if (isLoggedIn) {
-          const rows = await getHomeRows();
-          if (!alive) return;
+          const rows =
+            await getHomeRows();
 
-          const safeRows = Array.isArray(rows) ? rows : [];
-          setHomeRows(dedupeShelfRows(safeRows));
+          if (!alive) {
+            return;
+          }
+
+          const safeRows =
+            Array.isArray(rows)
+              ? rows
+              : [];
+
+          setHomeRows(
+            dedupeShelfRows(safeRows)
+          );
+
           setVideos([]);
+
           return;
         }
 
-        const vids = await getVideos({});
-        if (!alive) return;
+        const vids =
+          await getVideos({});
+
+        if (!alive) {
+          return;
+        }
 
         const filteredVids = applyTimeFilter(
-          Array.isArray(vids) ? vids : [],
+          Array.isArray(vids)
+            ? vids
+            : [],
           time
         );
 
         setVideos(filteredVids);
         setHomeRows([]);
-      } catch (e) {
-        console.error("Home fetch failed:", e);
-        if (!alive) return;
+      } catch (err) {
+        console.error(
+          "Home fetch failed:",
+          err
+        );
+
+        if (!alive) {
+          return;
+        }
+
         setVideos([]);
         setHomeRows([]);
       } finally {
-        if (alive) setLoading(false);
+        if (alive) {
+          setLoading(false);
+        }
       }
     })();
 
@@ -318,26 +490,52 @@ export default function Home({ user, onRequireLogin }) {
   ]);
 
   const tagRows = useMemo(() => {
-    if (isSearching || isLoggedIn) return [];
+    if (
+      isSearching ||
+      isLoggedIn
+    ) {
+      return [];
+    }
 
     return dedupeShelfRows(
-      buildRowsByTags(videos, { maxRows: 8, minCount: 2 })
+      buildRowsByTags(
+        videos,
+        {
+          maxRows: 8,
+          minCount: 2,
+        }
+      )
     );
-  }, [isSearching, isLoggedIn, videos]);
+  }, [
+    isSearching,
+    isLoggedIn,
+    videos,
+  ]);
 
   if (isSearching) {
-    const headerLabel = isRatedMode
-      ? "Recently Rated"
-      : isHistoryMode
-        ? "Watch History"
-        : isWatchLaterMode
-          ? "Watch Later"
-          : `Results for “${urlQ}”`;
+    const firstSearchChunk = videos.slice(0, 6);
+    const remainingSearchChunks = chunkArray(
+      videos.slice(6),
+      18
+    );
+    
+    const headerLabel =
+      isRatedMode
+        ? "Recently Rated"
+        : isHistoryMode
+          ? "Watch History"
+          : isWatchLaterMode
+            ? "Watch Later"
+            : `Results for “${urlQ}”`;
+    
+
 
     return (
       <div className="page page--home">
+
         <div className="resultsHeader">
           <div className="resultsHeaderBar">
+
             <div className="resultsHeaderInner">
               {loading ? (
                 <span>
@@ -351,14 +549,21 @@ export default function Home({ user, onRequireLogin }) {
                 </span>
               ) : (
                 <span>
-                  {headerLabel} <span className="resultsCount">({videos.length})</span>
+                  {headerLabel}{" "}
+                  <span className="resultsCount">
+                    ({videos.length})
+                  </span>
                 </span>
               )}
             </div>
 
             <div className="resultsControls">
+
               <div className="resultsSort">
-                <span className="resultsSortLabel">Sort:</span>
+                <span className="resultsSortLabel">
+                  Sort:
+                </span>
+
                 <select
                   className="resultsSortSelect"
                   value={
@@ -370,64 +575,145 @@ export default function Home({ user, onRequireLogin }) {
                           ? sort || "recent-watch-later"
                           : sort || "newest"
                   }
-                  onChange={(e) => setParam({ sort: e.target.value })}
+                  onChange={(e) =>
+                    setParam({
+                      sort: e.target.value,
+                    })
+                  }
                 >
                   {isRatedMode ? (
                     <>
-                      <option value="recent-rating">Recently rated</option>
-                      <option value="highest">Highest rated</option>
-                      <option value="views">Most views</option>
-                      <option value="newest">Newest</option>
-                      <option value="oldest">Oldest</option>
+                      <option value="recent-rating">
+                        Recently rated
+                      </option>
+
+                      <option value="highest">
+                        Highest rated
+                      </option>
+
+                      <option value="views">
+                        Most views
+                      </option>
+
+                      <option value="newest">
+                        Newest
+                      </option>
+
+                      <option value="oldest">
+                        Oldest
+                      </option>
                     </>
                   ) : isHistoryMode ? (
                     <>
-                      <option value="recent-history">Recently watched</option>
-                      <option value="highest">Highest rated</option>
-                      <option value="views">Most views</option>
-                      <option value="newest">Newest</option>
-                      <option value="oldest">Oldest</option>
+                      <option value="recent-history">
+                        Recently watched
+                      </option>
+
+                      <option value="highest">
+                        Highest rated
+                      </option>
+
+                      <option value="views">
+                        Most views
+                      </option>
+
+                      <option value="newest">
+                        Newest
+                      </option>
+
+                      <option value="oldest">
+                        Oldest
+                      </option>
                     </>
                   ) : isWatchLaterMode ? (
                     <>
-                      <option value="recent-watch-later">Recently added</option>
-                      <option value="highest">Highest rated</option>
-                      <option value="views">Most views</option>
-                      <option value="newest">Newest</option>
-                      <option value="oldest">Oldest</option>
+                      <option value="recent-watch-later">
+                        Recently added
+                      </option>
+
+                      <option value="highest">
+                        Highest rated
+                      </option>
+
+                      <option value="views">
+                        Most views
+                      </option>
+
+                      <option value="newest">
+                        Newest
+                      </option>
+
+                      <option value="oldest">
+                        Oldest
+                      </option>
                     </>
                   ) : (
                     <>
-                      <option value="newest">Newest</option>
-                      <option value="highest">Highest rated</option>
-                      <option value="views">Most views</option>
-                      <option value="oldest">Oldest</option>
+                      <option value="newest">
+                        Newest
+                      </option>
+
+                      <option value="highest">
+                        Highest rated
+                      </option>
+
+                      <option value="views">
+                        Most views
+                      </option>
+
+                      <option value="oldest">
+                        Oldest
+                      </option>
                     </>
                   )}
                 </select>
               </div>
 
               <div className="resultsSort">
-                <span className="resultsSortLabel">Time:</span>
+                <span className="resultsSortLabel">
+                  Time:
+                </span>
+
                 <select
                   className="resultsSortSelect"
                   value={time || "all"}
-                  onChange={(e) => setParam({ time: e.target.value })}
+                  onChange={(e) =>
+                    setParam({
+                      time: e.target.value,
+                    })
+                  }
                 >
-                  <option value="24h">Past 24 hours</option>
-                  <option value="week">Past week</option>
-                  <option value="month">Past month</option>
-                  <option value="year">Past year</option>
-                  <option value="all">All time</option>
+                  <option value="24h">
+                    Past 24 hours
+                  </option>
+
+                  <option value="week">
+                    Past week
+                  </option>
+
+                  <option value="month">
+                    Past month
+                  </option>
+
+                  <option value="year">
+                    Past year
+                  </option>
+
+                  <option value="all">
+                    All time
+                  </option>
                 </select>
               </div>
+
             </div>
           </div>
         </div>
 
-        {!loading && videos.length === 0 ? (
+        {!loading &&
+        videos.length === 0 ? (
           <div className="emptyState">
             <div className="emptyStateInner">
+
               <div className="emptyTitle">
                 {isRatedMode
                   ? "No rated videos yet"
@@ -449,14 +735,21 @@ export default function Home({ user, onRequireLogin }) {
                   <>
                     Would you like to{" "}
                     {user ? (
-                      <Link to="/create" className="createLink">
+                      <Link
+                        to="/create"
+                        className="createLink"
+                      >
                         create it?
                       </Link>
                     ) : (
                       <button
                         type="button"
                         className="plainBtn"
-                        onClick={() => onRequireLogin?.("/create")}
+                        onClick={() =>
+                          onRequireLogin?.(
+                            "/create"
+                          )
+                        }
                       >
                         create it?
                       </button>
@@ -464,20 +757,49 @@ export default function Home({ user, onRequireLogin }) {
                   </>
                 )}
               </div>
+
             </div>
           </div>
         ) : (
-          <div className="resultsGrid">
-            {videos.map((video, idx) => (
-              <VideoCard
-                key={video.id}
-                video={video}
-                locked={shouldLockFreeVideos}
-                onRequireLogin={onRequireLogin}
-                user={user}
-              />
+          <>
+            {firstSearchChunk.length > 0 ? (
+              <div className="resultsGrid">
+                {firstSearchChunk.map((video) => (
+                  <VideoCard
+                    key={video.id}
+                    video={video}
+                    locked={shouldLockFreeVideos}
+                    onRequireLogin={onRequireLogin}
+                    user={user}
+                  />
+                ))}
+              </div>
+            ) : null}
+
+            {videos.length > 6 ? (
+              <ReviveAd zoneId={SEARCH_AD_ZONE_ID} />
+            ) : null}
+
+            {remainingSearchChunks.map((chunk, chunkIndex) => (
+              <Fragment key={`search-chunk-${chunkIndex}`}>
+                <div className="resultsGrid">
+                  {chunk.map((video) => (
+                    <VideoCard
+                      key={video.id}
+                      video={video}
+                      locked={shouldLockFreeVideos}
+                      onRequireLogin={onRequireLogin}
+                      user={user}
+                    />
+                  ))}
+                </div>
+
+                {chunkIndex < remainingSearchChunks.length - 1 ? (
+                  <ReviveAd zoneId={SEARCH_AD_ZONE_ID} />
+                ) : null}
+              </Fragment>
             ))}
-          </div>
+          </>
         )}
       </div>
     );
@@ -487,50 +809,114 @@ export default function Home({ user, onRequireLogin }) {
 
   return (
     <div className="page page--home">
-      {SHOW_BETA_BANNER && !isLoggedIn ? <HomeBetaBanner /> : null}
+
+      {SHOW_BETA_BANNER &&
+      !isLoggedIn ? (
+        <HomeBetaBanner />
+      ) : null}
 
       {loading ? (
-        <div className="loading loadingPanel">Loading…</div>
+        <div className="loading loadingPanel">
+          Loading…
+        </div>
       ) : (
         <div className="feedInner">
+
           {isLoggedIn
-            ? homeRows.map((row) => {
-                const rowVideos = row.videos || [];
-                const startIndex = cursor;
-                cursor += rowVideos.length;
+            ? homeRows.map(
+                (row, rowIndex) => {
+                  const rowVideos =
+                    row.videos || [];
 
-                return (
-                  <VideoShelf
-                  key={row.key}
-                  title={row.title}
-                  videos={rowVideos}
-                  user={user}
-                  onRequireLogin={onRequireLogin}
-                  startIndex={startIndex}
-                  lockAfter={shouldLockFreeVideos ? 2 : 999999}
-                />
-                );
-              })
-            : tagRows.map((row) => {
-                const rowVideos = row.videos || [];
-                const startIndex = cursor;
-                cursor += rowVideos.length;
+                  const startIndex =
+                    cursor;
 
-                return (
-                  <VideoShelf
-                    key={row.key}
-                    title={row.title}
-                    videos={rowVideos}
-                    user={user}
-                    onRequireLogin={onRequireLogin}
-                    startIndex={startIndex}
-                    lockAfter={2}
-                  />
-                );
-              })}
+                  cursor +=
+                    rowVideos.length;
+
+                  return (
+                    <Fragment key={row.key}>
+
+                      <VideoShelf
+                        title={row.title}
+                        videos={rowVideos}
+                        user={user}
+                        onRequireLogin={
+                          onRequireLogin
+                        }
+                        startIndex={
+                          startIndex
+                        }
+                        lockAfter={
+                          shouldLockFreeVideos
+                            ? 2
+                            : 999999
+                        }
+                      />
+
+                      {(rowIndex === 0 || (rowIndex + 1) % 10 === 0) ? (
+                        <ReviveAd
+                          zoneId={30239}
+                          width={728}
+                          height={90}
+
+                          mobileZoneId={30470}
+                          mobileWidth={300}
+                          mobileHeight={100}
+                        />
+                      ) : null}
+
+                    </Fragment>
+                  );
+                }
+              )
+            : tagRows.map(
+                (row, rowIndex) => {
+                  const rowVideos =
+                    row.videos || [];
+
+                  const startIndex =
+                    cursor;
+
+                  cursor +=
+                    rowVideos.length;
+
+                  return (
+                    <Fragment key={row.key}>
+
+                      <VideoShelf
+                        title={row.title}
+                        videos={rowVideos}
+                        user={user}
+                        onRequireLogin={
+                          onRequireLogin
+                        }
+                        startIndex={
+                          startIndex
+                        }
+                        lockAfter={2}
+                      />
+
+                      {(rowIndex === 0 || (rowIndex + 1) % 10 === 0) ? (
+                        <ReviveAd
+                          zoneId={30239}
+                          width={728}
+                          height={90}
+
+                          mobileZoneId={30470}
+                          mobileWidth={300}
+                          mobileHeight={100}
+                        />
+                      ) : null}
+
+                    </Fragment>
+                  );
+                }
+              )}
+
         </div>
       )}
+
     </div>
-    
   );
 }

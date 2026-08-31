@@ -225,7 +225,6 @@ export default function Header({
                   {headerName}
                 </NavLink>
 
-                <span className="tokens">🪙 {tokensVal}</span>
                 <span className="rating">
                   ⭐ {ratingVal == null ? "—" : Number(ratingVal).toFixed(2)} ({reviewCountVal})
                 </span>
