@@ -31,7 +31,7 @@ export default async function handler(req, res) {
     // ---------------------------------------------------------
 
     const videoResponse = await fetch(
-      `${BACKEND_URL}/api/videos/${encodeURIComponent(id)}`
+    `${BACKEND_URL}/api/videos/${encodeURIComponent(id)}/metadata`
     );
 
     if (!videoResponse.ok) {
