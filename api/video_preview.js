@@ -18,6 +18,22 @@ function truncate(value = "", max = 200) {
   return `${text.slice(0, max - 1).trim()}…`;
 }
 
+function toIsoDuration(seconds) {
+  const total = Math.max(0, Math.floor(Number(seconds) || 0));
+
+  const hours = Math.floor(total / 3600);
+  const minutes = Math.floor((total % 3600) / 60);
+  const secs = total % 60;
+
+  let duration = "PT";
+
+  if (hours) duration += `${hours}H`;
+  if (minutes) duration += `${minutes}M`;
+  if (secs || (!hours && !minutes)) duration += `${secs}S`;
+
+  return duration;
+}
+
 export default async function handler(req, res) {
   try {
     const { id } = req.query;
@@ -27,47 +43,46 @@ export default async function handler(req, res) {
     }
 
     // ---------------------------------------------------------
-    // 1. Get the video from the existing DYOP backend
+    // 1. Get PUBLIC video metadata from the DYOP backend
     // ---------------------------------------------------------
 
     const videoResponse = await fetch(
-    `${BACKEND_URL}/api/videos/${encodeURIComponent(id)}/metadata`
+      `${BACKEND_URL}/api/videos/${encodeURIComponent(id)}/metadata`
     );
 
     if (!videoResponse.ok) {
-    const errorBody = await videoResponse.text();
+      const errorBody = await videoResponse.text();
 
-    console.error(
-        "DYOP API video request failed:",
+      console.error(
+        "DYOP API video metadata request failed:",
         videoResponse.status,
         videoResponse.statusText,
         errorBody
-    );
+      );
 
-    return res.status(videoResponse.status).json({
-        error: "Backend rejected video request",
-        backendStatus: videoResponse.status,
-        backendStatusText: videoResponse.statusText,
-        backendResponse: errorBody
-    });
+      return res.status(videoResponse.status).send("Video not found");
     }
 
     const video = await videoResponse.json();
 
     // ---------------------------------------------------------
-    // 2. Only generate indexable previews for public videos
+    // 2. Double-check this is a public video
     // ---------------------------------------------------------
 
     const isPublic =
       !video.visibility ||
       String(video.visibility).toLowerCase() === "public";
 
-    if (!isPublic) {
+    const isPublicAsset =
+      !video.assetScope ||
+      String(video.assetScope).toLowerCase() === "public";
+
+    if (!isPublic || !isPublicAsset) {
       return res.status(404).send("Video not found");
     }
 
     // ---------------------------------------------------------
-    // 3. Build metadata
+    // 3. Build page metadata
     // ---------------------------------------------------------
 
     const videoTitle =
@@ -78,7 +93,6 @@ export default async function handler(req, res) {
     const creator =
       video.channelDisplayName ||
       video.channelUsername ||
-      video.username ||
       "";
 
     const description = truncate(
@@ -98,7 +112,52 @@ export default async function handler(req, res) {
       "";
 
     // ---------------------------------------------------------
-    // 4. Get DYOP's actual deployed Vite HTML
+    // 4. Build Schema.org VideoObject structured data
+    // ---------------------------------------------------------
+
+    const videoObject = {
+      "@context": "https://schema.org",
+      "@type": "VideoObject",
+
+      name: videoTitle,
+      description,
+
+      thumbnailUrl: thumbnail
+        ? [thumbnail]
+        : undefined,
+
+      uploadDate:
+        video.createdAt ||
+        undefined,
+
+      duration:
+        video.durationSeconds != null
+          ? toIsoDuration(video.durationSeconds)
+          : undefined,
+
+      url: canonicalUrl,
+
+      author: creator
+        ? {
+            "@type": "Person",
+            name: creator,
+            url: video.channelUsername
+              ? `${SITE_URL}/u/${encodeURIComponent(
+                  video.channelUsername
+                )}`
+              : undefined,
+          }
+        : undefined,
+    };
+
+    // JSON.stringify automatically removes undefined object fields.
+    // Replacing "<" prevents user-generated text from prematurely
+    // closing the JSON-LD <script> element.
+    const videoObjectJson = JSON.stringify(videoObject)
+      .replace(/</g, "\\u003c");
+
+    // ---------------------------------------------------------
+    // 5. Get DYOP's actual deployed Vite HTML
     // ---------------------------------------------------------
 
     const indexResponse = await fetch(`${SITE_URL}/`);
@@ -112,7 +171,7 @@ export default async function handler(req, res) {
     let html = await indexResponse.text();
 
     // ---------------------------------------------------------
-    // 5. Remove generic metadata from index.html
+    // 6. Remove generic metadata from index.html
     // ---------------------------------------------------------
 
     html = html.replace(
@@ -135,20 +194,28 @@ export default async function handler(req, res) {
       ""
     );
 
-    // Remove existing OG/Twitter metadata if we add any
-    // globally to index.html later.
+    // Remove existing Open Graph metadata if global OG tags
+    // are added to index.html in the future.
     html = html.replace(
       /<meta\s+property=["']og:[^"']+["'][^>]*>/gi,
       ""
     );
 
+    // Remove existing Twitter/X metadata.
     html = html.replace(
       /<meta\s+name=["']twitter:[^"']+["'][^>]*>/gi,
       ""
     );
 
+    // Remove an existing VideoObject if one is ever placed
+    // into the global index.html.
+    html = html.replace(
+      /<script\s+type=["']application\/ld\+json["'][^>]*>[\s\S]*?<\/script>/gi,
+      ""
+    );
+
     // ---------------------------------------------------------
-    // 6. Generate video-specific metadata
+    // 7. Generate video-specific metadata
     // ---------------------------------------------------------
 
     const metadata = `
@@ -233,11 +300,17 @@ export default async function handler(req, res) {
         : ""
     }
 
+    <!-- Schema.org VideoObject -->
+
+    <script type="application/ld+json">
+      ${videoObjectJson}
+    </script>
+
     <!-- END DYOP VIDEO SEO -->
 `;
 
     // ---------------------------------------------------------
-    // 7. Inject metadata into <head>
+    // 8. Inject metadata into <head>
     // ---------------------------------------------------------
 
     if (!html.includes("</head>")) {
@@ -252,7 +325,7 @@ export default async function handler(req, res) {
     );
 
     // ---------------------------------------------------------
-    // 8. Return complete React application
+    // 9. Return the complete React application
     // ---------------------------------------------------------
 
     res.setHeader(
