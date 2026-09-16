@@ -754,6 +754,97 @@ const generalVideos = await getVideos();
     }
   }
 
+  useEffect(() => {
+  if (!video?.id) return;
+
+  const title = `${video.title || "Video"} | DYOP`;
+
+  const creator =
+    video.channelDisplayName ||
+    video.channelUsername ||
+    video.username ||
+    "";
+
+  const description = video.description?.trim()
+    ? video.description.trim().slice(0, 160)
+    : creator
+      ? `Watch ${video.title} by ${creator} on DYOP.`
+      : `Watch ${video.title} on DYOP.`;
+
+  const canonicalUrl = `https://dyop.ai/watch/${video.id}`;
+
+  // Page title
+  document.title = title;
+
+  function setPropertyMeta(property, content) {
+    if (!content) return;
+
+    let element = document.querySelector(
+      `meta[property="${property}"]`
+    );
+
+    if (!element) {
+      element = document.createElement("meta");
+      element.setAttribute("property", property);
+      document.head.appendChild(element);
+    }
+
+    element.setAttribute("content", content);
+  }
+
+  const thumbnail =
+    video.thumbUrl ||
+    video.thumb ||
+    "";
+
+  setPropertyMeta("og:title", title);
+  setPropertyMeta("og:description", description);
+  setPropertyMeta("og:url", canonicalUrl);
+  setPropertyMeta("og:type", "video.other");
+  setPropertyMeta("og:site_name", "DYOP");
+
+  if (thumbnail) {
+    setPropertyMeta("og:image", thumbnail);
+  }
+
+  function setMeta(name, content) {
+    let element = document.querySelector(`meta[name="${name}"]`);
+
+    if (!element) {
+      element = document.createElement("meta");
+      element.setAttribute("name", name);
+      document.head.appendChild(element);
+    }
+
+    element.setAttribute("content", content);
+  }
+
+  // Description
+  setMeta("description", description);
+
+  // Only public videos should be indexed.
+  const isPublic =
+    !video.visibility ||
+    String(video.visibility).toLowerCase() === "public";
+
+  setMeta(
+    "robots",
+    isPublic ? "index, follow" : "noindex, nofollow"
+  );
+
+  // Canonical URL
+  let canonical = document.querySelector('link[rel="canonical"]');
+
+  if (!canonical) {
+    canonical = document.createElement("link");
+    canonical.setAttribute("rel", "canonical");
+    document.head.appendChild(canonical);
+  }
+
+  canonical.setAttribute("href", canonicalUrl);
+
+}, [video]);
+
   if (!video) return <div className="shell">Loading…</div>;
 
   const channelUsername = video.channelUsername;
