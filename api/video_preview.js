@@ -35,13 +35,21 @@ export default async function handler(req, res) {
     );
 
     if (!videoResponse.ok) {
-      console.error(
+    const errorBody = await videoResponse.text();
+
+    console.error(
         "DYOP API video request failed:",
         videoResponse.status,
-        videoResponse.statusText
-      );
+        videoResponse.statusText,
+        errorBody
+    );
 
-      return res.status(videoResponse.status).send("Video not found");
+    return res.status(videoResponse.status).json({
+        error: "Backend rejected video request",
+        backendStatus: videoResponse.status,
+        backendStatusText: videoResponse.statusText,
+        backendResponse: errorBody
+    });
     }
 
     const video = await videoResponse.json();
