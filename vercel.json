@@ -2,10 +2,10 @@
   "rewrites": [
     {
       "source": "/watch/:id",
-      "destination": "/api/video-preview?id=:id"
+      "destination": "/api/video_preview?id=:id"
     },
     {
-      "source": "/(.*)",
+      "source": "/((?!api/).*)",
       "destination": "/"
     }
   ]
