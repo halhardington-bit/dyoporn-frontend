@@ -19,6 +19,7 @@ import CommentsSection from "../ui/CommentsSection.jsx";
 import "./Watch.css";
 import ReviveAd from "../components/ReviveAd.jsx";
 import DyopVideoPlayer from "../components/DyopVideoPlayer.jsx";
+import { Link } from "react-router-dom";
 
 const API_BASE =
   (import.meta.env.VITE_API_BASE || "http://localhost:3001")
@@ -1224,14 +1225,15 @@ const generalVideos = await getVideos();
                   aria-label="Video tags"
                 >
                   {video.tags.map((tag) => (
-                    <button
+                    <Link
                       key={tag}
-                      type="button"
-                      className="watchPageTag"
-                      onClick={() => handleTagClick(tag)}
+                      to={`/tag/${encodeURIComponent(
+                        String(tag).trim().toLowerCase()
+                      )}`}
+                      className="videoTag"
                     >
                       #{tag}
-                    </button>
+                    </Link>
                   ))}
                 </div>
               ) : (

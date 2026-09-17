@@ -39,6 +39,8 @@ import AccountBilling from "./pages/accountSettings/AccountBilling.jsx";
 import DeleteAccountConfirm from "./pages//DeleteAccountConfirm.jsx";
 import AccountDanger from "./pages/accountSettings/AccountDanger.jsx";
 
+import Tag from "./pages/Tag.jsx";
+
 import { trackPageView } from "./api.js";
 
 function PageViewTracker() {
@@ -286,6 +288,8 @@ export default function App() {
             path="/watch/:id"
             element={<Watch user={user} onRequireLogin={openLogin} />}
           />
+
+          <Route path="/tag/:tag" element={<Tag />} />
 
           <Route
             path="/plans"

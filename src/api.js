@@ -136,16 +136,30 @@ export async function betaSignup({ email, watching = false, creating = false }) 
 }
 
 // VIDEOS
-export async function getVideos({ q, category, sort, filter } = {}) {
+export async function getVideos({
+  q,
+  category,
+  tag,
+  sort,
+  filter,
+} = {}) {
   const url = `${API_BASE}/api/videos${qs({
     q,
     category,
+    tag,
     sort,
     filter,
     includeTest: INCLUDE_TEST ? "1" : undefined,
   })}`;
-  const res = await fetch(url, { credentials: "include" });
-  if (!res.ok) throw new Error(`getVideos failed: ${res.status}`);
+
+  const res = await fetch(url, {
+    credentials: "include",
+  });
+
+  if (!res.ok) {
+    throw new Error(`getVideos failed: ${res.status}`);
+  }
+
   return res.json();
 }
 
