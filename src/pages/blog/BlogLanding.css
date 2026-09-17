@@ -1,0 +1,536 @@
+/* =========================================================
+   DYOP SEO / BLOG LANDING PAGES
+   Shared styling for all SEO landing pages
+   ========================================================= */
+
+.blogLanding {
+  width: 100%;
+}
+
+
+/* =========================================================
+   HERO
+   ========================================================= */
+
+.blogHero {
+  padding: 90px 32px 80px;
+  border-radius: 24px;
+
+  background:
+    radial-gradient(
+      circle at 75% 20%,
+      rgba(255, 255, 255, 0.07),
+      transparent 30%
+    ),
+    linear-gradient(
+      145deg,
+      rgba(255, 255, 255, 0.045),
+      rgba(255, 255, 255, 0.015)
+    );
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.blogHeroInner,
+.blogSectionInner {
+  width: 100%;
+  max-width: 1050px;
+  margin: 0 auto;
+}
+
+.blogHeroInner {
+  max-width: 850px;
+  text-align: center;
+}
+
+.blogEyebrow {
+  margin-bottom: 14px;
+
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.blogHero h1 {
+  margin: 0;
+
+  font-size: clamp(40px, 6vw, 70px);
+  line-height: 1.02;
+  letter-spacing: -0.04em;
+}
+
+.blogLead {
+  max-width: 680px;
+  margin: 22px auto 0;
+
+  font-size: 18px;
+  line-height: 1.65;
+
+  color: rgba(255, 255, 255, 0.68);
+}
+
+
+/* =========================================================
+   BUTTONS / ACTIONS
+   ========================================================= */
+
+.blogActions {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+
+  gap: 12px;
+  margin-top: 30px;
+}
+
+.blogActionsLeft {
+  justify-content: flex-start;
+}
+
+.blogPrimary,
+.blogSecondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-height: 46px;
+  padding: 0 20px;
+
+  border-radius: 12px;
+
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+
+  transition:
+    transform 140ms ease,
+    background 140ms ease,
+    border-color 140ms ease;
+}
+
+.blogPrimary {
+  background: white;
+  color: black;
+}
+
+.blogPrimary:hover {
+  transform: translateY(-2px);
+  color: black;
+}
+
+.blogSecondary {
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.05);
+  color: white;
+}
+
+.blogSecondary:hover {
+  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.09);
+  color: white;
+}
+
+
+/* =========================================================
+   GENERAL SECTIONS
+   ========================================================= */
+
+.blogSection {
+  padding: 75px 32px;
+}
+
+.blogSection + .blogSection {
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.blogSection h2,
+.blogFinal h2 {
+  margin: 0 0 20px;
+
+  font-size: clamp(26px, 4vw, 36px);
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+}
+
+.blogSectionInner > p {
+  max-width: 780px;
+
+  font-size: 16px;
+  line-height: 1.75;
+
+  color: rgba(255, 255, 255, 0.68);
+}
+
+
+/* =========================================================
+   STEPS / FEATURE CARDS
+   ========================================================= */
+
+.blogSteps,
+.blogFeatureGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+
+  gap: 18px;
+  margin-top: 34px;
+}
+
+.blogSteps article,
+.blogFeatureGrid article {
+  padding: 24px;
+
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.blogSteps span {
+  display: block;
+
+  margin-bottom: 30px;
+
+  font-size: 12px;
+  font-weight: 700;
+
+  color: rgba(255, 255, 255, 0.38);
+}
+
+.blogSteps h3,
+.blogFeatureGrid h3,
+.blogFaq h3 {
+  margin: 0 0 9px;
+
+  font-size: 17px;
+}
+
+.blogSteps p,
+.blogFeatureGrid p,
+.blogFaq p {
+  margin: 0;
+
+  font-size: 14px;
+  line-height: 1.65;
+
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.blogFeatureGrid a,
+.blogSteps a {
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.blogFeatureGrid a:hover,
+.blogSteps a:hover {
+  color: white;
+}
+
+
+/* =========================================================
+   FAQ
+   ========================================================= */
+
+.blogFaq {
+  display: grid;
+  gap: 0;
+
+  margin-top: 30px;
+}
+
+.blogFaq article {
+  padding: 24px 0;
+
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+
+/* =========================================================
+   FINAL CTA
+   ========================================================= */
+
+.blogFinal {
+  margin-top: 20px;
+  padding: 80px 32px;
+
+  text-align: center;
+
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.blogFinal p {
+  max-width: 680px;
+
+  margin: 0 auto 24px;
+
+  color: rgba(255, 255, 255, 0.6);
+
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+.blogFinal .blogActions {
+  margin-top: 24px;
+}
+
+
+/* =========================================================
+   PROMPT EXAMPLES
+   ========================================================= */
+
+.blogPromptExample {
+  max-width: 780px;
+
+  margin-top: 28px;
+  padding: 24px;
+
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.blogPromptLabel {
+  margin-bottom: 12px;
+
+  color: rgba(255, 255, 255, 0.45);
+
+  font-size: 12px;
+  font-weight: 700;
+
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.blogPromptExample p {
+  margin: 0;
+
+  color: rgba(255, 255, 255, 0.82);
+
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+
+/* =========================================================
+   WIDE VIDEO / DISCOVERY SECTIONS
+   ========================================================= */
+
+.blogSectionWide {
+  width: 100%;
+  max-width: 1400px;
+
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.watchAiHeading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+
+  gap: 20px;
+  margin-bottom: 28px;
+}
+
+.watchAiHeading h2 {
+  margin-bottom: 8px;
+}
+
+.watchAiHeading p {
+  margin: 0;
+
+  color: rgba(255, 255, 255, 0.6);
+
+  font-size: 14px;
+}
+
+.watchAiStatus {
+  padding: 50px 0;
+
+  color: rgba(255, 255, 255, 0.55);
+
+  text-align: center;
+}
+
+
+/* =========================================================
+   TUTORIAL PAGES
+   ========================================================= */
+
+.blogTutorialStep {
+  width: 100%;
+  max-width: 1100px;
+
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.blogTutorialNumber {
+  margin-bottom: 10px;
+
+  font-size: 12px;
+  font-weight: 700;
+
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+
+  color: rgba(255, 255, 255, 0.45);
+}
+
+
+/* =========================================================
+   SCREENSHOTS
+   ========================================================= */
+
+.blogScreenshot {
+  width: 100%;
+
+  margin: 32px 0;
+
+  overflow: hidden;
+
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+
+  background: rgba(0, 0, 0, 0.25);
+
+  box-shadow:
+    0 24px 70px rgba(0, 0, 0, 0.3);
+}
+
+.blogScreenshot img {
+  display: block;
+
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+
+  opacity: 1;
+  filter: none;
+}
+
+
+/* =========================================================
+   WORKFLOW CHAIN
+   Character → Image → Video → Music → Editing
+   ========================================================= */
+
+.blogWorkflowChain {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+
+  gap: 14px;
+  margin-top: 30px;
+}
+
+.blogWorkflowChain span {
+  padding: 12px 18px;
+
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+
+  background: rgba(255, 255, 255, 0.04);
+
+  font-weight: 600;
+}
+
+.blogWorkflowChain b {
+  color: rgba(255, 255, 255, 0.35);
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 800px) {
+
+  .blogHero {
+    padding: 65px 20px 60px;
+  }
+
+  .blogHero h1 {
+    font-size: clamp(38px, 11vw, 58px);
+  }
+
+  .blogLead {
+    font-size: 16px;
+  }
+
+  .blogSection {
+    padding: 55px 20px;
+  }
+
+  .blogSteps,
+  .blogFeatureGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .blogSteps span {
+    margin-bottom: 18px;
+  }
+
+  .blogFinal {
+    padding: 60px 20px;
+  }
+
+  .watchAiHeading {
+    display: block;
+  }
+}
+
+
+@media (max-width: 700px) {
+
+  .blogWorkflowChain {
+    gap: 8px;
+  }
+
+  .blogWorkflowChain span {
+    padding: 10px 13px;
+
+    font-size: 13px;
+  }
+
+  .blogScreenshot {
+    margin: 24px 0;
+
+    border-radius: 10px;
+  }
+}
+
+
+@media (max-width: 520px) {
+
+  .blogHero {
+    padding: 52px 16px 48px;
+
+    border-radius: 16px;
+  }
+
+  .blogSection {
+    padding: 48px 16px;
+  }
+
+  .blogActions {
+    flex-direction: column;
+  }
+
+  .blogPrimary,
+  .blogSecondary {
+    width: 100%;
+  }
+
+  .blogFinal {
+    padding: 50px 16px;
+
+    border-radius: 16px;
+  }
+}

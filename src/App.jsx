@@ -39,9 +39,34 @@ import AccountBilling from "./pages/accountSettings/AccountBilling.jsx";
 import DeleteAccountConfirm from "./pages//DeleteAccountConfirm.jsx";
 import AccountDanger from "./pages/accountSettings/AccountDanger.jsx";
 
+import AiVideoGenerator from "./pages/blog/AiVideoGenerator.jsx";
+import TextToVideo from "./pages/blog/TextToVideo.jsx";
+import ImageToVideo from "./pages/blog/ImageToVideo.jsx";
+import AiVideoCommunity from "./pages/blog/AiVideoCommunity.jsx";
+import WatchAiVideos from "./pages/blog/WatchAiVideos.jsx";
+import FreeAiVideoGenerator from "./pages/blog/FreeAiVideoGenerator.jsx";
+import AiVideoMaker from "./pages/blog/AiVideoMaker.jsx";
+import AiAnimationGenerator from "./pages/blog/AiAnimationGenerator.jsx";
+import AiMusicVideoGenerator from "./pages/blog/AiMusicVideoGenerator.jsx";
+import LocalAiVideoGenerator from "./pages/blog/LocalAiVideoGenerator.jsx";
+import OfflineAiVideoGenerator from "./pages/blog/OfflineAiVideoGenerator.jsx";
+import AiCharacterGenerator from "./pages/blog/AiCharacterGenerator.jsx";
+import ConsistentAiGeneration from "./pages/blog/ConsistentAiGeneration.jsx";
+import AiWithoutSubscription from "./pages/blog/AiWithoutSubscription.jsx";
+import AiVideoSoftware from "./pages/blog/AiVideoSoftware.jsx";
+import FreeAiContentCreation from "./pages/blog/FreeAiContentCreation.jsx";
+import AllInOneAiGenerator from "./pages/blog/AllInOneAiGenerator.jsx";
+import FreeAiTools from "./pages/blog/FreeAiTools.jsx";
+import AiVideoForPc from "./pages/blog/AiVideoForPc.jsx";
+import GenerativeAiVideo from "./pages/blog/GenerativeAiVideo.jsx";
+import AiCreativeSuite from "./pages/blog/AiCreativeSuite.jsx";
+import HowToMakeAiVideos from "./pages/blog/HowToMakeAiVideos.jsx";
+
 import Tag from "./pages/Tag.jsx";
 
 import { trackPageView } from "./api.js";
+
+
 
 function PageViewTracker() {
   const location = useLocation();
@@ -349,11 +374,128 @@ export default function App() {
           />
 
           <Route
+            path="/ai-video-generator"
+            element={<AiVideoGenerator />}
+          />
+
+          <Route
+            path="/text-to-video"
+            element={<TextToVideo />}
+          />
+
+          <Route
+            path="/image-to-video"
+            element={<ImageToVideo />}
+          />
+
+          <Route
+            path="/ai-video-community"
+            element={<AiVideoCommunity />}
+          />
+
+          <Route
+            path="/ai-animation-generator"
+            element={<AiAnimationGenerator />}
+          />
+
+          <Route
+            path="/free-ai-video-generator"
+            element={<FreeAiVideoGenerator />}
+          />
+
+          <Route
+            path="/ai-music-video-generator"
+            element={<AiMusicVideoGenerator />}
+          />
+
+          <Route
+            path="/local-ai-video-generator"
+            element={<LocalAiVideoGenerator />}
+          />
+
+          <Route
+            path="/offline-ai-video-generator"
+            element={<OfflineAiVideoGenerator />}
+          />
+
+          <Route
+            path="/consistent-ai-generation"
+            element={<ConsistentAiGeneration />}
+          />
+
+          <Route
+            path="/ai-character-generator"
+            element={<AiCharacterGenerator />}
+          />
+
+          <Route
+            path="/ai-video-software"
+            element={<AiVideoSoftware />}
+          />
+
+          <Route
+            path="/ai-without-subscription"
+            element={<AiWithoutSubscription />}
+          />
+
+          <Route
+            path="/all-in-one-ai-generator"
+            element={<AllInOneAiGenerator />}
+          />
+
+          <Route
+            path="/free-ai-content-creation"
+            element={<FreeAiContentCreation />}
+          />
+
+          <Route
+            path="/watch-ai-videos"
+            element={
+              <WatchAiVideos
+                user={user}
+                onRequireLogin={openLogin}
+              />
+            }
+          />
+
+          <Route
+            path="/ai-video-for-pc"
+            element={<AiVideoForPc />}
+          />
+
+          <Route
+            path="/generative-ai-video"
+            element={<GenerativeAiVideo />}
+          />
+
+          <Route
+            path="/ai-creative-suite"
+            element={<AiCreativeSuite />}
+          />
+
+          <Route
+            path="/free-ai-tools"
+            element={<FreeAiTools />}
+          />
+
+          <Route
+            path="/how-to-make-ai-videos"
+            element={<HowToMakeAiVideos />}
+          />
+
+          <Route
+            path="/ai-video-maker"
+            element={<AiVideoMaker />}
+          />
+
+          <Route
             path="/moderation/videos/:id"
             element={
               user?.isModerator ? <ModerationVideoDetail /> : <Navigate to="/watch" replace />
             }
           />
+
+
 
           <Route
             path="/moderation/stats"

@@ -9,9 +9,115 @@
       "destination": "/api/tag_preview?tag=:tag"
     },
     {
+      "source": "/ai-video-generator",
+      "destination": "/api/seo_page?page=ai-video-generator"
+    },
+    {
       "source": "/sitemap.xml",
       "destination": "/api/sitemap"
     },
+    {
+      "source": "/text-to-video",
+      "destination": "/api/seo_page?page=text-to-video"
+    },
+    {
+      "source": "/image-to-video",
+      "destination": "/api/seo_page?page=image-to-video"
+    },
+
+    {
+      "source": "/ai-video-community",
+      "destination": "/api/seo_page?page=ai-video-community"
+    },
+
+    {
+    "source": "/watch-ai-videos",
+    "destination": "/api/seo_page?page=watch-ai-videos"
+  },
+
+  {
+    "source": "/free-ai-video-generator",
+    "destination": "/api/seo_page?page=free-ai-video-generator"
+  },
+
+  {
+    "source": "/ai-animation-generator",
+    "destination": "/api/seo_page?page=ai-animation-generator"
+  },
+
+  {
+    "source": "/how-to-make-ai-videos",
+    "destination": "/api/seo_page?page=how-to-make-ai-videos"
+  },
+
+  {
+    "source": "/ai-video-for-pc",
+    "destination": "/api/seo_page?page=ai-video-for-pc"
+  },
+  {
+    "source": "/generative-ai-video",
+    "destination": "/api/seo_page?page=generative-ai-video"
+  },
+  {
+    "source": "/ai-creative-suite",
+    "destination": "/api/seo_page?page=ai-creative-suite"
+  },
+
+  {
+    "source": "/free-ai-tools",
+    "destination": "/api/seo_page?page=free-ai-tools"
+  },
+
+  {
+    "source": "/all-in-one-ai-generator",
+    "destination": "/api/seo_page?page=all-in-one-ai-generator"
+  },
+
+  {
+    "source": "/free-ai-content-creation",
+    "destination": "/api/seo_page?page=free-ai-content-creation"
+  },
+
+  {
+    "source": "/ai-music-video-generator",
+    "destination": "/api/seo_page?page=ai-music-video-generator"
+  },
+
+  {
+    "source": "/ai-video-software",
+    "destination": "/api/seo_page?page=ai-video-software"
+  },
+
+  {
+    "source": "/ai-without-subscription",
+    "destination": "/api/seo_page?page=ai-without-subscription"
+  },
+
+  {
+    "source": "/consistent-ai-generation",
+    "destination": "/api/seo_page?page=consistent-ai-generation"
+  },
+
+  {
+    "source": "/ai-character-generator",
+    "destination": "/api/seo_page?page=ai-character-generator"
+  },
+
+  {
+    "source": "/offline-ai-video-generator",
+    "destination": "/api/seo_page?page=offline-ai-video-generator"
+  },
+
+  {
+    "source": "/local-ai-video-generator",
+    "destination": "/api/seo_page?page=local-ai-video-generator"
+  },
+
+  {
+    "source": "/ai-video-maker",
+    "destination": "/api/seo_page?page=ai-video-maker"
+  },
+
     {
       "source": "/((?!api/).*)",
       "destination": "/"

@@ -190,7 +190,7 @@ export default function ModerationVideos() {
                       <tr key={row.id}>
                         <td>
                           <Link
-                            to={`/moderation/videos/${row.id}`}
+                            to={`/watch/${row.id}`}
                             className="moderationVideosLink"
                           >
                             {title}
