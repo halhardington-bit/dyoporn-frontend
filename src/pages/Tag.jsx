@@ -1,6 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
+
 import { getVideos } from "../api.js";
+import VideoGrid from "../ui/VideoGrid.jsx";
+
+import "./Tag.css";
 
 function prettifyTag(tag) {
   return String(tag || "")
@@ -10,7 +14,10 @@ function prettifyTag(tag) {
     .replace(/\b\w/g, (char) => char.toUpperCase());
 }
 
-export default function Tag() {
+export default function Tag({
+  user = null,
+  onRequireLogin,
+}) {
   const { tag: rawTag } = useParams();
 
   const tag = useMemo(() => {
@@ -41,10 +48,15 @@ export default function Tag() {
         });
 
         if (!cancelled) {
-          setVideos(Array.isArray(result) ? result : []);
+          setVideos(
+            Array.isArray(result) ? result : []
+          );
         }
       } catch (err) {
-        console.error("Failed to load tag videos:", err);
+        console.error(
+          "Failed to load tag videos:",
+          err
+        );
 
         if (!cancelled) {
           setVideos([]);
@@ -72,24 +84,29 @@ export default function Tag() {
   useEffect(() => {
     if (!tag) return;
 
-    const title = `${displayTag} Videos | DYOP`;
+    const title =
+      `${displayTag} Videos | DYOP`;
 
     const description =
       `Watch ${displayTag} videos on DYOP. ` +
       `Discover AI-generated videos, creators and new content tagged ${displayTag}.`;
 
     const canonicalUrl =
-      `https://www.dyop.ai/tag/${encodeURIComponent(tag.toLowerCase())}`;
+      `https://www.dyop.ai/tag/` +
+      encodeURIComponent(tag.toLowerCase());
 
     document.title = title;
 
     function setMeta(name, content) {
-      let element = document.querySelector(
-        `meta[name="${name}"]`
-      );
+      let element =
+        document.querySelector(
+          `meta[name="${name}"]`
+        );
 
       if (!element) {
-        element = document.createElement("meta");
+        element =
+          document.createElement("meta");
+
         element.setAttribute("name", name);
         document.head.appendChild(element);
       }
@@ -100,17 +117,27 @@ export default function Tag() {
     setMeta("description", description);
     setMeta("robots", "index, follow");
 
-    let canonical = document.querySelector(
-      'link[rel="canonical"]'
-    );
+    let canonical =
+      document.querySelector(
+        'link[rel="canonical"]'
+      );
 
     if (!canonical) {
-      canonical = document.createElement("link");
-      canonical.setAttribute("rel", "canonical");
+      canonical =
+        document.createElement("link");
+
+      canonical.setAttribute(
+        "rel",
+        "canonical"
+      );
+
       document.head.appendChild(canonical);
     }
 
-    canonical.setAttribute("href", canonicalUrl);
+    canonical.setAttribute(
+      "href",
+      canonicalUrl
+    );
   }, [tag, displayTag]);
 
   return (
@@ -140,64 +167,39 @@ export default function Tag() {
         </div>
       )}
 
-      {!loading && !error && videos.length === 0 && (
-        <div className="tagPageEmpty">
-          <h2>No videos yet</h2>
+      {!loading &&
+        !error &&
+        videos.length === 0 && (
+          <div className="tagPageEmpty">
+            <h2>No videos yet</h2>
 
-          <p>
-            There aren't any public videos tagged{" "}
-            <strong>{displayTag}</strong> yet.
-          </p>
-        </div>
-      )}
-
-      {!loading && !error && videos.length > 0 && (
-        <>
-          <div className="tagPageCount">
-            {videos.length}{" "}
-            {videos.length === 1 ? "video" : "videos"}
+            <p>
+              There aren't any public videos
+              tagged{" "}
+              <strong>{displayTag}</strong>{" "}
+              yet.
+            </p>
           </div>
+        )}
 
-          <div className="tagVideoGrid">
-            {videos.map((video) => (
-              <Link
-                key={video.id}
-                to={`/watch/${video.id}`}
-                className="tagVideoCard"
-              >
-                <div className="tagVideoThumb">
-                  <img
-                    src={video.thumbUrl}
-                    alt={video.title || ""}
-                    loading="lazy"
-                  />
+      {!loading &&
+        !error &&
+        videos.length > 0 && (
+          <>
+            <div className="tagPageCount">
+              {videos.length}{" "}
+              {videos.length === 1
+                ? "video"
+                : "videos"}
+            </div>
 
-                  {video.durationText && (
-                    <span className="tagVideoDuration">
-                      {video.durationText}
-                    </span>
-                  )}
-                </div>
-
-                <div className="tagVideoInfo">
-                  <h2>{video.title}</h2>
-
-                  <div className="tagVideoCreator">
-                    {video.channelDisplayName ||
-                      video.channelUsername ||
-                      ""}
-                  </div>
-
-                  <div className="tagVideoMeta">
-                    {Number(video.views || 0).toLocaleString()}{" "}
-                    views
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </>
-      )}
+            <VideoGrid
+              videos={videos}
+              user={user}
+              onRequireLogin={onRequireLogin}
+            />
+          </>
+        )}
     </main>
   );
 }

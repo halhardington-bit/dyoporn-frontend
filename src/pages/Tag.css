@@ -1,0 +1,65 @@
+.tagPage {
+  width: 100%;
+  padding: 28px 0 60px;
+  box-sizing: border-box;
+}
+
+.tagPageHeader {
+  margin-bottom: 26px;
+}
+
+.tagPageEyebrow {
+  margin-bottom: 8px;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.tagPageHeader h1 {
+  margin: 0;
+  color: #fff;
+  font-size: 34px;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.tagPageHeader p {
+  margin: 10px 0 0;
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.tagPageCount {
+  margin-bottom: 14px;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 13px;
+}
+
+.tagPageStatus,
+.tagPageEmpty {
+  padding: 48px 0;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.tagPageEmpty h2 {
+  margin: 0 0 8px;
+  color: #fff;
+  font-size: 20px;
+}
+
+.tagPageEmpty p {
+  margin: 0;
+}
+
+@media (max-width: 700px) {
+  .tagPage {
+    padding-top: 20px;
+  }
+
+  .tagPageHeader h1 {
+    font-size: 28px;
+  }
+}
