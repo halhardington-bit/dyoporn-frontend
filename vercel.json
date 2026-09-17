@@ -5,6 +5,10 @@
       "destination": "/api/video_preview?id=:id"
     },
     {
+      "source": "/tag/:tag",
+      "destination": "/api/tag_preview?tag=:tag"
+    },
+    {
       "source": "/sitemap.xml",
       "destination": "/api/sitemap"
     },
